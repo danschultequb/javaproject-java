@@ -1,4 +1,5 @@
 {
+  "$schema": "file:///C:/qub/qub/javaproject-java/data/javaproject.schema.json",
   "project": "javaproject-java",
   "publisher": "qub",
   "version": "2",

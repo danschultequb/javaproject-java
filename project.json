@@ -1,7 +1,7 @@
 {
   "project": "javaproject-java",
   "publisher": "qub",
-  "version": "1",
+  "version": "2",
   "java": {
     "mainClass": "qub.JavaProject",
     "shortcutName": "qub-javaproject",
@@ -9,12 +9,12 @@
       {
         "publisher": "qub",
         "project": "projectjson-java",
-        "version": "93"
+        "version": "95"
       },
       {
         "publisher": "qub",
         "project": "git-java",
-        "version": "20"
+        "version": "21"
       }
     ]
   }

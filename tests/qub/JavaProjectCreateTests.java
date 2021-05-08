@@ -189,7 +189,7 @@ public interface JavaProjectCreateTests
                     test.assertEqual(
                         Iterable.create(
                             "{",
-                            "  \"$schema\": \"/qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
+                            "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
                             "  \"publisher\": \"qub\",",
                             "  \"project\": \"my-project\",",
                             "  \"version\": \"1\",",
@@ -451,7 +451,7 @@ public interface JavaProjectCreateTests
                     test.assertEqual(
                         Iterable.create(
                             "{",
-                            "  \"$schema\": \"/qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
+                            "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
                             "  \"publisher\": \"qub\",",
                             "  \"project\": \"path\",",
                             "  \"version\": \"1\",",
@@ -711,7 +711,7 @@ public interface JavaProjectCreateTests
                     test.assertEqual(
                         Iterable.create(
                             "{",
-                            "  \"$schema\": \"/qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
+                            "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
                             "  \"publisher\": \"qub\",",
                             "  \"project\": \"path\",",
                             "  \"version\": \"1\",",
@@ -981,7 +981,7 @@ public interface JavaProjectCreateTests
                     test.assertEqual(
                         Iterable.create(
                             "{",
-                            "  \"$schema\": \"/qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
+                            "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
                             "  \"publisher\": \"qub\",",
                             "  \"project\": \"my-project\",",
                             "  \"version\": \"1\",",
@@ -1252,7 +1252,7 @@ public interface JavaProjectCreateTests
                     test.assertEqual(
                         Iterable.create(
                             "{",
-                            "  \"$schema\": \"/qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
+                            "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
                             "  \"publisher\": \"qub\",",
                             "  \"project\": \"path\",",
                             "  \"version\": \"1\",",
@@ -1522,7 +1522,7 @@ public interface JavaProjectCreateTests
                     test.assertEqual(
                         Iterable.create(
                             "{",
-                            "  \"$schema\": \"/qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
+                            "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
                             "  \"publisher\": \"qub\",",
                             "  \"project\": \"path\",",
                             "  \"version\": \"1\",",

@@ -2,5 +2,20 @@
   "project": "javaproject-java",
   "publisher": "qub",
   "version": "1",
-  "java": {}
+  "java": {
+    "mainClass": "qub.JavaProject",
+    "shortcutName": "qub-javaproject",
+    "dependencies": [
+      {
+        "publisher": "qub",
+        "project": "projectjson-java",
+        "version": "93"
+      },
+      {
+        "publisher": "qub",
+        "project": "git-java",
+        "version": "20"
+      }
+    ]
+  }
 }

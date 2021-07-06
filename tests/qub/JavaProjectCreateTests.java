@@ -117,7 +117,7 @@ public interface JavaProjectCreateTests
 
                     process.setDefaultCurrentFolder("/my-project/");
 
-                    process.getProcessFactory().add(FakeProcessRun.get("git")
+                    process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/my-project/"));
 
                     JavaProjectCreate.run(process, action);
@@ -305,6 +305,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /my-project/sources/qub/... Done.",
                             "VERBOSE:   Creating /my-project/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -379,7 +380,7 @@ public interface JavaProjectCreateTests
 
                     process.setDefaultCurrentFolder("/my-project/");
 
-                    process.getProcessFactory().add(FakeProcessRun.get("git")
+                    process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/my-project/relative/path/"));
 
                     JavaProjectCreate.run(process, action);
@@ -567,6 +568,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /my-project/relative/path/sources/qub/... Done.",
                             "VERBOSE:   Creating /my-project/relative/path/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -639,7 +641,7 @@ public interface JavaProjectCreateTests
                     final CommandLineAction action = actions.addAction("fake-action", (DesktopProcess actionProcess) -> {})
                         .setDescription("Fake action description");
 
-                    process.getProcessFactory().add(FakeProcessRun.get("git")
+                    process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/rooted/path/"));
 
                     JavaProjectCreate.run(process, action);
@@ -827,6 +829,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /rooted/path/sources/qub/... Done.",
                             "VERBOSE:   Creating /rooted/path/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -900,7 +903,7 @@ public interface JavaProjectCreateTests
 
                     process.setDefaultCurrentFolder("/my-project/");
 
-                    process.getProcessFactory().add(FakeProcessRun.get("git")
+                    process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/my-project/"));
 
                     JavaProjectCreate.run(process, action);
@@ -916,6 +919,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /my-project/sources/qub/... Done.",
                             "VERBOSE:   Creating /my-project/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
@@ -1097,6 +1101,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /my-project/sources/qub/... Done.",
                             "VERBOSE:   Creating /my-project/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -1171,7 +1176,7 @@ public interface JavaProjectCreateTests
 
                     process.setDefaultCurrentFolder("/my-project/");
 
-                    process.getProcessFactory().add(FakeProcessRun.get("git")
+                    process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/my-project/relative/path/"));
 
                     JavaProjectCreate.run(process, action);
@@ -1187,6 +1192,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /my-project/relative/path/sources/qub/... Done.",
                             "VERBOSE:   Creating /my-project/relative/path/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
@@ -1368,6 +1374,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /my-project/relative/path/sources/qub/... Done.",
                             "VERBOSE:   Creating /my-project/relative/path/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -1440,7 +1447,7 @@ public interface JavaProjectCreateTests
                     final CommandLineAction action = actions.addAction("fake-action", (DesktopProcess actionProcess) -> {})
                         .setDescription("Fake action description");
 
-                    process.getProcessFactory().add(FakeProcessRun.get("git")
+                    process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .setWorkingFolder("/")
                         .addArguments("init", "/rooted/path/"));
 
@@ -1457,6 +1464,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /rooted/path/sources/qub/... Done.",
                             "VERBOSE:   Creating /rooted/path/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
@@ -1638,6 +1646,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Creating /rooted/path/sources/qub/... Done.",
                             "VERBOSE:   Creating /rooted/path/tests/qub/... Done.",
                             "VERBOSE:   Initializing Git repository... Done.",
+                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });

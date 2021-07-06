@@ -178,11 +178,36 @@ public interface JavaProjectCreate
                     indentedVerboseStream.writeLine("Done.").await();
 
                     indentedVerboseStream.write("Initializing Git repository... ").await();
-                    Git.create(process)
-                        .getInitProcessBuilder().await()
-                        .addDirectory(projectFolder)
-                        .run().await();
+                    final Git git = Git.create(process);
+                    git.init(p -> p.addDirectory(projectFolder)).await();
                     indentedVerboseStream.writeLine("Done.").await();
+
+                    final String gitHubTokenEnvironmentVariableName = "GITHUB_TOKEN";
+                    final String gitHubToken = process.getEnvironmentVariable(gitHubTokenEnvironmentVariableName)
+                        .catchError(NotFoundException.class)
+                        .await();
+                    if (Strings.isNullOrEmpty(gitHubToken))
+                    {
+                        indentedVerboseStream.writeLine("No GitHub token found in the environment variable " + gitHubTokenEnvironmentVariableName + ".").await();
+                    }
+                    else
+                    {
+                        indentedVerboseStream.write("Creating GitHub repository... ").await();
+                        final GitHubRepository repository = GitHubClient.create(process.getNetwork())
+                            .setAccessToken(gitHubToken)
+                            .createRepository(CreateRepositoryParameters.create()
+                                .setName(projectName))
+                            .await();
+                        indentedVerboseStream.writeLine("Done.").await();
+
+                        indentedVerboseStream.write("Adding remote reference to GitHub repository... ").await();
+                        git.remoteAdd(p ->
+                        {
+                            p.addName("origin");
+                            p.addUrl(repository.getGitUrl());
+                        }).await();
+                        indentedVerboseStream.writeLine("Done.").await();
+                    }
 
                     outputStream.writeLine("Done.").await();
                 }

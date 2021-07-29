@@ -15,7 +15,7 @@ public interface JavaProjectCreateTests
                 });
             });
             
-            runner.testGroup("run(DesktopProcess)", () ->
+            runner.testGroup("run(DesktopProcess,CommandLineAction)", () ->
             {
                 runner.test("with null process", (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
@@ -157,7 +157,7 @@ public interface JavaProjectCreateTests
                             "out",
                             "outputs",
                             "target"),
-                        Strings.getLines(gitIgnoreFile.getContentsAsString().await()));
+                        Strings.iterateLines(gitIgnoreFile.getContentsAsString().await()).toList());
                     test.assertEqual(
                         Iterable.create(
                             "MIT License",
@@ -181,11 +181,11 @@ public interface JavaProjectCreateTests
                             "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,",
                             "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE",
                             "SOFTWARE."),
-                        Strings.getLines(licenseFile.getContentsAsString().await()));
+                        Strings.iterateLines(licenseFile.getContentsAsString().await()).toList());
                     test.assertEqual(
                         Iterable.create(
                             "# qub/my-project"),
-                        Strings.getLines(readmeMdFile.getContentsAsString().await()));
+                        Strings.iterateLines(readmeMdFile.getContentsAsString().await()).toList());
                     test.assertEqual(
                         Iterable.create(
                             "{",
@@ -197,7 +197,7 @@ public interface JavaProjectCreateTests
                             "    \"dependencies\": []",
                             "  }",
                             "}"),
-                        Strings.getLines(projectJsonFile.getContentsAsString().await()));
+                        Strings.iterateLines(projectJsonFile.getContentsAsString().await()).toList());
 
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -293,7 +293,7 @@ public interface JavaProjectCreateTests
                             "    \"java\"",
                             "  ]",
                             "}"),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()).toList());
                     test.assertEqual(
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
@@ -307,7 +307,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Initializing Git repository... Done.",
                             "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()).toList());
                 });
 
                 runner.test("with " + English.andList("no arguments", "existing project.json file"),
@@ -362,11 +362,11 @@ public interface JavaProjectCreateTests
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertEqual(
                         Iterable.create(),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()).toList());
                     test.assertEqual(
                         Iterable.create(
                             "A project already exists in folder \"/my-project/\"."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()).toList());
                 });
 
                 runner.test("with " + English.andList("relative path argument", "no existing project.json file"),
@@ -414,14 +414,14 @@ public interface JavaProjectCreateTests
                             sourcesQubFolder,
                             testsQubFolder),
                         projectFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             ".idea",
                             "out",
                             "outputs",
                             "target"),
-                        Strings.getLines(gitIgnoreFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(gitIgnoreFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "MIT License",
                             "",
@@ -444,12 +444,12 @@ public interface JavaProjectCreateTests
                             "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,",
                             "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE",
                             "SOFTWARE."),
-                        Strings.getLines(licenseFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(licenseFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "# qub/path"),
-                        Strings.getLines(readmeMdFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(readmeMdFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
@@ -460,7 +460,7 @@ public interface JavaProjectCreateTests
                             "    \"dependencies\": []",
                             "  }",
                             "}"),
-                        Strings.getLines(projectJsonFile.getContentsAsString().await()));
+                        Strings.iterateLines(projectJsonFile.getContentsAsString().await()));
 
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -482,7 +482,7 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"http://json-schema.org/draft-04/schema\",",
@@ -556,8 +556,8 @@ public interface JavaProjectCreateTests
                             "    \"java\"",
                             "  ]",
                             "}"),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /my-project/relative/path/... ",
@@ -570,7 +570,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Initializing Git repository... Done.",
                             "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("relative path argument", "existing project.json file"),
@@ -623,13 +623,13 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "A project already exists in folder \"/my-project/relative/path/\"."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("rooted path argument", "no existing project.json file"),
@@ -675,14 +675,14 @@ public interface JavaProjectCreateTests
                             sourcesQubFolder,
                             testsQubFolder),
                         projectFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             ".idea",
                             "out",
                             "outputs",
                             "target"),
-                        Strings.getLines(gitIgnoreFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(gitIgnoreFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "MIT License",
                             "",
@@ -705,12 +705,12 @@ public interface JavaProjectCreateTests
                             "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,",
                             "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE",
                             "SOFTWARE."),
-                        Strings.getLines(licenseFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(licenseFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "# qub/path"),
-                        Strings.getLines(readmeMdFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(readmeMdFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
@@ -721,7 +721,7 @@ public interface JavaProjectCreateTests
                             "    \"dependencies\": []",
                             "  }",
                             "}"),
-                        Strings.getLines(projectJsonFile.getContentsAsString().await()));
+                        Strings.iterateLines(projectJsonFile.getContentsAsString().await()));
 
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -743,7 +743,7 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"http://json-schema.org/draft-04/schema\",",
@@ -817,8 +817,8 @@ public interface JavaProjectCreateTests
                             "    \"java\"",
                             "  ]",
                             "}"),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /rooted/path/... ",
@@ -831,7 +831,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Initializing Git repository... Done.",
                             "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("rooted path argument", "existing project.json file"),
@@ -883,13 +883,13 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "A project already exists in folder \"/rooted/path/\"."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("no arguments", "no existing project.json file", "verbose logs"),
@@ -947,14 +947,14 @@ public interface JavaProjectCreateTests
                             sourcesQubFolder,
                             testsQubFolder),
                         projectFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             ".idea",
                             "out",
                             "outputs",
                             "target"),
-                        Strings.getLines(gitIgnoreFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(gitIgnoreFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "MIT License",
                             "",
@@ -977,12 +977,12 @@ public interface JavaProjectCreateTests
                             "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,",
                             "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE",
                             "SOFTWARE."),
-                        Strings.getLines(licenseFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(licenseFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "# qub/my-project"),
-                        Strings.getLines(readmeMdFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(readmeMdFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
@@ -993,7 +993,7 @@ public interface JavaProjectCreateTests
                             "    \"dependencies\": []",
                             "  }",
                             "}"),
-                        Strings.getLines(projectJsonFile.getContentsAsString().await()));
+                        Strings.iterateLines(projectJsonFile.getContentsAsString().await()));
 
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -1015,7 +1015,7 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"http://json-schema.org/draft-04/schema\",",
@@ -1089,8 +1089,8 @@ public interface JavaProjectCreateTests
                             "    \"java\"",
                             "  ]",
                             "}"),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/my-project@1\" in /my-project/... ",
@@ -1103,7 +1103,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Initializing Git repository... Done.",
                             "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("no arguments", "existing project.json file", "verbose logs"),
@@ -1156,13 +1156,13 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "A project already exists in folder \"/my-project/\"."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("relative path argument", "no existing project.json file", "verbose logs"),
@@ -1220,14 +1220,14 @@ public interface JavaProjectCreateTests
                             sourcesQubFolder,
                             testsQubFolder),
                         projectFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             ".idea",
                             "out",
                             "outputs",
                             "target"),
-                        Strings.getLines(gitIgnoreFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(gitIgnoreFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "MIT License",
                             "",
@@ -1250,12 +1250,12 @@ public interface JavaProjectCreateTests
                             "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,",
                             "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE",
                             "SOFTWARE."),
-                        Strings.getLines(licenseFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(licenseFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "# qub/path"),
-                        Strings.getLines(readmeMdFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(readmeMdFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
@@ -1266,7 +1266,7 @@ public interface JavaProjectCreateTests
                             "    \"dependencies\": []",
                             "  }",
                             "}"),
-                        Strings.getLines(projectJsonFile.getContentsAsString().await()));
+                        Strings.iterateLines(projectJsonFile.getContentsAsString().await()));
 
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -1288,7 +1288,7 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"http://json-schema.org/draft-04/schema\",",
@@ -1362,8 +1362,8 @@ public interface JavaProjectCreateTests
                             "    \"java\"",
                             "  ]",
                             "}"),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /my-project/relative/path/... ",
@@ -1376,7 +1376,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Initializing Git repository... Done.",
                             "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("relative path argument", "existing project.json file", "verbose logs"),
@@ -1429,13 +1429,13 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "A project already exists in folder \"/my-project/relative/path/\"."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("rooted path argument", "no existing project.json file", "verbose logs"),
@@ -1492,14 +1492,14 @@ public interface JavaProjectCreateTests
                             sourcesQubFolder,
                             testsQubFolder),
                         projectFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             ".idea",
                             "out",
                             "outputs",
                             "target"),
-                        Strings.getLines(gitIgnoreFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(gitIgnoreFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "MIT License",
                             "",
@@ -1522,12 +1522,12 @@ public interface JavaProjectCreateTests
                             "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,",
                             "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE",
                             "SOFTWARE."),
-                        Strings.getLines(licenseFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(licenseFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "# qub/path"),
-                        Strings.getLines(readmeMdFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(readmeMdFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"file:////qub/fake-publisher/fake-project/data/javaproject.schema.json\",",
@@ -1538,7 +1538,7 @@ public interface JavaProjectCreateTests
                             "    \"dependencies\": []",
                             "  }",
                             "}"),
-                        Strings.getLines(projectJsonFile.getContentsAsString().await()));
+                        Strings.iterateLines(projectJsonFile.getContentsAsString().await()));
 
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -1560,7 +1560,7 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(
                             "{",
                             "  \"$schema\": \"http://json-schema.org/draft-04/schema\",",
@@ -1634,8 +1634,8 @@ public interface JavaProjectCreateTests
                             "    \"java\"",
                             "  ]",
                             "}"),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /rooted/path/... ",
@@ -1648,7 +1648,7 @@ public interface JavaProjectCreateTests
                             "VERBOSE:   Initializing Git repository... Done.",
                             "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
 
                 runner.test("with " + English.andList("rooted path argument", "existing project.json file", "verbose logs"),
@@ -1700,13 +1700,13 @@ public interface JavaProjectCreateTests
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(
+                    test.assertLinesEqual(
                         Iterable.create(),
-                        Strings.getLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
-                    test.assertEqual(
+                        Strings.iterateLines(javaProjectSchemaJsonFile.getContentsAsString().await()));
+                    test.assertLinesEqual(
                         Iterable.create(
                             "A project already exists in folder \"/rooted/path/\"."),
-                        Strings.getLines(fakeProjectLogsFile.getContentsAsString().await()));
+                        Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
             });
         });

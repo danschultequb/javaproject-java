@@ -16,8 +16,8 @@ public interface JavaProjectCreate
         PreCondition.assertNotNull(action, "action");
 
         final CommandLineParameters parameters = action.createCommandLineParameters();
-        final CommandLineParameter<Folder> projectFolderParameter = parameters.addPositionalFolder("projectFolder", process)
-            .setDescription("The folder that the new Java project will be created in.");
+        final CommandLineParameter<Folder> projectFolderParameter = JavaProject.addProjectFolderParameter(parameters, process,
+            "The folder that the new Java project will be created in.");
         final CommandLineParameterHelp helpParameter = parameters.addHelp();
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
 

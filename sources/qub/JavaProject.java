@@ -1,7 +1,5 @@
 package qub;
 
-import java.awt.*;
-
 public interface JavaProject
 {
     static void main(String[] args)
@@ -31,5 +29,15 @@ public interface JavaProject
             .addAction(CommandLineLogsAction::addAction)
             .addAction(CommandLineConfigurationAction::addAction)
             .run();
+    }
+
+    static CommandLineParameter<Folder> addProjectFolderParameter(CommandLineParameters parameters, DesktopProcess process, String parameterDescription)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+        PreCondition.assertNotNull(process, "process");
+        PreCondition.assertNotNullAndNotEmpty(parameterDescription, "parameterDescription");
+
+        return parameters.addPositionalFolder("projectFolder", process)
+            .setDescription(parameterDescription);
     }
 }

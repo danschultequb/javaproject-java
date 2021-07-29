@@ -22,6 +22,7 @@ public interface JavaProject
 
         JavaProject.createCommandLineActions(process)
             .addAction(JavaProjectCreate::addAction)
+            .addAction(JavaProjectClean::addAction)
             .addAction(JavaProjectBuild::addAction)
             .addAction(JavaProjectTest::addAction)
             .addAction(JavaProjectPack::addAction)

@@ -2,11 +2,11 @@ package qub;
 
 public interface JavaProjectBuild
 {
-    static void addAction(CommandLineActions actions)
+    static CommandLineAction addAction(CommandLineActions actions)
     {
         PreCondition.assertNotNull(actions, "actions");
 
-        actions.addAction("build", JavaProjectBuild::run)
+        return actions.addAction("build", JavaProjectBuild::run)
             .setDescription("Build a Java source code project.");
     }
 
@@ -24,7 +24,7 @@ public interface JavaProjectBuild
         if (!helpParameter.showApplicationHelpLines(process).await())
         {
             final Folder dataFolder = process.getQubProjectDataFolder().await();
-            final Folder projectFolder = projectFolderParameter.getValue().await();
+            final JavaProjectFolder projectFolder = JavaProjectFolder.get(projectFolderParameter.getValue().await());
 
             final LogStreams logStreams = CommandLineLogsAction.getLogStreamsFromDataFolder(dataFolder, process.getOutputWriteStream(), verboseParameter.getVerboseCharacterToByteWriteStream().await());
             try (final Disposable logStream = logStreams.getLogStream())
@@ -34,291 +34,320 @@ public interface JavaProjectBuild
 
                 try
                 {
-                    final File projectJsonFile = projectFolder.getFile("project.json").await();
-                    verboseStream.writeLine("Parsing " + projectJsonFile + "...").await();
-                    final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile)
-                        .onError(FileNotFoundException.class, () ->
-                        {
-                            outputStream.writeLine("No project.json file exists in the project folder at " + Strings.escapeAndQuote(projectFolder) + ".").await();
-                        })
-                        .onError(ParseException.class, (ParseException error) ->
-                        {
-                            outputStream.writeLine("Invalid project.json file: " + error.getMessage()).await();
-                        })
-                        .await();
-                    if (projectJson != null)
+                    verboseStream.writeLine("Parsing " + projectFolder.getProjectJsonFile().await() + "...").await();
+                    final JavaProjectJSON projectJson = projectFolder.getProjectJson(outputStream).await();
+                    final QubFolder qubFolder = process.getQubFolder().await();
+                    final JDKFolder jdkFolder = JDKFolder.getLatestVersion(qubFolder, outputStream).await();
+                    final Javac javac = jdkFolder.getJavac(process).await();
+
+                    final List<JavaPublishedProjectFolder> dependencyFolders = List.create();
+                    final Iterable<ProjectSignature> declaredDependencies = projectJson.getDependencies();
+                    if (!Iterable.isNullOrEmpty(declaredDependencies))
                     {
-                        final QubFolder qubFolder = process.getQubFolder().await();
-                        final String jdkPublisherName = "openjdk";
-                        final String jdkProjectName = "jdk";
-                        final QubProjectVersionFolder latestJdkFolder = qubFolder.getProjectLatestVersionFolder(jdkPublisherName, jdkProjectName)
-                            .onError(NotFoundException.class, () ->
-                            {
-                                outputStream.writeLine("No openjdk/jdk project is installed in the qub folder at " + Strings.escapeAndQuote(qubFolder) + ".").await();
-                            })
-                            .await();
-                        final Javac javac = Javac.create(process.getChildProcessRunner())
-                            .setExecutablePath(latestJdkFolder.getFile("bin/javac.exe").await());
-
-                        final List<QubProjectVersionFolder> dependencyFolders = List.create();
-                        final ProjectJSONJava projectJsonJava = projectJson.getJava();
-                        final List<ProjectSignature> declaredDependencies = List.create();
-                        if (projectJsonJava != null)
+                        verboseStream.writeLine("Discovering dependencies...").await();
+                        final MutableMap<ProjectSignature,List<Node1<ProjectSignature>>> dependencyPaths = Map.create();
+                        final MutableMap<Tuple2<String,String>,List<VersionNumber>> dependencyVersions = Map.create();
+                        final List<Throwable> dependencyErrors = List.create();
+                        Traversal.createDepthFirstSearch((TraversalActions<Node1<ProjectSignature>,Void> actions, Node1<ProjectSignature> currentNode) ->
                         {
-                            declaredDependencies.addAll(projectJsonJava.getDependencies());
+                            final ProjectSignature dependency = currentNode.getValue();
+                            dependencyPaths.getOrSet(dependency, List::create).await()
+                                .add(currentNode);
+                            dependencyVersions.getOrSet(Tuple.create(dependency.getPublisher(), dependency.getProject()), List::create).await()
+                                .add(dependency.getVersion());
 
-                            verboseStream.writeLine("Discovering dependencies...").await();
-                            final Map<ProjectSignature, Iterable<ProjectSignature>> dependencyMap = projectJsonJava.getTransitiveDependencyPaths(qubFolder);
-                            if (!Iterable.isNullOrEmpty(dependencyMap))
+                            JavaPublishedProjectFolder.getIfExists(qubFolder, dependency)
+                                .then((JavaPublishedProjectFolder dependencyFolder) ->
+                                {
+                                    dependencyFolders.add(dependencyFolder);
+
+                                    final JavaProjectJSON dependencyProjectJson = dependencyFolder.getProjectJson().await();
+                                    final Iterable<ProjectSignature> nextDependencies = dependencyProjectJson.getDependencies();
+                                    actions.visitNodes(nextDependencies.map((ProjectSignature nextDependency) -> Node1.create(nextDependency).setNode1(currentNode)));
+                                })
+                                .catchError(dependencyErrors::add)
+                                .await();
+                        }).iterate(declaredDependencies.map(Node1::create)).await();
+
+                        final Iterable<MapEntry<Tuple2<String,String>,List<VersionNumber>>> multipleVersionDependencies = dependencyVersions
+                            .where((MapEntry<Tuple2<String,String>,List<VersionNumber>> entry) -> entry.getValue().getCount() > 1);
+                        if (multipleVersionDependencies.any())
+                        {
+                            final InMemoryCharacterToByteStream errorMessage = InMemoryCharacterToByteStream.create();
+                            final IndentedCharacterWriteStream indentedErrorMessage = IndentedCharacterWriteStream.create(errorMessage)
+                                .setSingleIndent(" ");
+                            for (final MapEntry<Tuple2<String, String>, List<VersionNumber>> dependency : multipleVersionDependencies)
                             {
-                                final Iterable<ProjectSignature> allDependencies = dependencyMap.getKeys();
-                                final Set<ProjectSignature> errorDependencies = Set.create();
-                                for (final ProjectSignature dependency : allDependencies)
+                                final String publisher = dependency.getKey().getValue1();
+                                final String project = dependency.getKey().getValue2();
+                                final Iterable<VersionNumber> versions = dependency.getValue();
+                                indentedErrorMessage.writeLine("Found more than one required version for package " + publisher + "/" + project + ":").await();
+                                int number = 0;
+                                for (final VersionNumber version : versions)
                                 {
-                                    if (!errorDependencies.contains(dependency))
-                                    {
-                                        final Iterable<ProjectSignature> matchingDependencies = allDependencies.where(dependency::equalsIgnoreVersion).toList();
-                                        if (matchingDependencies.getCount() > 1)
-                                        {
-                                            errorDependencies.addAll(matchingDependencies);
-                                            final InMemoryCharacterToByteStream errorMessage = InMemoryCharacterToByteStream.create();
-                                            final IndentedCharacterWriteStream indentedErrorMessage = IndentedCharacterWriteStream.create(errorMessage)
-                                                .setSingleIndent(" ");
-                                            indentedErrorMessage.writeLine("Found more than one required version for package " + dependency.toStringIgnoreVersion() + ":").await();
-                                            int number = 0;
-                                            for (final ProjectSignature matchingProjectSignature : matchingDependencies)
-                                            {
-                                                ++number;
-                                                final String numberString = number + ". ";
-                                                indentedErrorMessage.setCurrentIndent("");
-                                                errorMessage.writeLine(numberString + matchingProjectSignature).await();
-                                                indentedErrorMessage.setCurrentIndent(Strings.repeat(' ', numberString.length()));
-                                                final Iterable<ProjectSignature> path = dependencyMap.get(matchingProjectSignature).await();
-                                                for (final ProjectSignature pathProjectSignature : path)
-                                                {
-                                                    indentedErrorMessage.increaseIndent();
-                                                    indentedErrorMessage.writeLine("from " + pathProjectSignature).await();
-                                                }
-                                            }
-                                            throw new RuntimeException(errorMessage.getText().await());
-                                        }
-                                    }
-                                }
+                                    ++number;
+                                    final String numberString = number + ". ";
+                                    final ProjectSignature dependencySignature = ProjectSignature.create(publisher, project, version);
+                                    indentedErrorMessage.setCurrentIndent("");
+                                    indentedErrorMessage.writeLine(numberString + dependencySignature).await();
+                                    indentedErrorMessage.setCurrentIndent(Strings.repeat(' ', numberString.length()));
 
-                                for (final ProjectSignature dependency : allDependencies)
-                                {
-                                    final String dependencyPublisher = dependency.getPublisher();
-                                    final QubPublisherFolder publisherFolder = qubFolder.getPublisherFolder(dependencyPublisher).await();
-                                    if (!publisherFolder.exists().await())
+                                    final List<ProjectSignature> dependencyPath = List.create();
+                                    Node1<ProjectSignature> dependencyNode = dependencyPaths.get(dependencySignature).await().first();
+                                    // Skip the first node because that's the dependency itself (not the path to the dependency).
+                                    dependencyNode = dependencyNode.getNode1();
+                                    while (dependencyNode != null)
                                     {
-                                        throw new NotFoundException("No publisher folder named " + Strings.escapeAndQuote(dependencyPublisher) + " found in the Qub folder (" + qubFolder + ").");
+                                        dependencyPath.insert(0, dependencyNode.getValue());
+                                        dependencyNode = dependencyNode.getNode1();
                                     }
-                                    else
+
+                                    for (final ProjectSignature pathProjectSignature : dependencyPath)
                                     {
-                                        final String dependencyProject = dependency.getProject();
-                                        final QubProjectFolder dependencyProjectFolder = publisherFolder.getProjectFolder(dependencyProject).await();
-                                        if (!dependencyProjectFolder.exists().await())
-                                        {
-                                            throw new NotFoundException("No project folder named " + Strings.escapeAndQuote(dependencyProject) + " found in the " + Strings.escapeAndQuote(dependencyPublisher) + " publisher folder (" + publisherFolder + ").");
-                                        }
-                                        else
-                                        {
-                                            final VersionNumber dependencyVersion = dependency.getVersion();
-                                            final QubProjectVersionFolder dependencyVersionFolder = dependencyProjectFolder.getProjectVersionFolder(dependencyVersion).await();
-                                            if (!dependencyVersionFolder.exists().await())
-                                            {
-                                                throw new NotFoundException("No version folder named " + Strings.escapeAndQuote(dependencyVersion) + " found in the " + Strings.escapeAndQuote(dependency.toStringIgnoreVersion()) + " project folder (" + projectFolder + ").");
-                                            }
-                                            else
-                                            {
-                                                dependencyFolders.add(dependencyVersionFolder);
-                                            }
-                                        }
+                                        indentedErrorMessage.increaseIndent();
+                                        indentedErrorMessage.writeLine("from " + pathProjectSignature).await();
                                     }
                                 }
                             }
+                            dependencyErrors.add(new RuntimeException(errorMessage.getText().await().trim()));
                         }
 
-                        final Folder outputsFolder = projectFolder.getFolder("outputs").await();
-                        final File buildJsonFile = outputsFolder.getFile("build.json").await();
-                        verboseStream.writeLine("Parsing " + buildJsonFile.relativeTo(projectFolder) + "...").await();
-                        final BuildJSON previousBuildJson = BuildJSON.parse(buildJsonFile)
-                            .catchError(FileNotFoundException.class, BuildJSON::create)
-                            .await();
-
-                        final ProjectJSON previousProjectJson = previousBuildJson.getProjectJson();
-                        final ProjectJSONJava previousProjectJsonJava = previousProjectJson.getJava();
-
-                        verboseStream.writeLine("Checking if dependencies have changed since the previous build...").await();
-                        final boolean declaredDependenciesChanged = !declaredDependencies.toSet().equals(previousProjectJsonJava.getDependencies().toSet());
-                        verboseStream.writeLine("  Dependencies have " + (declaredDependenciesChanged ? "" : "not ") + "changed.").await();
-
-                        verboseStream.writeLine("Checking if latest installed JDK has changed since the previous build...").await();
-                        final VersionNumber javacVersionNumber = javac.version().await();
-                        final boolean javacVersionChanged = !javacVersionNumber.equals(previousBuildJson.getJavacVersion());
-                        verboseStream.writeLine("  Installed JDK has " + (javacVersionChanged ? "" : "not ") + "changed.").await();
-
-                        final Map<Path,DateTime> sourceFiles = JavaProjectBuild.getJavaFiles(projectFolder);
-
-                        verboseStream.writeLine("Looking for source files that have been deleted...").await();
-                        final List<Path> deletedSourceFilePaths = List.create();
-                        for (final BuildJSONSourceFile previousBuildJsonSourceFile : previousBuildJson.getSourceFiles())
+                        final int dependencyErrorCount = dependencyErrors.getCount();
+                        if (dependencyErrorCount >= 1)
                         {
-                            final Path previousSourceFilePath = previousBuildJsonSourceFile.getRelativePath();
-                            if (!sourceFiles.containsKey(previousSourceFilePath))
+                            final boolean singleError = (dependencyErrorCount == 1);
+                            final String errorString = singleError ? "An error" : "Errors";
+                            outputStream.writeLine(errorString + " occurred while discovering dependencies:").await();
+                            int errorNumber = 0;
+                            for (final Throwable dependencyError : dependencyErrors)
                             {
-                                verboseStream.writeLine(previousSourceFilePath + " - Deleted").await();
-                                deletedSourceFilePaths.add(previousSourceFilePath);
-                                for (final Path previousSourceClassFilePath : previousBuildJsonSourceFile.getClassFiles().getKeys())
-                                {
-                                    projectFolder.deleteFile(previousSourceClassFilePath)
-                                        .catchError()
-                                        .await();
-                                }
+                                errorNumber++;
+                                final IndentedCharacterWriteStream indentedOutputStream = IndentedCharacterWriteStream.create(outputStream);
+                                final String errorNumberString = errorNumber + ". ";
+                                indentedOutputStream.write(errorNumberString).await();
+                                indentedOutputStream.setCurrentIndent(Strings.repeat(' ', errorNumberString.length()));
+                                indentedOutputStream.writeLine(dependencyError.getMessage()).await();
                             }
+                            throw ErrorIterable.create(dependencyErrors);
                         }
+                    }
 
-                        final Map<Path,DateTime> classFiles = JavaProjectBuild.getClassFiles(projectFolder);
+                    final Folder outputsFolder = projectFolder.getOutputsFolder().await();
+                    verboseStream.writeLine("Parsing " + projectFolder.getBuildJsonRelativePath().await() + "...").await();
+                    final BuildJSON buildJson = projectFolder.getBuildJson()
+                        .catchError(FileNotFoundException.class, BuildJSON::create)
+                        .await();
 
-                        verboseStream.writeLine("Looking for source files to compile...").await();
-                        final List<BuildJSONSourceFile> sourceFilesToCompile = List.create();
-                        final List<BuildJSONSourceFile> unmodifiedSourceFiles = List.create();
-                        final List<BuildJSONSourceFile> sourceFilesWithNewContent = List.create();
-                        for (final MapEntry<Path,DateTime> sourceFileEntry : sourceFiles)
+                    JavaProjectJSON buildJsonProjectJson = buildJson.getProjectJson();
+                    if (buildJsonProjectJson == null)
+                    {
+                        buildJsonProjectJson = JavaProjectJSON.create();
+                    }
+
+                    verboseStream.writeLine("Checking if dependencies have changed since the previous build...").await();
+                    boolean modifiedPreviousDependencies = false;
+                    for (final ProjectSignature previousDependency : buildJsonProjectJson.getDependencies())
+                    {
+                        if (!declaredDependencies.contains(previousDependency))
                         {
-                            final Path relativeSourceFilePath = sourceFileEntry.getKey();
-                            final DateTime sourceFileLastModified = sourceFileEntry.getValue();
-                            final BuildJSONSourceFile previousBuildJsonSourceFile = previousBuildJson.getSourceFile(relativeSourceFilePath)
+                            modifiedPreviousDependencies = true;
+                            break;
+                        }
+                    }
+                    verboseStream.writeLine("  Previous dependencies have " + (modifiedPreviousDependencies ? "" : "not ") + "changed.").await();
+
+                    verboseStream.writeLine("Checking if latest installed JDK has changed since the previous build...").await();
+                    final VersionNumber javacVersionNumber = javac.version().await();
+                    final boolean javacVersionChanged = !javacVersionNumber.equals(buildJson.getJavacVersion());
+                    verboseStream.writeLine("  Installed JDK has " + (javacVersionChanged ? "" : "not ") + "changed.").await();
+
+                    final Iterable<JavaFile> javaFiles = projectFolder.getJavaFiles().await();
+
+                    verboseStream.writeLine("Looking for .java files that have been deleted...").await();
+                    final Iterable<JavaFile> deletedJavaFiles = projectFolder.getDeletedJavaFiles().await();
+                    for (final JavaFile deletedJavaFile : deletedJavaFiles)
+                    {
+                        verboseStream.writeLine(deletedJavaFile.relativeTo(projectFolder) + " - Deleted").await();
+                    }
+                    projectFolder.deleteClassFiles(deletedJavaFiles).await();
+
+                    if (!javaFiles.any())
+                    {
+                        outputStream.writeLine("No .java files found in " + projectFolder + ".").await();
+                        process.setExitCode(-1);
+                    }
+                    else
+                    {
+                        final Iterable<JavaClassFile> classFiles = projectFolder.getClassFiles().await();
+
+                        verboseStream.writeLine("Looking for .java files to compile...").await();
+                        final List<BuildJSONJavaFile> javaFilesToCompile = List.create();
+                        final List<BuildJSONJavaFile> unmodifiedJavaFiles = List.create();
+                        final List<BuildJSONJavaFile> javaFilesWithNewContent = List.create();
+                        for (final JavaFile javaFile : javaFiles)
+                        {
+                            final Path javaFileRelativePath = javaFile.relativeTo(projectFolder);
+                            final DateTime javaFileLastModified = javaFile.getLastModified().await();
+                            final BuildJSONJavaFile buildJsonJavaFile = buildJson.getJavaFile(javaFileRelativePath)
                                 .catchError(NotFoundException.class)
                                 .await();
-                            boolean shouldCompileSourceFile = declaredDependenciesChanged || javacVersionChanged;
+                            boolean shouldCompileJavaFile = modifiedPreviousDependencies || javacVersionChanged;
                             boolean hasNewContent = false;
-                            if (previousBuildJsonSourceFile == null)
+                            if (buildJsonJavaFile == null)
                             {
-                                verboseStream.writeLine(relativeSourceFilePath + " - New file").await();
+                                verboseStream.writeLine(javaFileRelativePath + " - New file").await();
                                 hasNewContent = true;
-                                shouldCompileSourceFile = true;
+                                shouldCompileJavaFile = true;
                             }
-                            else if (!sourceFileLastModified.equals(previousBuildJsonSourceFile.getLastModified()))
+                            else if (!javaFileLastModified.equals(buildJsonJavaFile.getLastModified()))
                             {
-                                verboseStream.writeLine(relativeSourceFilePath + " - Modified").await();
+                                verboseStream.writeLine(javaFileRelativePath + " - Modified").await();
                                 hasNewContent = true;
-                                shouldCompileSourceFile = true;
-                            }
-                            else
-                            {
-                                final Map<Path,DateTime> previousClassFiles = previousBuildJsonSourceFile.getClassFiles();
-                                if (!previousClassFiles.any())
-                                {
-                                    verboseStream.writeLine(relativeSourceFilePath + " - Missing class file(s)").await();
-                                    shouldCompileSourceFile = true;
-                                }
-                                else if (previousClassFiles
-                                    .where((MapEntry<Path,DateTime> sourceFileClassFile) -> !classFiles.contains(sourceFileClassFile))
-                                    .any())
-                                {
-                                    verboseStream.writeLine(relativeSourceFilePath + " - Missing or modified class file(s)").await();
-                                    shouldCompileSourceFile = true;
-                                }
+                                shouldCompileJavaFile = true;
                             }
 
-                            if (shouldCompileSourceFile)
+                            if (shouldCompileJavaFile)
                             {
-                                final BuildJSONSourceFile buildJsonSourceFile = BuildJSONSourceFile.create(relativeSourceFilePath)
-                                    .setLastModified(sourceFileLastModified);
+                                final BuildJSONJavaFile newBuildJsonJavaFile = BuildJSONJavaFile.create(javaFileRelativePath)
+                                    .setLastModified(javaFileLastModified);
 
-                                sourceFilesToCompile.add(buildJsonSourceFile);
+                                javaFilesToCompile.add(newBuildJsonJavaFile);
                                 if (hasNewContent)
                                 {
-                                    sourceFilesWithNewContent.add(buildJsonSourceFile);
+                                    javaFilesWithNewContent.add(newBuildJsonJavaFile);
                                 }
                                 else
                                 {
-                                    buildJsonSourceFile.addDependencies(previousBuildJsonSourceFile.getDependencies());
+                                    Iterable<Path> dependencies = buildJsonJavaFile.getDependencies();
+                                    if (dependencies == null)
+                                    {
+                                        dependencies = Iterable.create();
+                                    }
+                                    newBuildJsonJavaFile.addDependencies(dependencies);
                                 }
                             }
                             else
                             {
-                                unmodifiedSourceFiles.add(previousBuildJsonSourceFile);
+                                unmodifiedJavaFiles.add(buildJsonJavaFile);
                             }
                         }
 
-                        verboseStream.writeLine("Update source file dependencies...").await();
-                        if (sourceFilesWithNewContent.any())
+                        verboseStream.writeLine("Update .java file dependencies...").await();
+                        if (javaFilesWithNewContent.any())
                         {
-                            final Map<String,Path> typeNamesToPathMap = sourceFiles.getKeys()
-                                .toMap(JavaProjectBuild::getFileTypeName, (Path sourceFilePath) -> sourceFilePath);
+                            final Map<String, Path> typeNamesToPathMap = javaFiles
+                                .toMap(File::getNameWithoutFileExtension,
+                                       (JavaFile javaFile) -> javaFile.relativeTo(projectFolder));
 
-                            for (final BuildJSONSourceFile sourceFileToCompile : sourceFilesWithNewContent)
+                            for (final BuildJSONJavaFile javaFileToCompile : javaFilesWithNewContent)
                             {
-                                final Path sourceFileRelativePath = sourceFileToCompile.getRelativePath();
-                                final Set<String> sourceFileWords = Set.create();
-                                try (final CharacterToByteReadStream fileStream = projectFolder.getFileContentReadStream(sourceFileRelativePath).await())
+                                final Path javaFileRelativePath = javaFileToCompile.getRelativePath();
+                                final Set<String> javaFileWords;
+                                try (final CharacterToByteReadStream fileStream = projectFolder.getFileContentReadStream(javaFileRelativePath).await())
                                 {
-                                    sourceFileWords.addAll(Strings.iterateWords(CharacterReadStream.iterate(fileStream)));
+                                    javaFileWords = Strings.iterateWords(CharacterReadStream.iterate(fileStream)).toSet();
                                 }
 
-                                final String sourceFileTypeName = JavaProjectBuild.getFileTypeName(sourceFileRelativePath);
-                                for (final String sourceFileWord : sourceFileWords.order(Strings::lessThan))
+                                final String javaFileTypeName = javaFileRelativePath.getNameWithoutFileExtension();
+                                for (final String javaFileWord : javaFileWords.order(Strings::lessThan))
                                 {
-                                    if (!sourceFileWord.equals(sourceFileTypeName))
+                                    if (!javaFileWord.equals(javaFileTypeName))
                                     {
-                                        final Path dependencyPath = typeNamesToPathMap.get(sourceFileWord).catchError().await();
+                                        final Path dependencyPath = typeNamesToPathMap.get(javaFileWord).catchError().await();
                                         if (dependencyPath != null)
                                         {
-                                            sourceFileToCompile.addDependency(dependencyPath);
+                                            javaFileToCompile.addDependency(dependencyPath);
                                         }
                                     }
                                 }
                             }
                         }
 
-                        verboseStream.writeLine("Discovering unmodified source files that have dependencies that are being compiled or were deleted...").await();
-                        if (sourceFilesToCompile.any())
+                        verboseStream.writeLine("Discovering unmodified .java files that have dependencies that are being compiled or were deleted...").await();
+                        if (unmodifiedJavaFiles.any())
                         {
-                            boolean sourceFilesToCompileChanged = true;
-                            while (unmodifiedSourceFiles.any() && sourceFilesToCompileChanged)
+                            final Iterable<Path> deletedJavaFilePaths = deletedJavaFiles.map((JavaFile deletedJavaFile) -> deletedJavaFile.relativeTo(projectFolder)).toList();
+                            boolean javaFilesToCompileChanged = true;
+                            while (unmodifiedJavaFiles.any() && javaFilesToCompileChanged)
                             {
-                                sourceFilesToCompileChanged = false;
+                                javaFilesToCompileChanged = false;
 
-                                for (final BuildJSONSourceFile unmodifiedSourceFile : unmodifiedSourceFiles.toList())
+                                for (final BuildJSONJavaFile unmodifiedJavaFile : unmodifiedJavaFiles.toList())
                                 {
-                                    final Iterable<Path> unmodifiedSourceFileDependencies = unmodifiedSourceFile.getDependencies();
-                                    final Iterable<Path> sourceFilePathsToCompile = sourceFilesToCompile.map(BuildJSONSourceFile::getRelativePath);
-                                    boolean shouldCompileSourceFile = false;
+                                    final Iterable<Path> unmodifiedJavaFileDependencyPaths = unmodifiedJavaFile.getDependencies();
+                                    if (!Iterable.isNullOrEmpty(unmodifiedJavaFileDependencyPaths))
+                                    {
+                                        final Iterable<Path> javaFilePathsToCompile = javaFilesToCompile.map(BuildJSONJavaFile::getRelativePath);
+                                        boolean shouldCompileJavaFile = false;
 
-                                    final Iterable<Path> unmodifiedSourceFileDependenciesBeingCompiled = unmodifiedSourceFileDependencies.where(sourceFilePathsToCompile::contains);
-                                    if (unmodifiedSourceFileDependenciesBeingCompiled.any())
-                                    {
-                                        verboseStream.writeLine(unmodifiedSourceFile.getRelativePath() + " - Dependency file(s) being compiled").await();
-                                        shouldCompileSourceFile = true;
-                                    }
-                                    else
-                                    {
-                                        final Iterable<Path> unmodifiedSourceFileDependenciesThatWereDeleted = unmodifiedSourceFileDependencies.where(deletedSourceFilePaths::contains);
-                                        if (unmodifiedSourceFileDependenciesThatWereDeleted.any())
+                                        final Iterable<Path> unmodifiedJavaFileDependenciesBeingCompiled = unmodifiedJavaFileDependencyPaths.where(javaFilePathsToCompile::contains);
+                                        if (!Iterable.isNullOrEmpty(unmodifiedJavaFileDependenciesBeingCompiled))
                                         {
-                                            verboseStream.writeLine(unmodifiedSourceFile.getRelativePath() + " - Dependency file(s) were deleted").await();
-                                            shouldCompileSourceFile = true;
+                                            verboseStream.writeLine(unmodifiedJavaFile.getRelativePath() + " - Dependency file(s) being compiled").await();
+                                            shouldCompileJavaFile = true;
+                                        }
+                                        else
+                                        {
+                                            final Iterable<Path> unmodifiedJavaFileDependenciesThatWereDeleted = unmodifiedJavaFileDependencyPaths.where(deletedJavaFilePaths::contains);
+                                            if (unmodifiedJavaFileDependenciesThatWereDeleted.any())
+                                            {
+                                                verboseStream.writeLine(unmodifiedJavaFile.getRelativePath() + " - Dependency file(s) were deleted").await();
+                                                shouldCompileJavaFile = true;
+                                            }
+                                        }
+
+                                        if (shouldCompileJavaFile)
+                                        {
+                                            javaFilesToCompile.add(unmodifiedJavaFile);
+                                            unmodifiedJavaFiles.remove(unmodifiedJavaFile);
+                                            javaFilesToCompileChanged = true;
                                         }
                                     }
+                                }
+                            }
+                        }
 
-                                    if (shouldCompileSourceFile)
+                        verboseStream.writeLine("Discovering unmodified .java files that have missing or modified .class files...").await();
+                        for (final BuildJSONJavaFile unmodifiedJavaFile : unmodifiedJavaFiles.toList())
+                        {
+                            boolean shouldCompileJavaFile = false;
+
+                            final Path javaFileRelativePath = unmodifiedJavaFile.getRelativePath();
+                            final Iterable<BuildJSONClassFile> buildJsonJavaFileClassFiles = unmodifiedJavaFile.getClassFiles();
+                            if (!buildJsonJavaFileClassFiles.any())
+                            {
+                                verboseStream.writeLine(javaFileRelativePath + " - Missing class file(s)").await();
+                                shouldCompileJavaFile = true;
+                            }
+                            else
+                            {
+                                for (final BuildJSONClassFile buildJsonJavaFileClassFile : buildJsonJavaFileClassFiles)
+                                {
+                                    Path classFileRelativePath = buildJsonJavaFileClassFile.getRelativePath();
+                                    final JavaClassFile javaClassFile = classFiles.first((JavaClassFile classFile) -> classFile.relativeTo(projectFolder).equals(classFileRelativePath));
+                                    if (javaClassFile == null ||
+                                        !javaClassFile.getLastModified().await().equals(buildJsonJavaFileClassFile.getLastModified()))
                                     {
-                                        sourceFilesToCompile.add(unmodifiedSourceFile);
-                                        unmodifiedSourceFiles.remove(unmodifiedSourceFile);
-                                        sourceFilesToCompileChanged = true;
+                                        verboseStream.writeLine(javaFileRelativePath + " - Missing or modified class file(s)").await();
+                                        shouldCompileJavaFile = true;
+                                        break;
                                     }
                                 }
+                            }
+
+                            if (shouldCompileJavaFile)
+                            {
+                                javaFilesToCompile.add(unmodifiedJavaFile);
+                                unmodifiedJavaFiles.remove(unmodifiedJavaFile);
                             }
                         }
 
                         final List<JavacIssue> unmodifiedWarnings = List.create();
                         final List<JavacIssue> unmodifiedErrors = List.create();
                         final List<JavacIssue> unmodifiedUnrecognizedIssues = List.create();
-                        for (final BuildJSONSourceFile unmodifiedSourceFile : unmodifiedSourceFiles)
+                        for (final BuildJSONJavaFile unmodifiedJavaFile : unmodifiedJavaFiles)
                         {
-                            for (final JavacIssue issue : unmodifiedSourceFile.getIssues())
+                            for (final JavacIssue issue : unmodifiedJavaFile.getIssues())
                             {
                                 if (Comparer.equalIgnoreCase("warning", issue.getType()))
                                 {
@@ -338,35 +367,35 @@ public interface JavaProjectBuild
                         final BuildJSON newBuildJson = BuildJSON.create()
                             .setJavacVersion(javacVersionNumber)
                             .setProjectJson(projectJson)
-                            .setSourceFiles(unmodifiedSourceFiles)
-                            .setSourceFiles(sourceFilesToCompile);
+                            .setJavaFiles(unmodifiedJavaFiles)
+                            .setJavaFiles(javaFilesToCompile);
                         final List<JavacIssue> newWarnings = List.create();
                         final List<JavacIssue> newErrors = List.create();
                         final List<JavacIssue> newUnrecognizedIssues = List.create();
-                        if (!sourceFilesToCompile.any())
+                        if (!javaFilesToCompile.any())
                         {
-                            outputStream.writeLine("No files need to be compiled.").await();
+                            outputStream.writeLine("No .java files need to be compiled.").await();
                         }
                         else
                         {
-                            final int sourceFilesToCompileCount = sourceFilesToCompile.getCount();
-                            outputStream.writeLine("Compiling " + sourceFilesToCompileCount + " source file" + (sourceFilesToCompileCount == 1 ? "" : "s") + "...").await();
+                            final int javaFilesToCompileCount = javaFilesToCompile.getCount();
+                            outputStream.writeLine("Compiling " + javaFilesToCompileCount + " source file" + (javaFilesToCompileCount == 1 ? "" : "s") + "...").await();
                             final JavacResult javacResult = javac.compile((JavacParameters javacParameters) ->
                             {
-                                final Folder sourcesOutputFolder = outputsFolder.getFolder("sources").await();
-                                javacParameters.addDirectory(sourcesOutputFolder);
+                                javacParameters.addDirectory(outputsFolder);
 
-                                javacParameters.addClasspath(sourcesOutputFolder);
-                                for (final QubProjectVersionFolder dependencyFolder : dependencyFolders)
+                                javacParameters.addClasspath(outputsFolder);
+                                for (final JavaPublishedProjectFolder dependencyFolder : dependencyFolders)
                                 {
-                                    final File compiledSourcesFile = dependencyFolder.getCompiledSourcesFile().await();
+                                    final File compiledSourcesFile = dependencyFolder.getCompiledSourcesJarFile().await();
                                     javacParameters.addClasspath(compiledSourcesFile);
                                 }
 
                                 javacParameters.addXLint();
-                                javacParameters.addArguments(sourceFilesToCompile
-                                    .map(BuildJSONSourceFile::getRelativePath)
-                                    .map(Path::toString));
+                                javacParameters.addArguments(javaFilesToCompile
+                                    .map(BuildJSONJavaFile::getRelativePath)
+                                    .map(Path::toString)
+                                    .order(Strings::lessThan));
                             }).await();
 
                             process.setExitCode(javacResult.getExitCode());
@@ -386,7 +415,7 @@ public interface JavaProjectBuild
                                     newUnrecognizedIssues.add(issue);
                                 }
 
-                                newBuildJson.getSourceFile(issue.getSourceFilePath()).await()
+                                newBuildJson.getJavaFile(issue.getSourceFilePath()).await()
                                     .addIssue(issue);
                             }
                         }
@@ -399,11 +428,8 @@ public interface JavaProjectBuild
                         JavaProjectBuild.writeIssues(outputStream, newErrors, "Error").await();
                         JavaProjectBuild.writeIssues(outputStream, newUnrecognizedIssues, "Unrecognized Issue").await();
 
-                        verboseStream.writeLine("Updating " + buildJsonFile + "...").await();
-                        try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(buildJsonFile.getContentsByteWriteStream().await())))
-                        {
-                            newBuildJson.toString(writeStream, JSONFormat.pretty).await();
-                        }
+                        verboseStream.writeLine("Updating " + projectFolder.getBuildJsonRelativePath().await() + "...").await();
+                        projectFolder.writeBuildJson(newBuildJson).await();
                     }
                 }
                 catch (Throwable error)
@@ -413,33 +439,6 @@ public interface JavaProjectBuild
                 }
             }
         }
-    }
-
-    static Map<Path,DateTime> getJavaFiles(Folder folder)
-    {
-        return JavaProjectBuild.getFiles(folder, ".java");
-    }
-
-    static Map<Path,DateTime> getClassFiles(Folder folder)
-    {
-        return JavaProjectBuild.getFiles(folder, ".class");
-    }
-
-    static Map<Path,DateTime> getFiles(Folder folder, String fileExtension)
-    {
-        PreCondition.assertNotNullAndNotEmpty(fileExtension, "fileExtension");
-        PreCondition.assertStartsWith(fileExtension, ".", "fileExtension");
-
-        return folder.iterateFilesRecursively()
-            .where((File file) -> Comparer.equalIgnoreCase(fileExtension, file.getFileExtension()))
-            .toMap((File file) -> file.relativeTo(folder), (File file) -> file.getLastModified().await());
-    }
-
-    static String getFileTypeName(Path filePath)
-    {
-        PreCondition.assertNotNull(filePath, "filePath");
-
-        return filePath.withoutFileExtension().getSegments().last();
     }
 
     static Result<Void> writeIssues(CharacterWriteStream writeStream, Iterable<JavacIssue> issues, String issueType)

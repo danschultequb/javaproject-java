@@ -14,7 +14,7 @@ public interface JavaProjectCreateTests
                         new PreConditionFailure("actions cannot be null."));
                 });
             });
-            
+
             runner.testGroup("run(DesktopProcess,CommandLineAction)", () ->
             {
                 runner.test("with null process", (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
@@ -31,14 +31,14 @@ public interface JavaProjectCreateTests
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
                             fakeProjectFolder,
                             fakeProjectFolder.getProjectVersionsFolder().await(),
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                 });
 
@@ -52,14 +52,14 @@ public interface JavaProjectCreateTests
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
                             fakeProjectFolder,
                             fakeProjectFolder.getProjectVersionsFolder().await(),
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                 });
 
@@ -95,14 +95,14 @@ public interface JavaProjectCreateTests
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
                             fakeProjectFolder,
                             fakeProjectFolder.getProjectVersionsFolder().await(),
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                 });
 
@@ -206,7 +206,7 @@ public interface JavaProjectCreateTests
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.getFile("javaproject.schema.json").await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -217,7 +217,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertEqual(
                         Iterable.create(
@@ -347,7 +347,7 @@ public interface JavaProjectCreateTests
 
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -358,7 +358,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertEqual(
                         Iterable.create(),
@@ -469,7 +469,7 @@ public interface JavaProjectCreateTests
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.getFile("javaproject.schema.json").await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -480,7 +480,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(
@@ -610,7 +610,7 @@ public interface JavaProjectCreateTests
 
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -621,7 +621,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -730,7 +730,7 @@ public interface JavaProjectCreateTests
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.getFile("javaproject.schema.json").await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -741,7 +741,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(
@@ -870,7 +870,7 @@ public interface JavaProjectCreateTests
 
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -881,7 +881,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -1002,7 +1002,7 @@ public interface JavaProjectCreateTests
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.getFile("javaproject.schema.json").await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -1013,7 +1013,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(
@@ -1143,7 +1143,7 @@ public interface JavaProjectCreateTests
 
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -1154,7 +1154,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -1275,7 +1275,7 @@ public interface JavaProjectCreateTests
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.getFile("javaproject.schema.json").await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -1286,7 +1286,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(
@@ -1416,7 +1416,7 @@ public interface JavaProjectCreateTests
 
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -1427,7 +1427,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -1547,7 +1547,7 @@ public interface JavaProjectCreateTests
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.getFile("javaproject.schema.json").await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -1558,7 +1558,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(
@@ -1687,7 +1687,7 @@ public interface JavaProjectCreateTests
 
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
                     final File fakeProjectLogsFile = fakeProjectLogsFolder.getFile("1.log").await();
-                    final QubProjectVersionFolder fakeProjectVersionFolder = fakeProjectFolder.getProjectVersionFolder("8").await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
                         Iterable.create(
                             fakePublisherFolder,
@@ -1698,7 +1698,7 @@ public interface JavaProjectCreateTests
                             javaProjectSchemaJsonFile,
                             fakeProjectLogsFile,
                             fakeProjectVersionFolder,
-                            fakeProjectVersionFolder.getCompiledSourcesFile().await()),
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
                     test.assertLinesEqual(
                         Iterable.create(),

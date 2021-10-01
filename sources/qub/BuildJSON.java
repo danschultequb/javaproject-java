@@ -4,7 +4,7 @@ public class BuildJSON extends JSONObjectWrapperBase
 {
     private static final String projectJsonPropertyName = "project.json";
     private static final String javacVersionPropertyName = "javacVersion";
-    private static final String sourceFilesPropertyName = "sourceFiles";
+    private static final String javaFilesPropertyName = "javaFiles";
 
     private BuildJSON(JSONObject json)
     {
@@ -74,12 +74,12 @@ public class BuildJSON extends JSONObjectWrapperBase
         return this;
     }
 
-    public ProjectJSON getProjectJson()
+    public JavaProjectJSON getProjectJson()
     {
         final JSONObject projectJson = this.toJson().getObject(BuildJSON.projectJsonPropertyName)
             .catchError()
             .await();
-        return projectJson == null ? null : ProjectJSON.create(projectJson);
+        return projectJson == null ? null : JavaProjectJSON.create(projectJson);
     }
 
     public BuildJSON setJavacVersion(String javacVersion)
@@ -105,33 +105,33 @@ public class BuildJSON extends JSONObjectWrapperBase
             .await();
     }
 
-    public Iterable<BuildJSONSourceFile> getSourceFiles()
+    public Iterable<BuildJSONJavaFile> getJavaFiles()
     {
-        final JSONObject sourceFilesJson = this.toJson().getObject(BuildJSON.sourceFilesPropertyName)
+        final JSONObject sourceFilesJson = this.toJson().getObject(BuildJSON.javaFilesPropertyName)
             .catchError(() -> JSONObject.create())
             .await();
         return sourceFilesJson.getProperties()
-            .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())
+            .map((JSONProperty property) -> BuildJSONJavaFile.parse(property).await())
             .toList();
     }
 
-    public BuildJSON setSourceFile(BuildJSONSourceFile sourceFile)
+    public BuildJSON setJavaFile(BuildJSONJavaFile javaFile)
     {
-        PreCondition.assertNotNull(sourceFile, "sourceFile");
+        PreCondition.assertNotNull(javaFile, "javaFile");
 
-        this.toJson().getOrCreateObject(BuildJSON.sourceFilesPropertyName).await()
-            .set(sourceFile.toJson());
+        this.toJson().getOrCreateObject(BuildJSON.javaFilesPropertyName).await()
+            .set(javaFile.toJson());
 
         return this;
     }
 
-    public BuildJSON setSourceFiles(Iterable<BuildJSONSourceFile> sourceFiles)
+    public BuildJSON setJavaFiles(Iterable<BuildJSONJavaFile> javaFiles)
     {
-        PreCondition.assertNotNull(sourceFiles, "sourceFiles");
+        PreCondition.assertNotNull(javaFiles, "javaFiles");
 
-        for (final BuildJSONSourceFile sourceFile : sourceFiles)
+        for (final BuildJSONJavaFile javaFile : javaFiles)
         {
-            this.setSourceFile(sourceFile);
+            this.setJavaFile(javaFile);
         }
 
         return this;
@@ -144,11 +144,11 @@ public class BuildJSON extends JSONObjectWrapperBase
      *                     folder.
      * @return The BuildJSONSourceFile that is associated with the provided relative path.
      */
-    public Result<BuildJSONSourceFile> getSourceFile(String relativePath)
+    public Result<BuildJSONJavaFile> getJavaFile(String relativePath)
     {
         PreCondition.assertNotNullAndNotEmpty(relativePath, "relativePath");
 
-        return this.getSourceFile(Path.parse(relativePath));
+        return this.getJavaFile(Path.parse(relativePath));
     }
 
     /**
@@ -158,22 +158,22 @@ public class BuildJSON extends JSONObjectWrapperBase
      *                     folder.
      * @return The BuildJSONSourceFile that is associated with the provided relative path.
      */
-    public Result<BuildJSONSourceFile> getSourceFile(Path relativePath)
+    public Result<BuildJSONJavaFile> getJavaFile(Path relativePath)
     {
         PreCondition.assertNotNull(relativePath, "relativePath");
         PreCondition.assertFalse(relativePath.isRooted(), "relativePath.isRooted()");
 
         return Result.create(() ->
         {
-            BuildJSONSourceFile result = null;
-            final Iterable<BuildJSONSourceFile> sourceFiles = this.getSourceFiles();
-            if (!Iterable.isNullOrEmpty(sourceFiles))
+            BuildJSONJavaFile result = null;
+            final Iterable<BuildJSONJavaFile> javaFiles = this.getJavaFiles();
+            if (!Iterable.isNullOrEmpty(javaFiles))
             {
-                result = sourceFiles.first((BuildJSONSourceFile sourceFile) -> sourceFile.getRelativePath().equals(relativePath));
+                result = javaFiles.first((BuildJSONJavaFile javaFile) -> javaFile.getRelativePath().equals(relativePath));
             }
             if (result == null)
             {
-                throw new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + ".");
+                throw new NotFoundException("No .java file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + ".");
             }
             return result;
         });

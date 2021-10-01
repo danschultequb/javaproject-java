@@ -44,6 +44,8 @@ public class Javac extends ChildProcessRunnerWrapper<Javac,JavacParameters>
                 parameters.redirectErrorTo(errorStream);
             }).await());
 
+            errorStream.endOfStream();
+
             final Iterator<String> errorLines = Strings.iterateLines(CharacterReadStream.iterate(errorStream)).start();
             while (errorLines.hasCurrent())
             {

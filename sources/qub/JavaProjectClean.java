@@ -6,7 +6,7 @@ public interface JavaProjectClean
     {
         PreCondition.assertNotNull(actions, "actions");
 
-        return actions.addAction("clean", JavaProjectPack::run)
+        return actions.addAction("clean", JavaProjectClean::run)
             .setDescription("Clean a Java source code project's build outputs.");
     }
 
@@ -23,52 +23,36 @@ public interface JavaProjectClean
 
         if (!helpParameter.showApplicationHelpLines(process).await())
         {
-            final Folder projectFolder = projectFolderParameter.getValue().await();
+            final JavaProjectFolder projectFolder = JavaProjectFolder.get(projectFolderParameter.getValue().await());
 
             final LogStreams logStreams = CommandLineLogsAction.getLogStreamsFromDesktopProcess(process, verboseParameter.getVerboseCharacterToByteWriteStream().await());
             try (final Disposable logStream = logStreams.getLogStream())
             {
                 final IndentedCharacterWriteStream output = IndentedCharacterWriteStream.create(logStreams.getOutput());
-                final VerboseCharacterToByteWriteStream verbose = logStreams.getVerbose();
 
                 output.writeLine("Cleaning...").await();
 
                 if (!projectFolder.exists().await())
                 {
-                    output.writeLine("The folder " + projectFolder + " doesn't exist.").await();
+                    output.writeLine("The project folder " + projectFolder + " doesn't exist.").await();
                 }
                 else
                 {
-                    int foldersCleaned = 0;
-                    for (final String folderNameToClean : Iterable.create("outputs", "out", "target"))
+                    final Folder outputsFolder = projectFolder.getOutputsFolder().await();
+                    if (outputsFolder.exists().await())
                     {
-                        final Folder folderToDelete = projectFolder.getFolder(folderNameToClean).await();
-                        verbose.writeLine("Checking if " + folderToDelete + " exists...").await();
-                        if (!folderToDelete.exists().await())
-                        {
-                            verbose.writeLine("Doesn't exist.").await();
-                        }
-                        else
-                        {
-                            ++foldersCleaned;
-                            output.write("Deleting folder " + folderToDelete + "...").await();
-                            folderToDelete.delete()
-                                .then(() ->
-                                {
-                                    output.writeLine(" Done.").await();
-                                })
-                                .catchError((Throwable error) ->
-                                {
-                                    output.writeLine(" Failed.").await();
-                                    output.indent(() -> output.writeLine(error.getMessage()).await());
-                                })
-                                .await();
-                        }
-                    }
-
-                    if (foldersCleaned == 0)
-                    {
-                        output.writeLine("Found no folders to delete.").await();
+                        output.write("Deleting folder " + outputsFolder + "...").await();
+                        outputsFolder.delete()
+                            .then(() ->
+                            {
+                                output.writeLine(" Done.").await();
+                            })
+                            .catchError((Throwable error) ->
+                            {
+                                output.writeLine(" Failed.").await();
+                                output.indent(() -> output.writeLine(error.getMessage()).await());
+                            })
+                            .await();
                     }
                 }
             }

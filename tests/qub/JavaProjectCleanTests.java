@@ -36,7 +36,7 @@ public interface JavaProjectCleanTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Usage: qub javaproject clean [[--projectFolder=]<projectFolder-value>] [--help] [--verbose]",
+                            "Usage: qub-javaproject clean [[--projectFolder=]<projectFolder-value>] [--help] [--verbose]",
                             "  Clean a Java source code project's build outputs.",
                             "  --projectFolder: The folder that contains a Java project to build. Defaults to the current folder.",
                             "  --help(?):       Show the help message for this application.",
@@ -58,7 +58,7 @@ public interface JavaProjectCleanTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Usage: qub javaproject clean [[--projectFolder=]<projectFolder-value>] [--help] [--verbose]",
+                            "Usage: qub-javaproject clean [[--projectFolder=]<projectFolder-value>] [--help] [--verbose]",
                             "  Clean a Java source code project's build outputs.",
                             "  --projectFolder: The folder that contains a Java project to build. Defaults to the current folder.",
                             "  --help(?):       Show the help message for this application.",
@@ -81,7 +81,7 @@ public interface JavaProjectCleanTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "Cleaning...",
-                            "The folder /folder/to/clean/ doesn't exist."),
+                            "The project folder /folder/to/clean/ doesn't exist."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -102,8 +102,7 @@ public interface JavaProjectCleanTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Cleaning...",
-                            "Found no folders to delete."),
+                            "Cleaning..."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -124,14 +123,7 @@ public interface JavaProjectCleanTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Cleaning...",
-                            "VERBOSE: Checking if /folder/to/clean/outputs/ exists...",
-                            "VERBOSE: Doesn't exist.",
-                            "VERBOSE: Checking if /folder/to/clean/out/ exists...",
-                            "VERBOSE: Doesn't exist.",
-                            "VERBOSE: Checking if /folder/to/clean/target/ exists...",
-                            "VERBOSE: Doesn't exist.",
-                            "Found no folders to delete."),
+                            "Cleaning..."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -181,12 +173,7 @@ public interface JavaProjectCleanTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "Cleaning...",
-                            "VERBOSE: Checking if /folder/to/clean/outputs/ exists...",
-                            "Deleting folder /folder/to/clean/outputs/... Done.",
-                            "VERBOSE: Checking if /folder/to/clean/out/ exists...",
-                            "VERBOSE: Doesn't exist.",
-                            "VERBOSE: Checking if /folder/to/clean/target/ exists...",
-                            "VERBOSE: Doesn't exist."),
+                            "Deleting folder /folder/to/clean/outputs/... Done."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -205,7 +192,7 @@ public interface JavaProjectCleanTests
                     final Folder folderToClean = fileSystem.getFolder("/folder/to/clean/").await();
                     final Folder outputsFolder = folderToClean.getFolder("outputs").await();
                     outputsFolder.create().await();
-                    fileSystem.setFolderCanDelete(outputsFolder.getPath(), false);
+                    fileSystem.setFolderCanDelete(outputsFolder.getPath(), false).await();
 
                     final CommandLineAction action = JavaProjectCleanTests.createAction(process);
 
@@ -227,13 +214,12 @@ public interface JavaProjectCleanTests
             });
         });
     }
-    
+
     static CommandLineAction createAction(FakeDesktopProcess process)
     {
         PreCondition.assertNotNull(process, "process");
-        
-        final CommandLineActions actions = process.createCommandLineActions()
-            .setApplicationName("qub javaproject");
+
+        final CommandLineActions actions = JavaProject.createCommandLineActions(process);
         return JavaProjectClean.addAction(actions);
     }
 }

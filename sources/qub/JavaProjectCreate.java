@@ -110,13 +110,12 @@ public interface JavaProjectCreate
 
                     indentedVerboseStream.write("Creating " + projectJsonFile + "... ").await();
                     projectJsonFile.setContentsAsString(
-                        ProjectJSON.create()
+                        JavaProjectJSON.create()
                             .setSchema(projectJsonSchemaFile)
                             .setPublisher(projectSignature.getPublisher())
                             .setProject(projectSignature.getProject())
                             .setVersion(projectSignature.getVersion())
-                            .setJava(ProjectJSONJava.create()
-                                .setDependencies(Iterable.create()))
+                            .setDependencies(Iterable.create())
                             .toString(JSONFormat.pretty))
                         .await();
                     indentedVerboseStream.writeLine("Done.").await();

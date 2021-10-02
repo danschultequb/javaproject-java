@@ -38,7 +38,8 @@ public interface JavaProjectBuild
                     final JavaProjectJSON projectJson = projectFolder.getProjectJson(outputStream).await();
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final JDKFolder jdkFolder = JDKFolder.getLatestVersion(qubFolder, outputStream).await();
-                    final Javac javac = jdkFolder.getJavac(process).await();
+                    final VerboseChildProcessRunner childProcessRunner = VerboseChildProcessRunner.create(process, verboseStream);
+                    final Javac javac = jdkFolder.getJavac(childProcessRunner).await();
 
                     final List<JavaPublishedProjectFolder> dependencyFolders = List.create();
                     final Iterable<ProjectSignature> declaredDependencies = projectJson.getDependencies();
@@ -53,8 +54,11 @@ public interface JavaProjectBuild
                             final ProjectSignature dependency = currentNode.getValue();
                             dependencyPaths.getOrSet(dependency, List::create).await()
                                 .add(currentNode);
-                            dependencyVersions.getOrSet(Tuple.create(dependency.getPublisher(), dependency.getProject()), List::create).await()
-                                .add(dependency.getVersion());
+                            final List<VersionNumber> dependencyVersionList = dependencyVersions.getOrSet(Tuple.create(dependency.getPublisher(), dependency.getProject()), List::create).await();
+                            if (!dependencyVersionList.contains(dependency.getVersion()))
+                            {
+                                dependencyVersionList.add(dependency.getVersion());
+                            }
 
                             JavaPublishedProjectFolder.getIfExists(qubFolder, dependency)
                                 .then((JavaPublishedProjectFolder dependencyFolder) ->
@@ -384,14 +388,14 @@ public interface JavaProjectBuild
                             {
                                 javacParameters.addDirectory(outputsFolder);
 
-                                javacParameters.addClasspath(outputsFolder);
-                                for (final JavaPublishedProjectFolder dependencyFolder : dependencyFolders)
+                                final List<String> classpath = List.create(outputsFolder.toString());
+                                if (dependencyFolders.any())
                                 {
-                                    final File compiledSourcesFile = dependencyFolder.getCompiledSourcesJarFile().await();
-                                    javacParameters.addClasspath(compiledSourcesFile);
+                                    classpath.addAll(dependencyFolders.map(folder -> folder.getCompiledSourcesJarFile().await().toString()));
                                 }
+                                javacParameters.addClasspath(classpath);
 
-                                javacParameters.addXLint();
+                                javacParameters.addXLint("all", "-try", "-overrides");
                                 javacParameters.addArguments(javaFilesToCompile
                                     .map(BuildJSONJavaFile::getRelativePath)
                                     .map(Path::toString)
@@ -400,6 +404,7 @@ public interface JavaProjectBuild
 
                             process.setExitCode(javacResult.getExitCode());
 
+                            verboseStream.writeLine("Adding compilation issues to new build.json...").await();
                             for (final JavacIssue issue : javacResult.getIssues())
                             {
                                 if (Comparer.equalIgnoreCase("warning", issue.getType()))
@@ -417,6 +422,34 @@ public interface JavaProjectBuild
 
                                 newBuildJson.getJavaFile(issue.getSourceFilePath()).await()
                                     .addIssue(issue);
+                            }
+
+                            verboseStream.writeLine("Associating .class files with original .java files...").await();
+                            for (final File classFile : projectFolder.getClassFiles().await())
+                            {
+                                final Path classFileRelativeToOutputsPath = classFile.relativeTo(outputsFolder);
+                                final List<String> classSourceFileRelativePathSegments = List.create(classFileRelativeToOutputsPath.getSegments());
+                                String typeName = classFile.getNameWithoutFileExtension();
+                                final int dollarSignIndex = typeName.indexOf('$');
+                                final boolean isAnonymousType = (dollarSignIndex >= 0);
+                                if (isAnonymousType)
+                                {
+                                    typeName = typeName.substring(0, dollarSignIndex);
+                                }
+                                classSourceFileRelativePathSegments.removeLast();
+                                classSourceFileRelativePathSegments.add(typeName + ".java");
+
+                                final Path classSourceFileRelativeToSourceFolderPath = Path.parse(Strings.join('/', classSourceFileRelativePathSegments));
+                                File classSourceFile = projectFolder.getSourcesFolder().await()
+                                    .getFile(classSourceFileRelativeToSourceFolderPath).await();
+                                if (!classSourceFile.exists().await())
+                                {
+                                    classSourceFile = projectFolder.getTestsFolder().await()
+                                        .getFile(classSourceFileRelativeToSourceFolderPath).await();
+                                }
+                                final Path classSourceFileRelativeToProjectFolderPath = classSourceFile.relativeTo(projectFolder);
+                                final BuildJSONJavaFile javaFile = newBuildJson.getJavaFile(classSourceFileRelativeToProjectFolderPath).await();
+                                javaFile.addClassFile(classFile.relativeTo(projectFolder), classFile.getLastModified().await());
                             }
                         }
 

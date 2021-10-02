@@ -41,10 +41,17 @@ public class JDKFolder extends Folder
     {
         PreCondition.assertNotNull(process, "process");
 
+        return this.getJavac(process.getChildProcessRunner());
+    }
+
+    public Result<Javac> getJavac(ChildProcessRunner childProcessRunner)
+    {
+        PreCondition.assertNotNull(childProcessRunner, "childProcessRunner");
+
         return Result.create(() ->
         {
             final File javacFile = this.getFile("bin/javac").await();
-            return Javac.create(process.getChildProcessRunner())
+            return Javac.create(childProcessRunner)
                 .setExecutablePath(javacFile);
         });
     }

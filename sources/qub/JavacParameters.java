@@ -93,47 +93,23 @@ public class JavacParameters extends ChildProcessParametersDecorator<JavacParame
      * @param classpath The class path argument that indicates where existing class files are.
      * @return This object for method chaining.
      */
-    public JavacParameters addClasspath(String classpath)
+    public JavacParameters addClasspath(String... classpath)
+    {
+        PreCondition.assertNotNullAndNotEmpty(classpath, "classpaths");
+
+        return this.addClasspath(Iterable.create(classpath));
+    }
+
+    /**
+     * Add a class path argument that will indicate where existing class files are.
+     * @param classpath The class path argument that indicates where existing class files are.
+     * @return This object for method chaining.
+     */
+    public JavacParameters addClasspath(Iterable<String> classpath)
     {
         PreCondition.assertNotNullAndNotEmpty(classpath, "classpath");
 
-        return this.addClasspath(Path.parse(classpath));
-    }
-
-    /**
-     * Add a class path argument that will indicate where existing class files are.
-     * @param classpath The class path argument that indicates where existing class files are.
-     * @return This object for method chaining.
-     */
-    public JavacParameters addClasspath(Path classpath)
-    {
-        PreCondition.assertNotNull(classpath, "classpath");
-
-        return this.addArguments("--class-path", classpath.toString());
-    }
-
-    /**
-     * Add a class path argument that will indicate where existing class files are.
-     * @param classpath The class path argument that indicates where existing class files are.
-     * @return This object for method chaining.
-     */
-    public JavacParameters addClasspath(File classpath)
-    {
-        PreCondition.assertNotNull(classpath, "classpath");
-
-        return this.addClasspath(classpath.getPath());
-    }
-
-    /**
-     * Add a class path argument that will indicate where existing class files are.
-     * @param classpath The class path argument that indicates where existing class files are.
-     * @return This object for method chaining.
-     */
-    public JavacParameters addClasspath(Folder classpath)
-    {
-        PreCondition.assertNotNull(classpath, "classpath");
-
-        return this.addClasspath(classpath.getPath());
+        return this.addArguments("--class-path", Strings.join(';', classpath));
     }
 
     /**

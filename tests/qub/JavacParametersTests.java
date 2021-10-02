@@ -210,7 +210,7 @@ public interface JavacParametersTests
                 test.assertEqual(Iterable.create("--version"), parameters.getArguments());
             });
 
-            runner.testGroup("addClasspath(String)", () ->
+            runner.testGroup("addClasspath(String...)", () ->
             {
                 final Action2<String,Throwable> addClasspathErrorTest = (String classpath, Throwable expected) ->
                 {
@@ -219,12 +219,12 @@ public interface JavacParametersTests
                         final JavacParameters parameters = JavacParameters.create();
                         test.assertThrows(() -> parameters.addClasspath(classpath),
                             expected);
-                        test.assertEqual(Iterable.create(), parameters.getArguments());
+                        test.assertEqual(Iterable.create("--class-path"), parameters.getArguments());
                     });
                 };
 
-                addClasspathErrorTest.run(null, new PreConditionFailure("classpath cannot be null."));
-                addClasspathErrorTest.run("", new PreConditionFailure("classpath cannot be empty."));
+                addClasspathErrorTest.run(null, new PreConditionFailure("argument cannot be empty."));
+                addClasspathErrorTest.run("", new PreConditionFailure("argument cannot be empty."));
 
                 final Action1<String> addClasspathTest = (String classpath) ->
                 {
@@ -241,80 +241,6 @@ public interface JavacParametersTests
                 addClasspathTest.run("outputs/");
                 addClasspathTest.run("outputs/folder");
                 addClasspathTest.run("/outputs/folder/");
-            });
-
-            runner.testGroup("addClasspath(Path)", () ->
-            {
-                final Action2<Path,Throwable> addClasspathErrorTest = (Path classpath, Throwable expected) ->
-                {
-                    runner.test("with " + Strings.escapeAndQuote(classpath), (Test test) ->
-                    {
-                        final JavacParameters parameters = JavacParameters.create();
-                        test.assertThrows(() -> parameters.addClasspath(classpath),
-                            expected);
-                        test.assertEqual(Iterable.create(), parameters.getArguments());
-                    });
-                };
-
-                addClasspathErrorTest.run(null, new PreConditionFailure("classpath cannot be null."));
-
-                final Action1<Path> addClasspathTest = (Path classpath) ->
-                {
-                    runner.test("with " + Strings.escapeAndQuote(classpath), (Test test) ->
-                    {
-                        final JavacParameters parameters = JavacParameters.create();
-                        final JavacParameters addClasspathResult = parameters.addClasspath(classpath);
-                        test.assertSame(parameters, addClasspathResult);
-                        test.assertEqual(Iterable.create("--class-path", classpath.toString()), parameters.getArguments());
-                    });
-                };
-
-                addClasspathTest.run(Path.parse("outputs"));
-                addClasspathTest.run(Path.parse("outputs/"));
-                addClasspathTest.run(Path.parse("outputs/folder"));
-                addClasspathTest.run(Path.parse("/outputs/folder/"));
-            });
-
-            runner.testGroup("addClasspath(File)", () ->
-            {
-                runner.test("with null", (Test test) ->
-                {
-                    final JavacParameters parameters = JavacParameters.create();
-                    test.assertThrows(() -> parameters.addClasspath((File)null),
-                        new PreConditionFailure("classpath cannot be null."));
-                    test.assertEqual(Iterable.create(), parameters.getArguments());
-                });
-
-                runner.test("with non-null", (Test test) ->
-                {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
-                    final File file = fileSystem.getFile("/project/outputs/file").await();
-                    final JavacParameters parameters = JavacParameters.create();
-                    final JavacParameters addClasspathResult = parameters.addClasspath(file);
-                    test.assertSame(parameters, addClasspathResult);
-                    test.assertEqual(Iterable.create("--class-path", file.toString()), parameters.getArguments());
-                });
-            });
-
-            runner.testGroup("addClasspath(Folder)", () ->
-            {
-                runner.test("with null", (Test test) ->
-                {
-                    final JavacParameters parameters = JavacParameters.create();
-                    test.assertThrows(() -> parameters.addClasspath((Folder)null),
-                        new PreConditionFailure("classpath cannot be null."));
-                    test.assertEqual(Iterable.create(), parameters.getArguments());
-                });
-
-                runner.test("with non-null", (Test test) ->
-                {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
-                    final Folder folder = fileSystem.getFolder("/project/outputs/").await();
-                    final JavacParameters parameters = JavacParameters.create();
-                    final JavacParameters addClasspathResult = parameters.addClasspath(folder);
-                    test.assertSame(parameters, addClasspathResult);
-                    test.assertEqual(Iterable.create("--class-path", folder.toString()), parameters.getArguments());
-                });
             });
 
             runner.testGroup("addXLint(String...)", () ->

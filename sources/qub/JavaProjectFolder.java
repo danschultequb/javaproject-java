@@ -226,7 +226,7 @@ public class JavaProjectFolder extends Folder
         return this.getFolder(JavaProjectFolder.sourcesFolderName);
     }
 
-    public Result<Folder> getTestsFolder()
+    public Result<Folder> getTestSourcesFolder()
     {
         return this.getFolder(JavaProjectFolder.testsFolderName);
     }

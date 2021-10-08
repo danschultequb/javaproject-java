@@ -480,13 +480,14 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -508,8 +509,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual(
@@ -546,7 +548,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -589,13 +591,14 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -617,8 +620,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual(
@@ -655,7 +659,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -697,14 +701,15 @@ public interface JavaProjectBuildTests
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
                     bJavaFile.setContentsAsString("B.java source code").await();
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
                             .setFunction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -727,9 +732,10 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
@@ -758,7 +764,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -801,17 +807,24 @@ public interface JavaProjectBuildTests
                     final File bJavaFile = testsFolder.getFile("B.java").await();
                     bJavaFile.setContentsAsString("B.java source code").await();
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final Folder outputsTestsFolder = outputsFolder.getFolder(testsFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsTestsFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java", "tests/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
+                            }));
+                    childProcessRunner.add(
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/tests/", "--class-path", "/project/folder/outputs/tests/;/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "tests/B.java")
+                            .setFunction(() ->
+                            {
                                 bClassFile.setContentsAsString("B.java byte code").await();
                             }));
 
@@ -819,7 +832,8 @@ public interface JavaProjectBuildTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Compiling 2 source files..."),
+                            "Compiling 1 source file...",
+                            "Compiling 1 test source file..."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -832,9 +846,11 @@ public interface JavaProjectBuildTests
                             sourcesFolder,
                             testsFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            outputsTestsFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
@@ -862,8 +878,10 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Update .java file dependencies...",
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
-                            "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java tests/B.java",
+                            "Compiling 1 source file...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "Compiling 1 test source file...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides tests/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -903,14 +921,15 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     aClassFile.setContentsAsString("A.java byte code").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -935,8 +954,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java byte code - 2", aClassFile.getContentsAsString().await());
@@ -965,7 +985,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -1109,7 +1129,8 @@ public interface JavaProjectBuildTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     aClassFile.setContentsAsString("A.java byte code").await();
                     final BuildJSON buildJson = BuildJSON.create()
                         .setProjectJson(projectJson)
@@ -1123,7 +1144,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -1149,8 +1170,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java byte code - 2", aClassFile.getContentsAsString().await());
@@ -1180,7 +1202,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -1226,7 +1248,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 JavaProjectBuildTests.writeIssues(error,
@@ -1289,7 +1311,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "1 Error:",
@@ -1445,8 +1467,9 @@ public interface JavaProjectBuildTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    aClassFile.setContentsAsString("A.java byte code").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    aClassFile.setContentsAsString("A.java byte code - 1").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     final BuildJSON buildJson = BuildJSON.create()
                         .setProjectJson(projectJson)
@@ -1465,7 +1488,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 JavaProjectBuildTests.writeIssues(error,
@@ -1475,6 +1498,7 @@ public interface JavaProjectBuildTests
                                         .setColumnNumber(20)
                                         .setType("warning")
                                         .setMessage("Are you still sure?"));
+                                aClassFile.setContentsAsString("A.java byte code - 2").await();
                             }));;
 
                     clock.advance(Duration.minutes(1));
@@ -1499,12 +1523,13 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(startTime, aClassFile.getLastModified().await());
-                    test.assertEqual("A.java byte code", aClassFile.getContentsAsString().await());
+                    test.assertEqual(clock.getCurrentDateTime(), aClassFile.getLastModified().await());
+                    test.assertEqual("A.java byte code - 2", aClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -1530,7 +1555,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "1 Warning:",
@@ -1575,13 +1600,12 @@ public interface JavaProjectBuildTests
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File bJavaFile = testsFolder.getFile("B.java").await();
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java", "tests/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 JavaProjectBuildTests.writeIssues(error,
@@ -1590,15 +1614,7 @@ public interface JavaProjectBuildTests
                                         .setLineNumber(1)
                                         .setColumnNumber(5)
                                         .setType("error")
-                                        .setMessage("Are you sure?"),
-                                    JavacIssue.create()
-                                        .setSourceFilePath("tests\\B.java")
-                                        .setLineNumber(10)
-                                        .setColumnNumber(7)
-                                        .setType("warning")
-                                        .setMessage("Can't be this."));
-
-                                bClassFile.setContentsAsString("B.java byte code").await();
+                                        .setMessage("Are you sure?"));
 
                                 return 1;
                             }));
@@ -1612,9 +1628,7 @@ public interface JavaProjectBuildTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Compiling 2 source files...",
-                            "1 Warning:",
-                            "tests/B.java (Line 10): Can't be this.",
+                            "Compiling 1 source file...",
                             "1 Error:",
                             "sources/A.java (Line 1): Are you sure?"),
                         process.getOutputWriteStream());
@@ -1629,13 +1643,10 @@ public interface JavaProjectBuildTests
                             sourcesFolder,
                             testsFolder,
                             projectJsonFile,
-                            bClassFile,
                             buildJsonFile,
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(clock.getCurrentDateTime(), bClassFile.getLastModified().await());
-                    test.assertEqual("B.java byte code", bClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -1661,12 +1672,10 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Update .java file dependencies...",
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
-                            "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java tests/B.java",
+                            "Compiling 1 source file...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
-                            "1 Warning:",
-                            "tests/B.java (Line 10): Can't be this.",
                             "1 Error:",
                             "sources/A.java (Line 1): Are you sure?",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -1712,8 +1721,10 @@ public interface JavaProjectBuildTests
                     final File cJavaFile = testsFolder.getFile("C.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File aTestsClassFile = outputsFolder.getFile("ATests.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final Folder outputsTestsFolder = outputsFolder.getFolder(testsFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File aTestsClassFile = outputsTestsFolder.getFile("ATests.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -1739,7 +1750,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java", "tests/ATests.java", "tests/C.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 JavaProjectBuildTests.writeIssues(error,
@@ -1754,48 +1765,24 @@ public interface JavaProjectBuildTests
                                         .setLineNumber(1)
                                         .setColumnNumber(5)
                                         .setType("error")
-                                        .setMessage("Are you sure?"),
-                                    JavacIssue.create()
-                                        .setSourceFilePath("tests\\C.java")
-                                        .setLineNumber(10)
-                                        .setColumnNumber(7)
-                                        .setType("warning")
-                                        .setMessage("Can't be this."),
-                                    JavacIssue.create()
-                                        .setSourceFilePath("tests\\C.java")
-                                        .setLineNumber(20)
-                                        .setColumnNumber(7)
-                                        .setType("error")
-                                        .setMessage("Can't be this."),
-                                    JavacIssue.create()
-                                        .setSourceFilePath("tests\\ATests.java")
-                                        .setLineNumber(10)
-                                        .setColumnNumber(7)
-                                        .setType("warning")
-                                        .setMessage("Can't be this."));
+                                        .setMessage("Are you sure?"));
 
-                                aTestsClassFile.setContentsAsString("ATests.java byte code").await();
-
-                                return 3;
+                                return 2;
                             }));
 
                     JavaProjectBuild.run(process, action);
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Compiling 4 source files...",
-                            "2 Warnings:",
-                            "tests/ATests.java (Line 10): Can't be this.",
-                            "tests/C.java (Line 10): Can't be this.",
-                            "3 Errors:",
+                            "Compiling 2 source files...",
+                            "2 Errors:",
                             "sources/A.java (Line 12): Are you sure?",
-                            "sources/B.java (Line 1): Are you sure?",
-                            "tests/C.java (Line 20): Can't be this."),
+                            "sources/B.java (Line 1): Are you sure?"),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
                         process.getErrorWriteStream());
-                    test.assertEqual(3, process.getExitCode());
+                    test.assertEqual(2, process.getExitCode());
 
                     test.assertEqual(
                         Iterable.create(
@@ -1803,16 +1790,14 @@ public interface JavaProjectBuildTests
                             sourcesFolder,
                             testsFolder,
                             projectJsonFile,
-                            aClassFile,
-                            aTestsClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile,
                             bJavaFile,
                             aTestsJavaFile,
                             cJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
-                    test.assertEqual(clock.getCurrentDateTime(), aTestsClassFile.getLastModified().await());
-                    test.assertEqual("ATests.java byte code", aTestsClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
@@ -1840,17 +1825,13 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Update .java file dependencies...",
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
-                            "Compiling 4 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java sources/B.java tests/ATests.java tests/C.java",
+                            "Compiling 2 source files...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
-                            "2 Warnings:",
-                            "tests/ATests.java (Line 10): Can't be this.",
-                            "tests/C.java (Line 10): Can't be this.",
-                            "3 Errors:",
+                            "2 Errors:",
                             "sources/A.java (Line 12): Are you sure?",
                             "sources/B.java (Line 1): Are you sure?",
-                            "tests/C.java (Line 20): Can't be this.",
                             "VERBOSE: Updating outputs/build.json..."),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
@@ -1890,8 +1871,9 @@ public interface JavaProjectBuildTests
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -1919,7 +1901,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -1942,9 +1924,10 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
@@ -1978,7 +1961,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2020,8 +2003,9 @@ public interface JavaProjectBuildTests
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -2049,7 +2033,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -2071,9 +2055,10 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
@@ -2106,7 +2091,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2148,8 +2133,9 @@ public interface JavaProjectBuildTests
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -2178,7 +2164,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -2201,9 +2187,10 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
@@ -2237,7 +2224,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/B.java - Dependency file(s) being compiled",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2279,8 +2266,9 @@ public interface JavaProjectBuildTests
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -2309,7 +2297,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/B.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2331,9 +2319,10 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
@@ -2366,7 +2355,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2408,8 +2397,9 @@ public interface JavaProjectBuildTests
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -2436,7 +2426,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/B.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2458,8 +2448,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            bClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            bClassFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("B.java byte code - 2", bClassFile.getContentsAsString().await());
@@ -2489,7 +2480,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/B.java - Dependency file(s) were deleted",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2531,8 +2522,9 @@ public interface JavaProjectBuildTests
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -2556,7 +2548,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -2578,9 +2570,10 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
@@ -2613,7 +2606,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2657,10 +2650,11 @@ public interface JavaProjectBuildTests
                     final File nJavaFile = sourcesFolder.getFile("N.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
-                    final File cClassFile = outputsFolder.getFile("C.class").await();
-                    final File nClassFile = outputsFolder.getFile("N.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
+                    final File cClassFile = outputsSourcesFolder.getFile("C.class").await();
+                    final File nClassFile = outputsSourcesFolder.getFile("N.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -2702,7 +2696,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java", "sources/C.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java", "sources/C.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -2726,11 +2720,12 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
                             cClassFile,
                             nClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile,
                             cJavaFile,
@@ -2771,7 +2766,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/A.java - Dependency file(s) being compiled",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 3 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java sources/B.java sources/C.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java sources/C.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2815,10 +2810,11 @@ public interface JavaProjectBuildTests
                     final File nJavaFile = sourcesFolder.getFile("N.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
-                    final File cClassFile = outputsFolder.getFile("C.class").await();
-                    final File nClassFile = outputsFolder.getFile("N.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
+                    final File cClassFile = outputsSourcesFolder.getFile("C.class").await();
+                    final File nClassFile = outputsSourcesFolder.getFile("N.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -2858,7 +2854,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -2881,10 +2877,11 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
                             nClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile,
                             nJavaFile),
@@ -2922,7 +2919,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/A.java - Dependency file(s) being compiled",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2966,10 +2963,11 @@ public interface JavaProjectBuildTests
                     final File nJavaFile = sourcesFolder.getFile("N.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
-                    final File bClassFile = outputsFolder.getFile("B.class").await();
-                    final File cClassFile = outputsFolder.getFile("C.class").await();
-                    final File nClassFile = outputsFolder.getFile("N.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
+                    final File cClassFile = outputsSourcesFolder.getFile("C.class").await();
+                    final File nClassFile = outputsSourcesFolder.getFile("N.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -3009,7 +3007,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/C.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/C.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 cClassFile.setContentsAsString("C.java byte code - 2").await();
@@ -3031,11 +3029,12 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
                             aClassFile,
                             bClassFile,
                             cClassFile,
                             nClassFile,
-                            buildJsonFile,
                             aJavaFile,
                             bJavaFile,
                             cJavaFile,
@@ -3074,7 +3073,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: sources/C.java - Missing or modified class file(s)",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/C.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/C.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -3593,7 +3592,8 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -3622,7 +3622,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -3644,8 +3644,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java byte code - 2", aClassFile.getContentsAsString().await());
@@ -3674,7 +3675,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -3732,7 +3733,8 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -3761,7 +3763,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/;/qub/other-publisher/other-project/versions/2/other-project.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/other-publisher/other-project/versions/2/other-project.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -3783,8 +3785,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java byte code - 2", aClassFile.getContentsAsString().await());
@@ -3814,7 +3817,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/;/qub/other-publisher/other-project/versions/2/other-project.jar -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/other-publisher/other-project/versions/2/other-project.jar -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -4327,7 +4330,8 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -4339,7 +4343,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -4361,8 +4365,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java byte code", aClassFile.getContentsAsString().await());
@@ -4393,7 +4398,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -4473,7 +4478,8 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();
@@ -4485,7 +4491,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -4507,8 +4513,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java byte code", aClassFile.getContentsAsString().await());
@@ -4539,7 +4546,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -4728,8 +4735,10 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
+
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
 
                     final ManualClock clock = process.getClock();
                     final DateTime startTime = clock.getCurrentDateTime();
@@ -4742,7 +4751,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/", "--class-path", "/project/folder/outputs/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                             .setFunction((ByteWriteStream output, ByteWriteStream error) ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 1").await();
@@ -4766,8 +4775,9 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java source code - 2", aJavaFile.getContentsAsString().await());
@@ -4812,7 +4822,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/ --class-path /project/folder/outputs/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),

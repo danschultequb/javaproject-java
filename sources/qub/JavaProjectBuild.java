@@ -382,46 +382,108 @@ public interface JavaProjectBuild
                         }
                         else
                         {
-                            final int javaFilesToCompileCount = javaFilesToCompile.getCount();
-                            outputStream.writeLine("Compiling " + javaFilesToCompileCount + " source file" + (javaFilesToCompileCount == 1 ? "" : "s") + "...").await();
-                            final JavacResult javacResult = javac.compile((JavacParameters javacParameters) ->
+                            JavacResult javacResult = null;
+
+                            final Iterable<Path> javaFileRelativePathsToCompile = javaFilesToCompile.map(BuildJSONJavaFile::getRelativePath).toList();
+
+                            final List<String> dependencyCompiledSourcesJarFilePaths = List.create();
+                            for (final JavaPublishedProjectFolder dependencyFolder : dependencyFolders)
                             {
-                                javacParameters.addDirectory(outputsFolder);
+                                final File dependencySourcesJarFile = dependencyFolder.getCompiledSourcesJarFile().await();
+                                dependencyCompiledSourcesJarFilePaths.add(dependencySourcesJarFile.toString());
+                            }
 
-                                final List<String> classpath = List.create(outputsFolder.toString());
-                                if (dependencyFolders.any())
+                            final Folder sourcesFolder = projectFolder.getSourcesFolder().await();
+                            final Path sourcesFolderRelativePath = sourcesFolder.relativeTo(projectFolder);
+                            final Folder sourcesOutputFolder = outputsFolder.getFolder(sourcesFolder.relativeTo(projectFolder)).await();
+                            final Iterable<String> javaSourceFileRelativePathsToCompile = javaFileRelativePathsToCompile
+                                .where(path -> path.startsWith(sourcesFolderRelativePath))
+                                .map(Path::toString)
+                                .order(Strings::lessThan)
+                                .toList();
+                            final int javaSourceFilesToCompileCount = javaSourceFileRelativePathsToCompile.getCount();
+                            if (javaSourceFilesToCompileCount > 0)
+                            {
+                                outputStream.writeLine("Compiling " + javaSourceFilesToCompileCount + " source file" + (javaSourceFilesToCompileCount == 1 ? "" : "s") + "...").await();
+                                javacResult = javac.compile((JavacParameters javacParameters) ->
                                 {
-                                    classpath.addAll(dependencyFolders.map(folder -> folder.getCompiledSourcesJarFile().await().toString()));
-                                }
-                                javacParameters.addClasspath(classpath);
+                                    javacParameters.addDirectory(sourcesOutputFolder);
 
-                                javacParameters.addXLint("all", "-try", "-overrides");
-                                javacParameters.addArguments(javaFilesToCompile
-                                    .map(BuildJSONJavaFile::getRelativePath)
+                                    final List<String> classpath = List.create(sourcesOutputFolder.toString());
+                                    classpath.addAll(dependencyCompiledSourcesJarFilePaths);
+                                    javacParameters.addClasspath(classpath);
+
+                                    javacParameters.addXLint("all", "-try", "-overrides");
+                                    javacParameters.addArguments(javaSourceFileRelativePathsToCompile);
+                                }).await();
+
+                                process.setExitCode(javacResult.getExitCode());
+                            }
+
+                            if (javacResult == null || javacResult.getExitCode() == 0)
+                            {
+                                final Folder testSourcesFolder = projectFolder.getTestSourcesFolder().await();
+                                final Path testSourcesFolderRelativePath = testSourcesFolder.relativeTo(projectFolder);
+                                final Folder testSourcesOutputFolder = outputsFolder.getFolder(testSourcesFolder.relativeTo(projectFolder)).await();
+                                final Iterable<String> javaTestSourceFileRelativePathsToCompile = javaFileRelativePathsToCompile
+                                    .where(path -> path.startsWith(testSourcesFolderRelativePath))
                                     .map(Path::toString)
-                                    .order(Strings::lessThan));
-                            }).await();
+                                    .order(Strings::lessThan)
+                                    .toList();
+                                final int javaTestSourceFilesToCompileCount = javaTestSourceFileRelativePathsToCompile.getCount();
+                                if (javaTestSourceFilesToCompileCount > 0)
+                                {
+                                    final List<String> dependencyCompiledTestSourcesJarFilePaths = List.create();
+                                    for (final JavaPublishedProjectFolder dependencyFolder : dependencyFolders)
+                                    {
+                                        final File dependencyTestSourcesJarFile = dependencyFolder.getCompiledTestsJarFile().await();
+                                        if (dependencyTestSourcesJarFile.exists().await())
+                                        {
+                                            dependencyCompiledTestSourcesJarFilePaths.add(dependencyTestSourcesJarFile.toString());
+                                        }
+                                    }
 
-                            process.setExitCode(javacResult.getExitCode());
+                                    outputStream.writeLine("Compiling " + javaTestSourceFilesToCompileCount + " test source file" + (javaTestSourceFilesToCompileCount == 1 ? "" : "s") + "...").await();
+                                    javacResult = javac.compile((JavacParameters javacParameters) ->
+                                    {
+                                        javacParameters.addDirectory(testSourcesOutputFolder);
 
-                            verboseStream.writeLine("Adding compilation issues to new build.json...").await();
-                            for (final JavacIssue issue : javacResult.getIssues())
+                                        final List<String> classpath = List.create(
+                                            testSourcesOutputFolder.toString(),
+                                            sourcesOutputFolder.toString());
+                                        classpath.addAll(dependencyCompiledSourcesJarFilePaths);
+                                        classpath.addAll(dependencyCompiledTestSourcesJarFilePaths);
+                                        javacParameters.addClasspath(classpath);
+
+                                        javacParameters.addXLint("all", "-try", "-overrides");
+                                        javacParameters.addArguments(javaTestSourceFileRelativePathsToCompile);
+                                    }).await();
+
+                                    process.setExitCode(javacResult.getExitCode());
+                                }
+                            }
+
+                            if (javacResult != null)
                             {
-                                if (Comparer.equalIgnoreCase("warning", issue.getType()))
+                                verboseStream.writeLine("Adding compilation issues to new build.json...").await();
+                                for (final JavacIssue issue : javacResult.getIssues())
                                 {
-                                    newWarnings.add(issue);
-                                }
-                                else if (Comparer.equalIgnoreCase("error", issue.getType()))
-                                {
-                                    newErrors.add(issue);
-                                }
-                                else
-                                {
-                                    newUnrecognizedIssues.add(issue);
-                                }
+                                    if (Comparer.equalIgnoreCase("warning", issue.getType()))
+                                    {
+                                        newWarnings.add(issue);
+                                    }
+                                    else if (Comparer.equalIgnoreCase("error", issue.getType()))
+                                    {
+                                        newErrors.add(issue);
+                                    }
+                                    else
+                                    {
+                                        newUnrecognizedIssues.add(issue);
+                                    }
 
-                                newBuildJson.getJavaFile(issue.getSourceFilePath()).await()
-                                    .addIssue(issue);
+                                    newBuildJson.getJavaFile(issue.getSourceFilePath()).await()
+                                        .addIssue(issue);
+                                }
                             }
 
                             verboseStream.writeLine("Associating .class files with original .java files...").await();
@@ -439,14 +501,7 @@ public interface JavaProjectBuild
                                 classSourceFileRelativePathSegments.removeLast();
                                 classSourceFileRelativePathSegments.add(typeName + ".java");
 
-                                final Path classSourceFileRelativeToSourceFolderPath = Path.parse(Strings.join('/', classSourceFileRelativePathSegments));
-                                File classSourceFile = projectFolder.getSourcesFolder().await()
-                                    .getFile(classSourceFileRelativeToSourceFolderPath).await();
-                                if (!classSourceFile.exists().await())
-                                {
-                                    classSourceFile = projectFolder.getTestsFolder().await()
-                                        .getFile(classSourceFileRelativeToSourceFolderPath).await();
-                                }
+                                File classSourceFile = projectFolder.getFile(Strings.join('/', classSourceFileRelativePathSegments)).await();
                                 final Path classSourceFileRelativeToProjectFolderPath = classSourceFile.relativeTo(projectFolder);
                                 final BuildJSONJavaFile javaFile = newBuildJson.getJavaFile(classSourceFileRelativeToProjectFolderPath).await();
                                 javaFile.addClassFile(classFile.relativeTo(projectFolder), classFile.getLastModified().await());

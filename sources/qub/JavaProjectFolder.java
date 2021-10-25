@@ -23,21 +23,23 @@ public class JavaProjectFolder extends Folder
         return this.getFolder(JavaProjectFolder.outputsFolderName);
     }
 
-    public Result<Folder> getSourceOutputsFolder()
+    public Result<Folder> getOutputsSourcesFolder()
     {
         return Result.create(() ->
         {
             final Folder outputsFolder = this.getOutputsFolder().await();
-            return outputsFolder.getFolder(JavaProjectFolder.sourcesFolderName).await();
+            final Folder sourcesFolder = this.getSourcesFolder().await();
+            return outputsFolder.getFolder(sourcesFolder.relativeTo(this)).await();
         });
     }
 
-    public Result<Folder> getTestOutputsFolder()
+    public Result<Folder> getOutputsTestsFolder()
     {
         return Result.create(() ->
         {
             final Folder outputsFolder = this.getOutputsFolder().await();
-            return outputsFolder.getFolder(JavaProjectFolder.testsFolderName).await();
+            final Folder testSourcesFolder = this.getTestSourcesFolder().await();
+            return outputsFolder.getFolder(testSourcesFolder.relativeTo(this)).await();
         });
     }
 
@@ -90,17 +92,69 @@ public class JavaProjectFolder extends Folder
         });
     }
 
-    public Result<Iterable<JavaClassFile>> getClassFiles()
+    public Result<File> getTestJsonFile()
     {
         return Result.create(() ->
         {
             final Folder outputsFolder = this.getOutputsFolder().await();
-            return outputsFolder.iterateFilesRecursively()
-                .catchError(NotFoundException.class)
-                .where((File file) -> Comparer.equalIgnoreCase(".class", file.getFileExtension()))
-                .map(JavaClassFile::get)
-                .toList();
+            return outputsFolder.getFile("test.json").await();
         });
+    }
+
+    public Result<Path> getTestJsonRelativePath()
+    {
+        return Result.create(() ->
+        {
+            final File testJsonFile = this.getTestJsonFile().await();
+            return testJsonFile.relativeTo(this);
+        });
+    }
+
+    public Result<CharacterWriteStream> getTestJsonFileWriteStream()
+    {
+        return Result.create(() ->
+        {
+            final File testJsonFile = this.getTestJsonFile().await();
+            return CharacterWriteStream.create(ByteWriteStream.buffer(testJsonFile.getContentsByteWriteStream().await()));
+        });
+    }
+
+    public Result<Void> writeTestJson(TestJSON testJson)
+    {
+        PreCondition.assertNotNull(testJson, "testJson");
+
+        return Result.create(() ->
+        {
+            try (final CharacterWriteStream writeStream = this.getTestJsonFileWriteStream().await())
+            {
+                testJson.toString(writeStream, JSONFormat.pretty).await();
+            }
+        });
+    }
+
+    public Result<TestJSON> getTestJson()
+    {
+        return Result.create(() ->
+        {
+            final File testJsonFile = this.getTestJsonFile().await();
+            return TestJSON.parse(testJsonFile).await();
+        });
+    }
+
+    public Iterator<JavaClassFile> iterateClassFiles()
+    {
+        final Folder outputsFolder = this.getOutputsFolder().await();
+        return JavaProjectFolder.iterateClassFilesFromOutputsFolder(outputsFolder);
+    }
+
+    public static Iterator<JavaClassFile> iterateClassFilesFromOutputsFolder(Folder outputsFolder)
+    {
+        PreCondition.assertNotNull(outputsFolder, "outputsFolder");
+
+        return outputsFolder.iterateFilesRecursively()
+            .catchError(NotFoundException.class)
+            .where((File file) -> Comparer.equalIgnoreCase(".class", file.getFileExtension()))
+            .map(JavaClassFile::get);
     }
 
     /**
@@ -180,31 +234,12 @@ public class JavaProjectFolder extends Folder
         return this.getFile("project.json");
     }
 
-    private Result<JavaProjectJSON> getProjectJson()
+    public Result<JavaProjectJSON> getProjectJson()
     {
         return Result.create(() ->
         {
             final File projectJsonFile = this.getProjectJsonFile().await();
             return JavaProjectJSON.parse(projectJsonFile).await();
-        });
-    }
-
-    public Result<JavaProjectJSON> getProjectJson(CharacterWriteStream outputStream)
-    {
-        PreCondition.assertNotNull(outputStream, "outputStream");
-
-        return Result.create(() ->
-        {
-            return this.getProjectJson()
-                .onError(FileNotFoundException.class, () ->
-                {
-                    outputStream.writeLine("No project.json file exists in the project folder at " + Strings.escapeAndQuote(this) + ".").await();
-                })
-                .onError(ParseException.class, (ParseException error) ->
-                {
-                    outputStream.writeLine("Invalid project.json file: " + error.getMessage()).await();
-                })
-                .await();
         });
     }
 
@@ -218,6 +253,78 @@ public class JavaProjectFolder extends Folder
         {
             final JavaProjectJSON projectJson = this.getProjectJson().await();
             return projectJson.getDependencies();
+        });
+    }
+
+    public Result<Iterable<ProjectSignature>> getAllDependencies(QubFolder qubFolder, boolean validateDependencies)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+
+        return JavaProjectFolder.getAllDependencies(qubFolder, this.getDependencies().await(), validateDependencies);
+    }
+
+    public static Result<Iterable<ProjectSignature>> getAllDependencies(QubFolder qubFolder, Iterable<ProjectSignature> projectSignatures, boolean validateDependencies)
+    {
+        return JavaProjectFolder.getAllDependencyFolders(qubFolder, projectSignatures, validateDependencies)
+            .then((Iterable<JavaPublishedProjectFolder> allDependencies) ->
+            {
+                return allDependencies.map((JavaPublishedProjectFolder dependency) -> dependency.getProjectSignature().await());
+            });
+    }
+
+    public Result<Iterable<JavaPublishedProjectFolder>> getAllDependencyFolders(QubFolder qubFolder, boolean validateDependencies)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+
+        return JavaProjectFolder.getAllDependencyFolders(qubFolder, this.getDependencies().await(), validateDependencies);
+    }
+
+    public static Result<Iterable<JavaPublishedProjectFolder>> getAllDependencyFolders(QubFolder qubFolder, Iterable<ProjectSignature> projectSignatures, boolean validateDependencies)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+        PreCondition.assertNotNull(projectSignatures, "projectSignatures");
+
+        return Result.create(() ->
+        {
+            final Iterable<QubProjectVersionFolder> dependencyFolders = qubFolder.getAllDependencyFolders(projectSignatures,
+                (QubProjectVersionFolder projectVersionFolder) ->
+                {
+                    return Result.create(() ->
+                    {
+                        final JavaPublishedProjectFolder javaPublishedProjectFolder = JavaPublishedProjectFolder.get(projectVersionFolder);
+                        return javaPublishedProjectFolder.getDependencies()
+                            .convertError(NotFoundException.class, (NotFoundException error) ->
+                            {
+                                Throwable result;
+                                final QubPublisherFolder publisherFolder = projectVersionFolder.getPublisherFolder().await();
+                                final QubProjectFolder projectFolder = projectVersionFolder.getProjectFolder().await();
+                                if (!publisherFolder.exists().await())
+                                {
+                                    result = new NotFoundException("No publisher folder named " + Strings.escapeAndQuote(publisherFolder.getPublisherName()) + " found in the Qub folder (" + qubFolder + ").");
+                                }
+                                else if (!projectFolder.exists().await())
+                                {
+                                    final String project = projectFolder.getProjectName();
+                                    result = new NotFoundException("No project folder named " + Strings.escapeAndQuote(project) + " found in the " + Strings.escapeAndQuote(publisherFolder.getPublisherName()) + " publisher folder (" + publisherFolder + ").");
+                                }
+                                else if (!projectVersionFolder.exists().await())
+                                {
+
+                                    final VersionNumber projectVersion = projectVersionFolder.getVersion().await();
+                                    final String projectSignatureWithoutVersion = projectVersionFolder.getProjectSignature().await().toStringIgnoreVersion();
+                                    result = new NotFoundException("No version folder named " + Strings.escapeAndQuote(projectVersion) + " found in the " + Strings.escapeAndQuote(projectSignatureWithoutVersion) + " project folder (" + projectFolder + ").");
+                                }
+                                else
+                                {
+                                    result = error;
+                                }
+                                return result;
+                            })
+                            .await();
+                    });
+                },
+                validateDependencies).await();
+            return dependencyFolders.map(JavaPublishedProjectFolder::get);
         });
     }
 

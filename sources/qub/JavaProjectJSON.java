@@ -266,6 +266,35 @@ public class JavaProjectJSON extends ProjectJSONWrapperBase<JavaProjectJSON>
             .map(JavaProjectJSON::projectSignatureToJson)));
     }
 
+    /**
+     * Get the published project folders of the dependencies found in this project's dependency
+     * graph.
+     * @param qubFolder The {@link QubFolder} to look for dependencies in.
+     * @return The published project folders of the dependencies found in this project's dependency
+     * graph.
+     */
+    public Result<Iterable<JavaPublishedProjectFolder>> getAllDependencyFolders(QubFolder qubFolder)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+
+        return qubFolder.getAllDependencyFolders(
+            this.getDependencies(),
+            (QubProjectVersionFolder projectVersionFolder) ->
+            {
+                return Result.create(() ->
+                {
+                    final JavaPublishedProjectFolder javaProjectVersionFolder = JavaPublishedProjectFolder.get(projectVersionFolder);
+                    final JavaProjectJSON dependencyProjectJson = javaProjectVersionFolder.getProjectJson().await();
+                    return dependencyProjectJson.getDependencies();
+                });
+            },
+            true)
+            .then((Iterable<QubProjectVersionFolder> projectVersionFolders) ->
+            {
+                return projectVersionFolders.map(JavaPublishedProjectFolder::get);
+            });
+    }
+
     public static JSONObject projectSignatureToJson(ProjectSignature projectSignature)
     {
         PreCondition.assertNotNull(projectSignature, "projectSignature");

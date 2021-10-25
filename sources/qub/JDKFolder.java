@@ -18,23 +18,22 @@ public class JDKFolder extends Folder
         return Result.success(new JDKFolder(innerFolder));
     }
 
-    public static Result<JDKFolder> getLatestVersion(QubFolder qubFolder, CharacterWriteStream outputStream)
+    public static Result<JDKFolder> getLatestVersion(QubFolder qubFolder)
     {
         PreCondition.assertNotNull(qubFolder, "qubFolder");
-        PreCondition.assertNotNull(outputStream, "outputStream");
 
         return Result.create(() ->
         {
             final String jdkPublisherName = "openjdk";
             final String jdkProjectName = "jdk";
-            final QubProjectVersionFolder latestJdkFolder = qubFolder.getProjectLatestVersionFolder(jdkPublisherName, jdkProjectName)
-                .onError(NotFoundException.class, () ->
-                {
-                    outputStream.writeLine("No openjdk/jdk project is installed in the qub folder at " + Strings.escapeAndQuote(qubFolder) + ".").await();
-                })
-                .await();
+            final QubProjectVersionFolder latestJdkFolder = qubFolder.getLatestProjectVersionFolder(jdkPublisherName, jdkProjectName).await();
             return JDKFolder.get(latestJdkFolder).await();
         });
+    }
+
+    public Result<File> getJavacFile()
+    {
+        return this.getFile("bin/javac");
     }
 
     public Result<Javac> getJavac(DesktopProcess process)
@@ -50,9 +49,31 @@ public class JDKFolder extends Folder
 
         return Result.create(() ->
         {
-            final File javacFile = this.getFile("bin/javac").await();
             return Javac.create(childProcessRunner)
-                .setExecutablePath(javacFile);
+                .setExecutablePath(this.getJavacFile().await());
+        });
+    }
+
+    public Result<File> getJavaFile()
+    {
+        return this.getFile("bin/java");
+    }
+
+    public Result<Java> getJava(DesktopProcess process)
+    {
+        PreCondition.assertNotNull(process, "process");
+
+        return this.getJava(process.getChildProcessRunner());
+    }
+
+    public Result<Java> getJava(ChildProcessRunner childProcessRunner)
+    {
+        PreCondition.assertNotNull(childProcessRunner, "childProcessRunner");
+
+        return Result.create(() ->
+        {
+            return Java.create(childProcessRunner)
+                .setExecutablePath(this.getJavaFile().await());
         });
     }
 }

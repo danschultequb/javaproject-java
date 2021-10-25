@@ -10,17 +10,17 @@
       {
         "publisher": "qub",
         "project": "projectjson-java",
-        "version": "105"
+        "version": "108"
       },
       {
         "publisher": "qub",
         "project": "git-java",
-        "version": "30"
+        "version": "33"
       },
       {
         "publisher": "qub",
         "project": "github-java",
-        "version": "11"
+        "version": "14"
       }
     ]
   }

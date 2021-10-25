@@ -1,45 +1,35 @@
 package qub;
 
-public class BuildJSONClassFile
+public class BuildJSONClassFile extends JSONPropertyWrapperBase
 {
-    private final Path relativePath;
-    private final DateTime lastModified;
-
-    private BuildJSONClassFile(Path relativePath, DateTime lastModified)
+    private BuildJSONClassFile(JSONProperty innerProperty)
     {
-        PreCondition.assertNotNull(relativePath, "relativePath");
-        PreCondition.assertFalse(relativePath.isRooted(), "relativePath.isRooted()");
-        PreCondition.assertNotNull(lastModified, "lastModified");
+        super(innerProperty);
+    }
 
-        this.relativePath = relativePath;
-        this.lastModified = lastModified;
+    public static BuildJSONClassFile create(JSONProperty innerProperty)
+    {
+        return new BuildJSONClassFile(innerProperty);
     }
 
     public static BuildJSONClassFile create(Path relativePath, DateTime lastModified)
     {
-        return new BuildJSONClassFile(relativePath, lastModified);
+        PreCondition.assertNotNull(relativePath, "relativePath");
+        PreCondition.assertNotNull(lastModified, "lastModified");
+
+        return BuildJSONClassFile.create(JSONProperty.create(relativePath.toString(), lastModified.toString()));
     }
 
     public Path getRelativePath()
     {
-        return this.relativePath;
+        return Path.parse(this.toJson().getName());
     }
 
     public DateTime getLastModified()
     {
-        return this.lastModified;
-    }
-
-    @Override
-    public boolean equals(Object rhs)
-    {
-        return rhs instanceof BuildJSONClassFile && this.equals((BuildJSONClassFile)rhs);
-    }
-
-    public boolean equals(BuildJSONClassFile rhs)
-    {
-        return rhs != null &&
-            this.relativePath.equals(rhs.relativePath) &&
-            this.lastModified.equals(rhs.lastModified);
+        return this.toJson().getStringValue()
+            .then((String lastModifiedString) -> DateTime.parse(lastModifiedString).await())
+            .catchError()
+            .await();
     }
 }

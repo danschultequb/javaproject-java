@@ -70,6 +70,15 @@ public class JavaPublishedProjectFolder extends QubProjectVersionFolder
         });
     }
 
+    public Result<Iterable<ProjectSignature>> getDependencies()
+    {
+        return Result.create(() ->
+        {
+            final JavaProjectJSON projectJson = this.getProjectJson().await();
+            return projectJson.getDependencies();
+        });
+    }
+
     public Result<File> getCompiledSourcesJarFile()
     {
         return Result.create(() ->

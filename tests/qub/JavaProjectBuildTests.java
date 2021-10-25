@@ -521,7 +521,8 @@ public interface JavaProjectBuildTests
                             .setJavaFiles(Iterable.create(
                                 BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                     .setLastModified(startTime)
-                                    .addClassFile(aClassFile.relativeTo(projectFolder), startTime)))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime)))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
 
@@ -535,6 +536,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -632,7 +634,8 @@ public interface JavaProjectBuildTests
                             .setJavaFiles(Iterable.create(
                                 BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                     .setLastModified(startTime)
-                                    .addClassFile(aClassFile.relativeTo(projectFolder), startTime)))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime)))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
 
@@ -646,6 +649,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -750,6 +754,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -865,6 +870,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -972,6 +978,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -1035,7 +1042,8 @@ public interface JavaProjectBuildTests
                         .setJavacVersion("17")
                         .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                             .setLastModified(startTime)
-                            .addClassFile(aClassFile.relativeTo(projectFolder), startTime));
+                            .setClassFiles(Iterable.create(
+                                BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))));
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     buildJsonFile.setContentsAsString(buildJson.toString()).await();
 
@@ -1078,6 +1086,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -1137,7 +1146,8 @@ public interface JavaProjectBuildTests
                         .setJavacVersion("17")
                         .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                             .setLastModified(startTime)
-                            .addClassFile(aClassFile.relativeTo(projectFolder), startTime));
+                            .setClassFiles(Iterable.create(
+                                BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))));
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     buildJsonFile.setContentsAsString(buildJson.toString()).await();
 
@@ -1189,6 +1199,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -1298,6 +1309,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -1364,13 +1376,15 @@ public interface JavaProjectBuildTests
                         .setJavacVersion("17")
                         .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                             .setLastModified(startTime)
-                            .addClassFile(aClassFile.relativeTo(projectFolder), startTime)
-                            .addIssue(JavacIssue.create()
-                                .setSourceFilePath(aJavaFile.relativeTo(projectFolder))
-                                .setLineNumber(1)
-                                .setColumnNumber(20)
-                                .setType("WARNING")
-                                .setMessage("Are you sure?")));
+                            .setClassFiles(Iterable.create(
+                                BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime)))
+                            .setIssues(Iterable.create(
+                                JavacIssue.create()
+                                    .setSourceFilePath(aJavaFile.relativeTo(projectFolder))
+                                    .setLineNumber(1)
+                                    .setColumnNumber(20)
+                                    .setType("WARNING")
+                                    .setMessage("Are you sure?"))));
                     buildJsonFile.setContentsAsString(buildJson.toString(JSONFormat.pretty)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
@@ -1414,6 +1428,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -1476,13 +1491,15 @@ public interface JavaProjectBuildTests
                         .setJavacVersion("17")
                         .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                             .setLastModified(startTime)
-                            .addClassFile(aClassFile.relativeTo(projectFolder), startTime)
-                            .addIssue(JavacIssue.create()
-                                .setSourceFilePath(aJavaFile.relativeTo(projectFolder))
-                                .setLineNumber(1)
-                                .setColumnNumber(20)
-                                .setType("WARNING")
-                                .setMessage("Are you sure?")));
+                            .setClassFiles(Iterable.create(
+                                BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime)))
+                            .setIssues(Iterable.create(
+                                JavacIssue.create()
+                                    .setSourceFilePath(aJavaFile.relativeTo(projectFolder))
+                                    .setLineNumber(1)
+                                    .setColumnNumber(20)
+                                    .setType("WARNING")
+                                    .setMessage("Are you sure?"))));
                     buildJsonFile.setContentsAsString(buildJson.toString(JSONFormat.pretty)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
@@ -1542,6 +1559,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -1659,6 +1677,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -1736,7 +1755,8 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -1810,6 +1830,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -1886,10 +1907,12 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -1947,6 +1970,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -2019,10 +2043,12 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -2078,6 +2104,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -2149,11 +2176,14 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(aJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(
+                                    aJavaFile.relativeTo(projectFolder))))
                             .toString())
                         .await();
 
@@ -2210,6 +2240,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -2282,11 +2313,14 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(aJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(
+                                    aJavaFile.relativeTo(projectFolder))))
                             .toString())
                         .await();
 
@@ -2342,6 +2376,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -2413,11 +2448,13 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(aJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(aJavaFile.relativeTo(projectFolder))))
                             .toString())
                         .await();
 
@@ -2466,6 +2503,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -2537,7 +2575,8 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -2593,6 +2632,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -2674,18 +2714,24 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(bJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(
+                                    bJavaFile.relativeTo(projectFolder))))
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(cJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(
+                                    cJavaFile.relativeTo(projectFolder))))
                             .setJavaFile(BuildJSONJavaFile.create(cJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(cClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(cClassFile.relativeTo(projectFolder), startTime))))
                             .setJavaFile(BuildJSONJavaFile.create(nJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(nClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(nClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -2751,6 +2797,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -2834,18 +2881,24 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(bJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(
+                                    bJavaFile.relativeTo(projectFolder))))
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(cJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(
+                                    cJavaFile.relativeTo(projectFolder))))
                             .setJavaFile(BuildJSONJavaFile.create(cJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(cClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(cClassFile.relativeTo(projectFolder), startTime))))
                             .setJavaFile(BuildJSONJavaFile.create(nJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(nClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(nClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -2904,6 +2957,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -2987,18 +3041,24 @@ public interface JavaProjectBuildTests
                             .setJavacVersion("17")
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(bJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(
+                                    bJavaFile.relativeTo(projectFolder))))
                             .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(bClassFile.relativeTo(projectFolder), startTime)
-                                .addDependency(cJavaFile.relativeTo(projectFolder)))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime)))
+                                .setDependencies(Iterable.create(
+                                    cJavaFile.relativeTo(projectFolder))))
                             .setJavaFile(BuildJSONJavaFile.create(cJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(cClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(cClassFile.relativeTo(projectFolder), startTime))))
                             .setJavaFile(BuildJSONJavaFile.create(nJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(nClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(nClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -3060,6 +3120,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -3136,7 +3197,8 @@ public interface JavaProjectBuildTests
                                 .setVersion("fake-version"))
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -3179,6 +3241,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -3251,7 +3314,8 @@ public interface JavaProjectBuildTests
                                 .setVersion("fake-version"))
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -3294,6 +3358,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -3366,7 +3431,8 @@ public interface JavaProjectBuildTests
                                 .setVersion("old-fake-version"))
                             .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                 .setLastModified(startTime)
-                                .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                             .toString())
                         .await();
 
@@ -3409,6 +3475,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -3486,7 +3553,8 @@ public interface JavaProjectBuildTests
                                     .setVersion("fake-version"))
                                 .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                     .setLastModified(startTime)
-                                    .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                                 .toString())
                         .await();
 
@@ -3613,7 +3681,8 @@ public interface JavaProjectBuildTests
                                     .setDependencies(Iterable.create(otherProjectFolder.getProjectSignature().await())))
                                 .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                     .setLastModified(startTime)
-                                    .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                                 .toString())
                         .await();
 
@@ -3663,6 +3732,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have changed.",
@@ -3754,7 +3824,8 @@ public interface JavaProjectBuildTests
                                     .setDependencies(Iterable.create(otherProjectVersionFolder1.getProjectSignature().await())))
                                 .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                     .setLastModified(startTime)
-                                    .addClassFile(aClassFile.relativeTo(projectFolder), startTime))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))))
                                 .toString())
                         .await();
 
@@ -3894,12 +3965,14 @@ public interface JavaProjectBuildTests
                                     .setVersion("fake-version"))
                                 .setJavaFile(BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                     .setLastModified(startTime)
-                                    .addClassFile(aClassFile.relativeTo(projectFolder), startTime)
-                                    .addClassFile(a1ClassFile.relativeTo(projectFolder), startTime)
-                                    .addClassFile(a2ClassFile.relativeTo(projectFolder), startTime))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime),
+                                        BuildJSONClassFile.create(a1ClassFile.relativeTo(projectFolder), startTime),
+                                        BuildJSONClassFile.create(a2ClassFile.relativeTo(projectFolder), startTime))))
                                 .setJavaFile(BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
                                     .setLastModified(startTime)
-                                    .addClassFile(bClassFile.relativeTo(projectFolder), startTime))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime))))
                                 .toString())
                         .await();
 
@@ -3942,6 +4015,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",
@@ -4795,7 +4869,8 @@ public interface JavaProjectBuildTests
                             .setJavaFiles(Iterable.create(
                                 BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
                                     .setLastModified(startTime)
-                                    .addClassFile(aClassFile.relativeTo(projectFolder), beforeBuild)))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), beforeBuild)))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
 
@@ -4809,6 +4884,7 @@ public interface JavaProjectBuildTests
                     test.assertLinesEqual(
                         Iterable.create(
                             "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Checking if dependencies have changed since the previous build...",
                             "VERBOSE:   Previous dependencies have not changed.",

@@ -1,6 +1,6 @@
 package qub;
 
-public interface JavaProjectJsonTests
+public interface JavaProjectJSONTests
 {
     static void test(TestRunner runner)
     {
@@ -468,6 +468,322 @@ public interface JavaProjectJsonTests
                     "{\"java\":false}",
                     JavaProjectJSON.create(JSONObject.create()
                         .setBoolean("java", false)));
+            });
+
+            runner.testGroup("getMainClass()", () ->
+            {
+                final Action2<JSONObject,String> getMainClassTest = (JSONObject json, String expected) ->
+                {
+                    runner.test("with " + json, (Test test) ->
+                    {
+                        final JavaProjectJSON projectJson = JavaProjectJSON.create(json);
+                        test.assertEqual(expected, projectJson.getMainClass());
+                    });
+                };
+
+                getMainClassTest.run(
+                    JSONObject.create(),
+                    null);
+                getMainClassTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()),
+                    null);
+                getMainClassTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setNull("mainClass")),
+                    null);
+                getMainClassTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("mainClass", "")),
+                    "");
+                getMainClassTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("mainClass", "hello")),
+                    "hello");
+            });
+
+            runner.testGroup("setMainClass(String)", () ->
+            {
+                final Action2<JSONObject,String> getMainClassTest = (JSONObject json, String mainClass) ->
+                {
+                    runner.test("with " + English.andList(json, Strings.escapeAndQuote(mainClass)), (Test test) ->
+                    {
+                        final JavaProjectJSON projectJson = JavaProjectJSON.create(json);
+                        final JavaProjectJSON setMainClassResult = projectJson.setMainClass(mainClass);
+                        test.assertSame(projectJson, setMainClassResult);
+                        test.assertEqual(mainClass, projectJson.getMainClass());
+                    });
+                };
+
+                getMainClassTest.run(
+                    JSONObject.create(),
+                    "fake.main.class");
+                getMainClassTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()),
+                    "fake.main.class");
+                getMainClassTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setNull("mainClass")),
+                    "fake.main.class");
+                getMainClassTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("mainClass", "")),
+                    "fake.main.class");
+                getMainClassTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("mainClass", "hello")),
+                    "fake.main.class");
+            });
+
+            runner.testGroup("getShortcutName()", () ->
+            {
+                final Action2<JSONObject,String> getShortcutNameTest = (JSONObject json, String expected) ->
+                {
+                    runner.test("with " + json, (Test test) ->
+                    {
+                        final JavaProjectJSON projectJson = JavaProjectJSON.create(json);
+                        test.assertEqual(expected, projectJson.getShortcutName());
+                    });
+                };
+
+                getShortcutNameTest.run(
+                    JSONObject.create(),
+                    null);
+                getShortcutNameTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()),
+                    null);
+                getShortcutNameTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setNull("shortcutName")),
+                    null);
+                getShortcutNameTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("shortcutName", "")),
+                    "");
+                getShortcutNameTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("shortcutName", "hello")),
+                    "hello");
+            });
+
+            runner.testGroup("setShortcutName(String)", () ->
+            {
+                final Action2<JSONObject,String> setShortcutNameTest = (JSONObject json, String shortcutName) ->
+                {
+                    runner.test("with " + English.andList(json, Strings.escapeAndQuote(shortcutName)), (Test test) ->
+                    {
+                        final JavaProjectJSON projectJson = JavaProjectJSON.create(json);
+                        final JavaProjectJSON setShortcutNameResult = projectJson.setShortcutName(shortcutName);
+                        test.assertSame(projectJson, setShortcutNameResult);
+                        test.assertEqual(shortcutName, projectJson.getShortcutName());
+                    });
+                };
+
+                setShortcutNameTest.run(
+                    JSONObject.create(),
+                    "fake-shortcut-name");
+                setShortcutNameTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()),
+                    "fake-shortcut-name");
+                setShortcutNameTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setNull("shortcutName")),
+                    "fake-shortcut-name");
+                setShortcutNameTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("shortcutName", "")),
+                    "fake-shortcut-name");
+                setShortcutNameTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("shortcutName", "hello")),
+                    "fake-shortcut-name");
+            });
+
+            runner.testGroup("getDependencies()", () ->
+            {
+                final Action2<JSONObject,Iterable<ProjectSignature>> getDependenciesTest = (JSONObject json, Iterable<ProjectSignature> expected) ->
+                {
+                    runner.test("with " + json, (Test test) ->
+                    {
+                        final JavaProjectJSON projectJson = JavaProjectJSON.create(json);
+                        test.assertEqual(expected, projectJson.getDependencies());
+                    });
+                };
+
+                getDependenciesTest.run(
+                    JSONObject.create(),
+                    Iterable.create());
+                getDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()),
+                    Iterable.create());
+                getDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setString("dependencies", "hello")),
+                    Iterable.create());
+                getDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create())),
+                    Iterable.create());
+                getDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .addString("hello"))),
+                    Iterable.create());
+                getDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()))),
+                    Iterable.create());
+                getDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")))),
+                    Iterable.create());
+                getDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")
+                                    .setString("project", "b")))),
+                    Iterable.create());
+                getDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")
+                                    .setString("project", "b")
+                                    .setString("version", "c")))),
+                    Iterable.create(ProjectSignature.create("a", "b", "c")));
+            });
+
+            runner.testGroup("setDependencies(Iterable<ProjectSignature>)", () ->
+            {
+                final Action2<JSONObject,Iterable<ProjectSignature>> setDependenciesTest = (JSONObject json, Iterable<ProjectSignature> dependencies) ->
+                {
+                    runner.test("with " + English.andList(json, dependencies), (Test test) ->
+                    {
+                        final JavaProjectJSON projectJson = JavaProjectJSON.create(json);
+                        final JavaProjectJSON setDependenciesResult = projectJson.setDependencies(dependencies);
+                        test.assertSame(projectJson, setDependenciesResult);
+                        test.assertEqual(dependencies, projectJson.getDependencies());
+                    });
+                };
+
+                setDependenciesTest.run(
+                    JSONObject.create(),
+                    Iterable.create());
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()),
+                    Iterable.create());
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create())),
+                    Iterable.create());
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()))),
+                    Iterable.create());
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")))),
+                    Iterable.create());
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")
+                                    .setString("project", "b")))),
+                    Iterable.create());
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")
+                                    .setString("project", "b")
+                                    .setString("version", "c")))),
+                    Iterable.create());
+                setDependenciesTest.run(
+                    JSONObject.create(),
+                    Iterable.create(
+                        ProjectSignature.create("x", "y", "z")));
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()),
+                    Iterable.create(
+                        ProjectSignature.create("x", "y", "z")));
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create())),
+                    Iterable.create(
+                        ProjectSignature.create("x", "y", "z")));
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()))),
+                    Iterable.create(
+                        ProjectSignature.create("x", "y", "z")));
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")))),
+                    Iterable.create(
+                        ProjectSignature.create("x", "y", "z")));
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")
+                                    .setString("project", "b")))),
+                    Iterable.create(
+                        ProjectSignature.create("x", "y", "z")));
+                setDependenciesTest.run(
+                    JSONObject.create()
+                        .setObject("java", JSONObject.create()
+                            .setArray("dependencies", JSONArray.create()
+                                .add(JSONObject.create()
+                                    .setString("publisher", "a")
+                                    .setString("project", "b")
+                                    .setString("version", "c")))),
+                    Iterable.create(
+                        ProjectSignature.create("x", "y", "z")));
             });
         });
     }

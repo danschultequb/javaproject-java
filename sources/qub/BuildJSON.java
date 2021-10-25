@@ -82,6 +82,14 @@ public class BuildJSON extends JSONObjectWrapperBase
         return projectJson == null ? null : JavaProjectJSON.create(projectJson);
     }
 
+    public Iterable<ProjectSignature> getDependencies()
+    {
+        final JavaProjectJSON projectJson = this.getProjectJson();
+        return projectJson == null
+            ? Iterable.create()
+            : projectJson.getDependencies();
+    }
+
     public BuildJSON setJavacVersion(String javacVersion)
     {
         PreCondition.assertNotNullAndNotEmpty(javacVersion, "javacVersion");
@@ -111,7 +119,7 @@ public class BuildJSON extends JSONObjectWrapperBase
             .catchError(() -> JSONObject.create())
             .await();
         return sourceFilesJson.getProperties()
-            .map((JSONProperty property) -> BuildJSONJavaFile.parse(property).await())
+            .map((JSONProperty property) -> BuildJSONJavaFile.create(property).await())
             .toList();
     }
 

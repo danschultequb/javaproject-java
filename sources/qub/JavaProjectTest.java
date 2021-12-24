@@ -6,6 +6,7 @@ public interface JavaProjectTest
     String coverageParameterName = "coverage";
     String testJsonParameterName = "testjson";
     String logFileParameterName = "logfile";
+    String profilerParameterName = "profiler";
 
     static CommandLineAction addAction(CommandLineActions actions)
     {
@@ -70,9 +71,12 @@ public interface JavaProjectTest
         final CommandLineParameterBoolean testJsonParameter = JavaProjectTest.addTestJson(parameters);
         final CommandLineParameterHelp helpParameter = parameters.addHelp();
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
+        final CommandLineParameterProfiler profilerParameter = JavaProject.addProfilerParameter(parameters, process);
 
         if (!helpParameter.showApplicationHelpLines(process).await())
         {
+            profilerParameter.await();
+
             final Folder dataFolder = process.getQubProjectDataFolder().await();
             final JavaProjectFolder projectFolder = JavaProjectFolder.get(projectFolderParameter.getValue().await());
 
@@ -200,6 +204,8 @@ public interface JavaProjectTest
 
                         javaParameters.addArgument("--" + JavaProjectTest.coverageParameterName + "=" + coverage.toString());
 
+                        javaParameters.addArgument("--" + JavaProjectTest.profilerParameterName + "=" + profilerParameter.getValue().await().toString());
+
                         javaParameters.redirectOutputTo(process.getOutputWriteStream());
                         javaParameters.redirectErrorTo(process.getErrorWriteStream());
                     }).await());
@@ -271,6 +277,9 @@ public interface JavaProjectTest
         final CommandLineParameterBoolean testJsonParameter = JavaProjectTest.addTestJson(parameters);
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
         final CommandLineParameter<File> logFileParameter = parameters.addFile(JavaProjectTest.logFileParameterName, process);
+        final CommandLineParameterProfiler profilerParameter = parameters.addProfiler(process, JavaProjectTest.class);
+
+        profilerParameter.await();
 
         final JavaProjectFolder projectFolder = JavaProjectFolder.get(projectFolderParameter.getValue().await());
         final PathPattern pattern = patternParameter.getValue().await();

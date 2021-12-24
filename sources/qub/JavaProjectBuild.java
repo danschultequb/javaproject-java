@@ -20,9 +20,12 @@ public interface JavaProjectBuild
             "The folder that contains a Java project to build. Defaults to the current folder.");
         final CommandLineParameterHelp helpParameter = parameters.addHelp();
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
+        final CommandLineParameterProfiler profilerParameter = JavaProject.addProfilerParameter(parameters, process);
 
         if (!helpParameter.showApplicationHelpLines(process).await())
         {
+            profilerParameter.await();
+
             final Folder dataFolder = process.getQubProjectDataFolder().await();
             final JavaProjectFolder projectFolder = JavaProjectFolder.get(projectFolderParameter.getValue().await());
 
@@ -296,6 +299,11 @@ public interface JavaProjectBuild
                                 break;
                             }
                         }
+
+                        if (!shouldCompileJavaFile)
+                        {
+                            verboseStream.writeLine(javaFileRelativePath + " - All class files are up to date.").await();
+                        }
                     }
 
                     if (shouldCompileJavaFile)
@@ -305,6 +313,7 @@ public interface JavaProjectBuild
                     }
                 }
 
+                verboseStream.writeLine("Discovering unmodified .java file issues...").await();
                 final List<JavacIssue> unmodifiedWarnings = List.create();
                 final List<JavacIssue> unmodifiedErrors = List.create();
                 final List<JavacIssue> unmodifiedUnrecognizedIssues = List.create();

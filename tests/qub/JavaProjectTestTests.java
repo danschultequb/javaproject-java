@@ -63,14 +63,15 @@ public interface JavaProjectTestTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Usage: qub-javaproject test [[--projectFolder=]<projectFolder-value>] [--pattern=<test-name-pattern>] [--coverage[=<None|Sources|Tests|All>]] [--testjson] [--help] [--verbose]",
+                            "Usage: qub-javaproject test [[--projectFolder=]<projectFolder-value>] [--pattern=<test-name-pattern>] [--coverage[=<None|Sources|Tests|All>]] [--testjson] [--help] [--verbose] [--profiler]",
                             "  Run the tests of a Java source code project.",
                             "  --projectFolder: The folder that contains a Java project to test. Defaults to the current folder.",
                             "  --pattern:       The pattern to match against tests to determine if they will be run.",
                             "  --coverage(c):   Whether code coverage information will be collected while running tests.",
                             "  --testjson:      Whether to use a test.json file to cache test results in.",
                             "  --help(?):       Show the help message for this application.",
-                            "  --verbose(v):    Whether or not to show verbose logs."),
+                            "  --verbose(v):    Whether or not to show verbose logs.",
+                            "  --profiler:      Whether or not this application should pause before it is run to allow a profiler to be attached."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -476,7 +477,7 @@ public interface JavaProjectTestTests
                                 aClassFile.setContentsAsString("A.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/sources/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None")
+                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/sources/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
 
                     JavaProjectTest.run(process, action);
@@ -543,12 +544,13 @@ public interface JavaProjectTestTests
                             "VERBOSE: Update .java file dependencies...",
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
+                            "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/sources/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/sources/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 0 test class files to test.",
@@ -608,7 +610,7 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None")
+                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
 
                     JavaProjectTest.run(process, action);
@@ -675,12 +677,13 @@ public interface JavaProjectTestTests
                             "VERBOSE: Update .java file dependencies...",
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
+                            "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/ -Xlint:all,-try,-overrides tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -742,7 +745,7 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None")
+                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
 
                     process.getTypeLoader()
@@ -817,12 +820,13 @@ public interface JavaProjectTestTests
                             "VERBOSE: Update .java file dependencies...",
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
+                            "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/ -Xlint:all,-try,-overrides tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -885,7 +889,7 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None")
+                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
 
                     process.getTypeLoader()
@@ -965,12 +969,13 @@ public interface JavaProjectTestTests
                             "VERBOSE: Update .java file dependencies...",
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
+                            "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/ -Xlint:all,-try,-overrides tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -1032,7 +1037,7 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None")
+                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
 
                     process.getTypeLoader()
@@ -1101,16 +1106,16 @@ public interface JavaProjectTestTests
                             "          Intentional failure",
                             "          Stack Trace:",
                             "            at qub.Test.fail(Test.java:1414)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1067)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1072)",
                             "            at qub.BasicTestRunner.test(BasicTestRunner.java:225)",
                             "            at qub.TestRunner.test(TestRunner.java:273)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1065)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1070)",
                             "            at qub.BasicTestRunner.testGroup(BasicTestRunner.java:123)",
                             "            at qub.TestRunner.testGroup(TestRunner.java:195)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1063)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1068)",
                             "            at qub.BasicTestRunner.testGroup(BasicTestRunner.java:123)",
                             "            at qub.TestRunner.testGroup(TestRunner.java:195)",
-                            "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1047)",
+                            "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1052)",
                             "            at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)",
                             "            at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)",
                             "            at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)",
@@ -1128,7 +1133,7 @@ public interface JavaProjectTestTests
                             "            at qub.LazyResult.await(LazyResult.java:151)",
                             "            at qub.LazyResult.ensureIsCompleted(LazyResult.java:128)",
                             "            at qub.LazyResult.await(LazyResult.java:151)",
-                            "            at qub.JavaProjectTest.runTests(JavaProjectTest.java:510)",
+                            "            at qub.JavaProjectTest.runTests(JavaProjectTest.java:519)",
                             "            at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "            at qub.AsyncTask.run(AsyncTask.java:178)",
                             "            at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
@@ -1146,16 +1151,16 @@ public interface JavaProjectTestTests
                             "      Intentional failure",
                             "      Stack Trace:",
                             "        at qub.Test.fail(Test.java:1414)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1067)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1072)",
                             "        at qub.BasicTestRunner.test(BasicTestRunner.java:225)",
                             "        at qub.TestRunner.test(TestRunner.java:273)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1065)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1070)",
                             "        at qub.BasicTestRunner.testGroup(BasicTestRunner.java:123)",
                             "        at qub.TestRunner.testGroup(TestRunner.java:195)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1063)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1068)",
                             "        at qub.BasicTestRunner.testGroup(BasicTestRunner.java:123)",
                             "        at qub.TestRunner.testGroup(TestRunner.java:195)",
-                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1047)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1052)",
                             "        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)",
                             "        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)",
                             "        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)",
@@ -1173,7 +1178,7 @@ public interface JavaProjectTestTests
                             "        at qub.LazyResult.await(LazyResult.java:151)",
                             "        at qub.LazyResult.ensureIsCompleted(LazyResult.java:128)",
                             "        at qub.LazyResult.await(LazyResult.java:151)",
-                            "        at qub.JavaProjectTest.runTests(JavaProjectTest.java:510)",
+                            "        at qub.JavaProjectTest.runTests(JavaProjectTest.java:519)",
                             "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "        at qub.AsyncTask.run(AsyncTask.java:178)",
                             "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
@@ -1246,12 +1251,13 @@ public interface JavaProjectTestTests
                             "VERBOSE: Update .java file dependencies...",
                             "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
+                            "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/ -Xlint:all,-try,-overrides tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -1268,16 +1274,16 @@ public interface JavaProjectTestTests
                             "          Intentional failure",
                             "          Stack Trace:",
                             "            at qub.Test.fail(Test.java:1414)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1067)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1072)",
                             "            at qub.BasicTestRunner.test(BasicTestRunner.java:225)",
                             "            at qub.TestRunner.test(TestRunner.java:273)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1065)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1070)",
                             "            at qub.BasicTestRunner.testGroup(BasicTestRunner.java:123)",
                             "            at qub.TestRunner.testGroup(TestRunner.java:195)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1063)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1068)",
                             "            at qub.BasicTestRunner.testGroup(BasicTestRunner.java:123)",
                             "            at qub.TestRunner.testGroup(TestRunner.java:195)",
-                            "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1047)",
+                            "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1052)",
                             "            at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)",
                             "            at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)",
                             "            at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)",
@@ -1295,7 +1301,7 @@ public interface JavaProjectTestTests
                             "            at qub.LazyResult.await(LazyResult.java:151)",
                             "            at qub.LazyResult.ensureIsCompleted(LazyResult.java:128)",
                             "            at qub.LazyResult.await(LazyResult.java:151)",
-                            "            at qub.JavaProjectTest.runTests(JavaProjectTest.java:510)",
+                            "            at qub.JavaProjectTest.runTests(JavaProjectTest.java:519)",
                             "            at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "            at qub.AsyncTask.run(AsyncTask.java:178)",
                             "            at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
@@ -1314,16 +1320,16 @@ public interface JavaProjectTestTests
                             "      Intentional failure",
                             "      Stack Trace:",
                             "        at qub.Test.fail(Test.java:1414)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1067)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1072)",
                             "        at qub.BasicTestRunner.test(BasicTestRunner.java:225)",
                             "        at qub.TestRunner.test(TestRunner.java:273)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1065)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1070)",
                             "        at qub.BasicTestRunner.testGroup(BasicTestRunner.java:123)",
                             "        at qub.TestRunner.testGroup(TestRunner.java:195)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1063)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1068)",
                             "        at qub.BasicTestRunner.testGroup(BasicTestRunner.java:123)",
                             "        at qub.TestRunner.testGroup(TestRunner.java:195)",
-                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1047)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1052)",
                             "        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)",
                             "        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)",
                             "        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)",
@@ -1341,7 +1347,7 @@ public interface JavaProjectTestTests
                             "        at qub.LazyResult.await(LazyResult.java:151)",
                             "        at qub.LazyResult.ensureIsCompleted(LazyResult.java:128)",
                             "        at qub.LazyResult.await(LazyResult.java:151)",
-                            "        at qub.JavaProjectTest.runTests(JavaProjectTest.java:510)",
+                            "        at qub.JavaProjectTest.runTests(JavaProjectTest.java:519)",
                             "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "        at qub.AsyncTask.run(AsyncTask.java:178)",
                             "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",

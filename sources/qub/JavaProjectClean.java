@@ -20,9 +20,12 @@ public interface JavaProjectClean
             "The folder that contains a Java project to build. Defaults to the current folder.");
         final CommandLineParameterHelp helpParameter = parameters.addHelp();
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
+        final CommandLineParameterProfiler profilerParameter = JavaProject.addProfilerParameter(parameters, process);
 
         if (!helpParameter.showApplicationHelpLines(process).await())
         {
+            profilerParameter.await();
+
             final JavaProjectFolder projectFolder = JavaProjectFolder.get(projectFolderParameter.getValue().await());
 
             final LogStreams logStreams = CommandLineLogsAction.getLogStreamsFromDesktopProcess(process, verboseParameter.getVerboseCharacterToByteWriteStream().await());

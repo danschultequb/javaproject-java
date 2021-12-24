@@ -20,9 +20,12 @@ public interface JavaProjectCreate
             "The folder that the new Java project will be created in.");
         final CommandLineParameterHelp helpParameter = parameters.addHelp();
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
+        final CommandLineParameterProfiler profilerParameter = JavaProject.addProfilerParameter(parameters, process);
 
         if (!helpParameter.showApplicationHelpLines(process).await())
         {
+            profilerParameter.await();
+
             final Folder dataFolder = process.getQubProjectDataFolder().await();
             final Folder projectFolder = projectFolderParameter.getValue().await();
 

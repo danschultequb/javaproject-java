@@ -36,11 +36,12 @@ public interface JavaProjectCleanTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Usage: qub-javaproject clean [[--projectFolder=]<projectFolder-value>] [--help] [--verbose]",
+                            "Usage: qub-javaproject clean [[--projectFolder=]<projectFolder-value>] [--help] [--verbose] [--profiler]",
                             "  Clean a Java source code project's build outputs.",
                             "  --projectFolder: The folder that contains a Java project to build. Defaults to the current folder.",
                             "  --help(?):       Show the help message for this application.",
-                            "  --verbose(v):    Whether or not to show verbose logs."),
+                            "  --verbose(v):    Whether or not to show verbose logs.",
+                            "  --profiler:      Whether or not this application should pause before it is run to allow a profiler to be attached."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -58,11 +59,12 @@ public interface JavaProjectCleanTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Usage: qub-javaproject clean [[--projectFolder=]<projectFolder-value>] [--help] [--verbose]",
+                            "Usage: qub-javaproject clean [[--projectFolder=]<projectFolder-value>] [--help] [--verbose] [--profiler]",
                             "  Clean a Java source code project's build outputs.",
                             "  --projectFolder: The folder that contains a Java project to build. Defaults to the current folder.",
                             "  --help(?):       Show the help message for this application.",
-                            "  --verbose(v):    Whether or not to show verbose logs."),
+                            "  --verbose(v):    Whether or not to show verbose logs.",
+                            "  --profiler:      Whether or not this application should pause before it is run to allow a profiler to be attached."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),

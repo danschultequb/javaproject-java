@@ -76,11 +76,12 @@ public interface JavaProjectCreateTests
 
                     test.assertLinesEqual(
                         Iterable.create(
-                            "Usage: qub fake-project fake-action [[--projectFolder=]<projectFolder-value>] [--help] [--verbose]",
+                            "Usage: qub fake-project fake-action [[--projectFolder=]<projectFolder-value>] [--help] [--verbose] [--profiler]",
                             "  Fake action description",
                             "  --projectFolder: The folder that the new Java project will be created in.",
                             "  --help(?):       Show the help message for this application.",
-                            "  --verbose(v):    Whether or not to show verbose logs."),
+                            "  --verbose(v):    Whether or not to show verbose logs.",
+                            "  --profiler:      Whether or not this application should pause before it is run to allow a profiler to be attached."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),

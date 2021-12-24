@@ -43,4 +43,12 @@ public interface JavaProject
         return parameters.addPositionalFolder(JavaProject.projectFolderParameterName, process)
             .setDescription(parameterDescription);
     }
+
+    static CommandLineParameterProfiler addProfilerParameter(CommandLineParameters parameters, DesktopProcess process)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+        PreCondition.assertNotNull(process, "process");
+
+        return parameters.addProfiler(process, JavaProject.class);
+    }
 }

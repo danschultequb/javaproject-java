@@ -204,10 +204,11 @@ public interface JavaProjectTest
 
                         javaParameters.addArgument("--" + JavaProjectTest.coverageParameterName + "=" + coverage.toString());
 
-                        javaParameters.addArgument("--" + JavaProjectTest.profilerParameterName + "=" + profilerParameter.getValue().await().toString());
+                        javaParameters.addArgument("--" + JavaProjectTest.profilerParameterName + "=" + Booleans.toString(profilerParameter.getValue().await()));
 
                         javaParameters.redirectOutputTo(process.getOutputWriteStream());
                         javaParameters.redirectErrorTo(process.getErrorWriteStream());
+                        javaParameters.setInputStream(process.getInputReadStream());
                     }).await());
 
                     if (jacocoFolder != null)

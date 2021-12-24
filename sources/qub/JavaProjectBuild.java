@@ -101,7 +101,7 @@ public interface JavaProjectBuild
             final Folder outputsFolder = projectFolder.getOutputsFolder().await();
             verboseStream.writeLine("Parsing " + projectFolder.getBuildJsonRelativePath().await() + "...").await();
             final BuildJSON buildJson = projectFolder.getBuildJson()
-                .catchError(FileNotFoundException.class, BuildJSON::create)
+                .catchError(FileNotFoundException.class, () -> BuildJSON.create())
                 .await();
 
             verboseStream.writeLine("Checking if dependencies have changed since the previous build...").await();
@@ -409,9 +409,11 @@ public interface JavaProjectBuild
                             {
                                 javacParameters.addDirectory(testSourcesOutputFolder);
 
-                                final List<String> classpath = List.create(
-                                    testSourcesOutputFolder.toString(),
-                                    outputsSourcesFolder.toString());
+                                final List<String> classpath = List.create(testSourcesOutputFolder.toString());
+                                if (outputsSourcesFolder.exists().await())
+                                {
+                                    classpath.add(outputsSourcesFolder.toString());
+                                }
                                 classpath.addAll(dependencyCompiledSourcesJarFilePaths);
                                 classpath.addAll(dependencyCompiledTestSourcesJarFilePaths);
                                 javacParameters.addClasspath(classpath);

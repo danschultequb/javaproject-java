@@ -134,4 +134,49 @@ public interface JavaProjectTests
             });
         });
     }
+
+    static CommandLineAction createAction(DesktopProcess process)
+    {
+        PreCondition.assertNotNull(process, "process");
+
+        final CommandLineActions actions = JavaProject.createCommandLineActions(process);
+        return JavaProjectBuild.addAction(actions);
+    }
+
+    static JDKFolder getJdkFolder(QubFolder qubFolder)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+
+        final JDKFolder jdkFolder = JDKFolder.get(qubFolder.getProjectVersionFolder("openjdk", "jdk", "17").await());
+        jdkFolder.create().catchError().await();
+
+        return jdkFolder;
+    }
+
+    static void addJavacVersionFakeChildProcessRun(FakeChildProcessRunner childProcessRunner, File javacFile)
+    {
+        PreCondition.assertNotNull(childProcessRunner, "childProcessRunner");
+        PreCondition.assertNotNull(javacFile, "javacFile");
+
+        childProcessRunner.add(
+            FakeChildProcessRun.create(javacFile, "--version")
+                .setAction((FakeDesktopProcess childProcess) ->
+                {
+                    childProcess.getOutputWriteStream().writeLine("javac 17").await();
+                }));
+    }
+
+    static void writeIssues(ByteWriteStream writeStream, JavacIssue... issues)
+    {
+        PreCondition.assertNotNull(writeStream, "writeStream");
+        PreCondition.assertNotNull(issues, "issues");
+
+        final CharacterWriteStream characterWriteStream = CharacterWriteStream.create(writeStream);
+        for (final JavacIssue issue : issues)
+        {
+            characterWriteStream.writeLine(issue.getSourceFilePath() + ":" + issue.getLineNumber() + ": " + issue.getType().toLowerCase() + ": " + issue.getMessage()).await();
+            characterWriteStream.writeLine("Fake code line").await();
+            characterWriteStream.writeLine(Strings.repeat(' ', issue.getColumnNumber() - 1) + "^").await();
+        }
+    }
 }

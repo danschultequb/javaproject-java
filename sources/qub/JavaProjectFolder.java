@@ -147,6 +147,18 @@ public class JavaProjectFolder extends Folder
         return JavaProjectFolder.iterateClassFilesFromOutputsFolder(outputsFolder);
     }
 
+    public Iterator<JavaClassFile> iterateSourceClassFiles()
+    {
+        final Folder outputsSourcesFolder = this.getOutputsSourcesFolder().await();
+        return JavaProjectFolder.iterateClassFilesFromOutputsFolder(outputsSourcesFolder);
+    }
+
+    public Iterator<JavaClassFile> iterateTestClassFiles()
+    {
+        final Folder outputsTestsFolder = this.getOutputsTestsFolder().await();
+        return JavaProjectFolder.iterateClassFilesFromOutputsFolder(outputsTestsFolder);
+    }
+
     public static Iterator<JavaClassFile> iterateClassFilesFromOutputsFolder(Folder outputsFolder)
     {
         PreCondition.assertNotNull(outputsFolder, "outputsFolder");
@@ -240,6 +252,33 @@ public class JavaProjectFolder extends Folder
         {
             final File projectJsonFile = this.getProjectJsonFile().await();
             return JavaProjectJSON.parse(projectJsonFile).await();
+        });
+    }
+
+    public Result<String> getPublisher()
+    {
+        return Result.create(() ->
+        {
+            final JavaProjectJSON projectJson = this.getProjectJson().await();
+            return projectJson.getPublisher();
+        });
+    }
+
+    public Result<String> getProject()
+    {
+        return Result.create(() ->
+        {
+            final JavaProjectJSON projectJson = this.getProjectJson().await();
+            return projectJson.getProject();
+        });
+    }
+
+    public Result<VersionNumber> getVersion()
+    {
+        return Result.create(() ->
+        {
+            final JavaProjectJSON projectJson = this.getProjectJson().await();
+            return projectJson.getVersion();
         });
     }
 

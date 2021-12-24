@@ -19,7 +19,7 @@ public interface JDKFolderTests
                     (Test test, FakeDesktopProcess process) ->
                 {
                     final Folder innerFolder = process.getCurrentFolder();
-                    final JDKFolder jdkFolder = JDKFolder.get(innerFolder).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(innerFolder);
                     test.assertNotNull(jdkFolder);
                     test.assertEqual(innerFolder, jdkFolder);
                 });
@@ -75,7 +75,7 @@ public interface JDKFolderTests
                 (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                 (Test test, FakeDesktopProcess process) ->
             {
-                final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                 final File javacFile = jdkFolder.getFile("bin/javac").await();
                 test.assertEqual(javacFile, jdkFolder.getJavacFile().await());
             });
@@ -86,7 +86,7 @@ public interface JDKFolderTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                     test.assertThrows(() -> jdkFolder.getJavac((DesktopProcess)null),
                         new PreConditionFailure("process cannot be null."));
                 });
@@ -95,7 +95,7 @@ public interface JDKFolderTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                     final Javac javac = jdkFolder.getJavac(process).await();
                     test.assertNotNull(javac);
                     test.assertEqual(jdkFolder.getJavacFile().await().getPath(), javac.getExecutablePath());
@@ -108,7 +108,7 @@ public interface JDKFolderTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                     test.assertThrows(() -> jdkFolder.getJavac((ChildProcessRunner)null),
                         new PreConditionFailure("childProcessRunner cannot be null."));
                 });
@@ -117,7 +117,7 @@ public interface JDKFolderTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                     final Javac javac = jdkFolder.getJavac(process.getChildProcessRunner()).await();
                     test.assertNotNull(javac);
                     test.assertEqual(jdkFolder.getJavacFile().await().getPath(), javac.getExecutablePath());
@@ -128,7 +128,7 @@ public interface JDKFolderTests
                 (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                 (Test test, FakeDesktopProcess process) ->
             {
-                final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                 final File javaFile = jdkFolder.getFile("bin/java").await();
                 test.assertEqual(javaFile, jdkFolder.getJavaFile().await());
             });
@@ -139,7 +139,7 @@ public interface JDKFolderTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                     test.assertThrows(() -> jdkFolder.getJava((DesktopProcess)null),
                         new PreConditionFailure("process cannot be null."));
                 });
@@ -148,7 +148,7 @@ public interface JDKFolderTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                     final Java java = jdkFolder.getJava(process).await();
                     test.assertNotNull(java);
                     test.assertEqual(jdkFolder.getJavaFile().await().getPath(), java.getExecutablePath());
@@ -161,7 +161,7 @@ public interface JDKFolderTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                     test.assertThrows(() -> jdkFolder.getJava((ChildProcessRunner)null),
                         new PreConditionFailure("childProcessRunner cannot be null."));
                 });
@@ -170,7 +170,7 @@ public interface JDKFolderTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder()).await();
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
                     final Java java = jdkFolder.getJava(process.getChildProcessRunner()).await();
                     test.assertNotNull(java);
                     test.assertEqual(jdkFolder.getJavaFile().await().getPath(), java.getExecutablePath());

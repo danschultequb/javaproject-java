@@ -1,21 +1,17 @@
 package qub;
 
-public class JDKFolder extends Folder
+public class JDKFolder extends QubProjectVersionFolder
 {
-    private final Folder innerFolder;
-
     private JDKFolder(Folder innerFolder)
     {
-        super(innerFolder.getFileSystem(), innerFolder.getPath());
-
-        this.innerFolder = innerFolder;
+        super(innerFolder);
     }
 
-    public static Result<JDKFolder> get(Folder innerFolder)
+    public static JDKFolder get(Folder innerFolder)
     {
         PreCondition.assertNotNull(innerFolder, "innerFolder");
 
-        return Result.success(new JDKFolder(innerFolder));
+        return new JDKFolder(innerFolder);
     }
 
     public static Result<JDKFolder> getLatestVersion(QubFolder qubFolder)
@@ -27,7 +23,7 @@ public class JDKFolder extends Folder
             final String jdkPublisherName = "openjdk";
             final String jdkProjectName = "jdk";
             final QubProjectVersionFolder latestJdkFolder = qubFolder.getLatestProjectVersionFolder(jdkPublisherName, jdkProjectName).await();
-            return JDKFolder.get(latestJdkFolder).await();
+            return JDKFolder.get(latestJdkFolder);
         });
     }
 

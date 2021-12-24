@@ -2,6 +2,8 @@ package qub;
 
 public interface JavaProject
 {
+    String projectFolderParameterName = "projectFolder";
+
     static void main(String[] args)
     {
         DesktopProcess.run(args, JavaProject::run);
@@ -38,7 +40,7 @@ public interface JavaProject
         PreCondition.assertNotNull(process, "process");
         PreCondition.assertNotNullAndNotEmpty(parameterDescription, "parameterDescription");
 
-        return parameters.addPositionalFolder("projectFolder", process)
+        return parameters.addPositionalFolder(JavaProject.projectFolderParameterName, process)
             .setDescription(parameterDescription);
     }
 }

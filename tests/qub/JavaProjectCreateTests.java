@@ -115,7 +115,7 @@ public interface JavaProjectCreateTests
                     final CommandLineAction action = actions.addAction("fake-action", (DesktopProcess actionProcess) -> {})
                         .setDescription("Fake action description");
 
-                    process.setDefaultCurrentFolder("/my-project/");
+                    process.setCurrentFolderPath("/my-project/");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/my-project/"));
@@ -325,7 +325,7 @@ public interface JavaProjectCreateTests
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.createFile("javaproject.schema.json").await();
 
-                    process.setDefaultCurrentFolder("/my-project/");
+                    process.setCurrentFolderPath("/my-project/");
                     final Folder projectFolder = process.getCurrentFolder();
                     final File projectJsonFile = projectFolder.createFile("project.json").await();
 
@@ -378,7 +378,7 @@ public interface JavaProjectCreateTests
                     final CommandLineAction action = actions.addAction("fake-action", (DesktopProcess actionProcess) -> {})
                         .setDescription("Fake action description");
 
-                    process.setDefaultCurrentFolder("/my-project/");
+                    process.setCurrentFolderPath("/my-project/");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/my-project/relative/path/"));
@@ -588,7 +588,7 @@ public interface JavaProjectCreateTests
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.createFile("javaproject.schema.json").await();
 
-                    process.setDefaultCurrentFolder("/my-project/");
+                    process.setCurrentFolderPath("/my-project/");
                     final Folder projectFolder = process.getCurrentFolder().getFolder("relative/path/").await();
                     final File projectJsonFile = projectFolder.createFile("project.json").await();
 
@@ -901,7 +901,7 @@ public interface JavaProjectCreateTests
                     final CommandLineAction action = actions.addAction("fake-action", (DesktopProcess actionProcess) -> {})
                         .setDescription("Fake action description");
 
-                    process.setDefaultCurrentFolder("/my-project/");
+                    process.setCurrentFolderPath("/my-project/");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/my-project/"));
@@ -1121,7 +1121,7 @@ public interface JavaProjectCreateTests
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.createFile("javaproject.schema.json").await();
 
-                    process.setDefaultCurrentFolder("/my-project/");
+                    process.setCurrentFolderPath("/my-project/");
                     final Folder projectFolder = process.getCurrentFolder();
                     final File projectJsonFile = projectFolder.createFile("project.json").await();
 
@@ -1174,7 +1174,7 @@ public interface JavaProjectCreateTests
                     final CommandLineAction action = actions.addAction("fake-action", (DesktopProcess actionProcess) -> {})
                         .setDescription("Fake action description");
 
-                    process.setDefaultCurrentFolder("/my-project/");
+                    process.setCurrentFolderPath("/my-project/");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
                         .addArguments("init", "/my-project/relative/path/"));
@@ -1394,7 +1394,7 @@ public interface JavaProjectCreateTests
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final File javaProjectSchemaJsonFile = fakeProjectDataFolder.createFile("javaproject.schema.json").await();
 
-                    process.setDefaultCurrentFolder("/my-project/");
+                    process.setCurrentFolderPath("/my-project/");
                     final Folder projectFolder = process.getCurrentFolder().getFolder("relative/path/").await();
                     final File projectJsonFile = projectFolder.createFile("project.json").await();
 

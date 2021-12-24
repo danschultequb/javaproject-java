@@ -13,16 +13,23 @@ public class BuildJSON extends JSONObjectWrapperBase
 
     public static BuildJSON create()
     {
-        return new BuildJSON(JSONObject.create());
+        return BuildJSON.create(JSONObject.create());
     }
 
-    public static Result<BuildJSON> parse(File parseJSONFile)
+    public static BuildJSON create(JSONObject json)
     {
-        PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
+        PreCondition.assertNotNull(json, "json");
+
+        return new BuildJSON(json);
+    }
+
+    public static Result<BuildJSON> parse(File buildJsonFile)
+    {
+        PreCondition.assertNotNull(buildJsonFile, "buildJsonFile");
 
         return Result.create(() ->
         {
-            return BuildJSON.parse(JSON.parseObject(parseJSONFile).await()).await();
+            return BuildJSON.create(JSON.parseObject(buildJsonFile).await());
         });
     }
 
@@ -33,7 +40,7 @@ public class BuildJSON extends JSONObjectWrapperBase
 
         return Result.create(() ->
         {
-            return BuildJSON.parse(JSON.parseObject(readStream).await()).await();
+            return BuildJSON.create(JSON.parseObject(readStream).await());
         });
     }
 
@@ -44,33 +51,25 @@ public class BuildJSON extends JSONObjectWrapperBase
 
         return Result.create(() ->
         {
-            return BuildJSON.parse(JSON.parseObject(readStream).await()).await();
+            return BuildJSON.create(JSON.parseObject(readStream).await());
         });
     }
 
     public static Result<BuildJSON> parse(Iterator<Character> characters)
     {
-        PreCondition.assertNotNull(characters, "character");
+        PreCondition.assertNotNull(characters, "characters");
 
         return Result.create(() ->
         {
-            return BuildJSON.parse(JSON.parseObject(characters).await()).await();
+            return BuildJSON.create(JSON.parseObject(characters).await());
         });
     }
 
-    public static Result<BuildJSON> parse(JSONObject json)
+    public BuildJSON setProjectJson(JavaProjectJSON projectJson)
     {
-        PreCondition.assertNotNull(json, "json");
+        PreCondition.assertNotNull(projectJson, "projectJson");
 
-        return Result.create(() ->
-        {
-            return new BuildJSON(json);
-        });
-    }
-
-    public BuildJSON setProjectJson(ProjectJSON projectJson)
-    {
-        this.toJson().setObjectOrNull(BuildJSON.projectJsonPropertyName, projectJson == null ? null : projectJson.toJson());
+        this.toJson().setObject(BuildJSON.projectJsonPropertyName, projectJson.toJson());
         return this;
     }
 

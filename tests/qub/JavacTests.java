@@ -14,7 +14,7 @@ public interface JavacTests
                 final VersionNumber versionNumber = javac.version().await();
                 test.assertEqual(
                     VersionNumber.create()
-                        .setMajor(16)
+                        .setMajor(17)
                         .setMinor(0)
                         .setPatch(1),
                     versionNumber);

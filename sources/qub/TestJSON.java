@@ -22,13 +22,13 @@ public class TestJSON extends JSONObjectWrapperBase
         return new TestJSON(json);
     }
 
-    public static Result<TestJSON> parse(File parseJSONFile)
+    public static Result<TestJSON> parse(File testJsonFile)
     {
-        PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
+        PreCondition.assertNotNull(testJsonFile, "testJsonFile");
 
         return Result.create(() ->
         {
-            return TestJSON.create(JSON.parseObject(parseJSONFile).await());
+            return TestJSON.create(JSON.parseObject(testJsonFile).await());
         });
     }
 
@@ -56,7 +56,7 @@ public class TestJSON extends JSONObjectWrapperBase
 
     public static Result<TestJSON> parse(Iterator<Character> characters)
     {
-        PreCondition.assertNotNull(characters, "character");
+        PreCondition.assertNotNull(characters, "characters");
 
         return Result.create(() ->
         {

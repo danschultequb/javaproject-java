@@ -36,7 +36,7 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     test.assertThrows(() -> JavaProjectBuild.run((DesktopProcess)null, action),
                         new PreConditionFailure("process cannot be null."));
 
@@ -79,7 +79,7 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("--help")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
 
                     JavaProjectBuild.run(process, action);
 
@@ -119,7 +119,7 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
 
                     JavaProjectBuild.run(process, action);
 
@@ -160,7 +160,7 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -205,7 +205,7 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -252,7 +252,7 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -299,7 +299,7 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -347,10 +347,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -359,7 +359,7 @@ public interface JavaProjectBuildTests
                     projectJsonFile.setContentsAsString(projectJson.toString()).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -404,10 +404,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -417,7 +417,7 @@ public interface JavaProjectBuildTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -463,10 +463,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final Clock clock = process.getClock();
                     final DateTime startTime = clock.getCurrentDateTime();
@@ -485,10 +485,10 @@ public interface JavaProjectBuildTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction(() ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
                             }));
@@ -576,10 +576,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final Clock clock = process.getClock();
                     final DateTime startTime = clock.getCurrentDateTime();
@@ -598,10 +598,10 @@ public interface JavaProjectBuildTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction(() ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
                             }));
@@ -689,10 +689,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -711,10 +711,10 @@ public interface JavaProjectBuildTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
-                            .setFunction(() ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
                                 bClassFile.setContentsAsString("B.java byte code").await();
@@ -795,10 +795,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -819,16 +819,16 @@ public interface JavaProjectBuildTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction(() ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
                             }));
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/tests/", "--class-path", "/project/folder/outputs/tests/;/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "tests/B.java")
-                            .setFunction(() ->
+                            .setAction(() ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code").await();
                             }));
@@ -913,10 +913,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -933,10 +933,10 @@ public interface JavaProjectBuildTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction(() ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                             }));
@@ -1018,10 +1018,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final ManualClock clock = process.getClock();
                     final DateTime startTime = clock.getCurrentDateTime();
@@ -1048,7 +1048,7 @@ public interface JavaProjectBuildTests
                     buildJsonFile.setContentsAsString(buildJson.toString()).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     clock.advance(Duration.minutes(1));
 
@@ -1122,10 +1122,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final ManualClock clock = process.getClock();
                     final DateTime startTime = clock.getCurrentDateTime();
@@ -1152,10 +1152,10 @@ public interface JavaProjectBuildTests
                     buildJsonFile.setContentsAsString(buildJson.toString()).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction(() ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                             }));
@@ -1239,10 +1239,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final ManualClock clock = process.getClock();
 
@@ -1257,19 +1257,19 @@ public interface JavaProjectBuildTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction((FakeDesktopProcess childProcess) ->
                             {
-                                JavaProjectBuildTests.writeIssues(error,
+                                JavaProjectTests.writeIssues(childProcess.getErrorWriteStream(),
                                     JavacIssue.create()
                                         .setSourceFilePath("sources\\A.java")
                                         .setLineNumber(1)
                                         .setColumnNumber(20)
                                         .setType("error")
                                         .setMessage("This doesn't look right to me."));
-                                return 1;
+                                childProcess.setExitCode(1);
                             }));
 
                     clock.advance(Duration.minutes(1));
@@ -1351,10 +1351,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final ManualClock clock = process.getClock();
                     final DateTime startTime = clock.getCurrentDateTime();
@@ -1388,7 +1388,7 @@ public interface JavaProjectBuildTests
                     buildJsonFile.setContentsAsString(buildJson.toString(JSONFormat.pretty)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     clock.advance(Duration.minutes(1));
 
@@ -1466,10 +1466,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final ManualClock clock = process.getClock();
                     final DateTime startTime = clock.getCurrentDateTime();
@@ -1503,12 +1503,12 @@ public interface JavaProjectBuildTests
                     buildJsonFile.setContentsAsString(buildJson.toString(JSONFormat.pretty)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction((FakeDesktopProcess childProcess) ->
                             {
-                                JavaProjectBuildTests.writeIssues(error,
+                                JavaProjectTests.writeIssues(childProcess.getErrorWriteStream(),
                                     JavacIssue.create()
                                         .setSourceFilePath("sources\\A.java")
                                         .setLineNumber(1)
@@ -1601,10 +1601,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final ManualClock clock = process.getClock();
 
@@ -1621,20 +1621,19 @@ public interface JavaProjectBuildTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction((FakeDesktopProcess childProcess) ->
                             {
-                                JavaProjectBuildTests.writeIssues(error,
+                                JavaProjectTests.writeIssues(childProcess.getErrorWriteStream(),
                                     JavacIssue.create()
                                         .setSourceFilePath("sources\\A.java")
                                         .setLineNumber(1)
                                         .setColumnNumber(5)
                                         .setType("error")
                                         .setMessage("Are you sure?"));
-
-                                return 1;
+                                childProcess.setExitCode(1);
                             }));
 
                     clock.advance(Duration.minutes(1));
@@ -1720,10 +1719,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -1768,12 +1767,12 @@ public interface JavaProjectBuildTests
                     cJavaFile.setContentsAsString("C.java source code").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction((FakeDesktopProcess childProcess) ->
                             {
-                                JavaProjectBuildTests.writeIssues(error,
+                                JavaProjectTests.writeIssues(childProcess.getErrorWriteStream(),
                                     JavacIssue.create()
                                         .setSourceFilePath("sources\\A.java")
                                         .setLineNumber(12)
@@ -1786,8 +1785,7 @@ public interface JavaProjectBuildTests
                                         .setColumnNumber(5)
                                         .setType("error")
                                         .setMessage("Are you sure?"));
-
-                                return 2;
+                                childProcess.setExitCode(2);
                             }));
 
                     JavaProjectBuild.run(process, action);
@@ -1876,10 +1874,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -1922,10 +1920,10 @@ public interface JavaProjectBuildTests
                     bJavaFile.setContentsAsString("B.java source code - 2").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2011,10 +2009,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -2057,10 +2055,10 @@ public interface JavaProjectBuildTests
                     aJavaFile.setContentsAsString("A.java source code - 2").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                             }));
@@ -2144,10 +2142,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -2192,10 +2190,10 @@ public interface JavaProjectBuildTests
                     aJavaFile.setContentsAsString("A.java source code - 2").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2281,10 +2279,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -2329,10 +2327,10 @@ public interface JavaProjectBuildTests
                     bJavaFile.setContentsAsString("B.java source code, Depends on A - 1").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/B.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
                             }));
@@ -2416,10 +2414,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -2461,10 +2459,10 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/B.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
                             }));
@@ -2544,10 +2542,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -2585,10 +2583,10 @@ public interface JavaProjectBuildTests
                     aJavaFile.setContentsAsString("A.java source code").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
                             }));
@@ -2672,10 +2670,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -2740,10 +2738,10 @@ public interface JavaProjectBuildTests
                     cJavaFile.setContentsAsString("C.java source code").await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java", "sources/C.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2839,10 +2837,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -2905,10 +2903,10 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2999,10 +2997,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -3065,10 +3063,10 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/C.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 cClassFile.setContentsAsString("C.java byte code - 2").await();
                             }));
@@ -3160,10 +3158,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -3205,7 +3203,7 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -3277,10 +3275,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -3322,7 +3320,7 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -3394,10 +3392,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -3439,7 +3437,7 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -3511,10 +3509,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final JavaPublishedProjectFolder otherProjectFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("other-publisher", "other-project", "other-version").await());
                     otherProjectFolder.getProjectJsonFile().await()
@@ -3561,7 +3559,7 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -3638,10 +3636,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final JavaPublishedProjectFolder otherProjectFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("other-publisher", "other-project", "other-version").await());
                     otherProjectFolder.getProjectJsonFile().await()
@@ -3689,10 +3687,10 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                             }));
@@ -3776,10 +3774,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final QubProjectFolder otherProjectFolder = qubFolder.getProjectFolder("other-publisher", "other-project").await();
                     final JavaPublishedProjectFolder otherProjectVersionFolder1 = JavaPublishedProjectFolder.get(otherProjectFolder.getProjectVersionFolder("1").await());
@@ -3832,10 +3830,10 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/other-publisher/other-project/versions/2/other-project.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                             }));
@@ -3921,10 +3919,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -3979,7 +3977,7 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -4052,10 +4050,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final JavaPublishedProjectFolder otherProjectFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("other-publisher", "other-project", "other-version").await());
 
@@ -4079,7 +4077,7 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -4136,10 +4134,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                        final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                        final CommandLineAction action = JavaProjectTests.createAction(process);
                         final QubFolder qubFolder = process.getQubFolder().await();
-                        final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                        final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                        final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                        final File javacFile = jdkFolder.getJavacFile().await();
 
                         final JavaPublishedProjectFolder otherProjectFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("other-publisher", "other-project", "other-version").await());
                         final QubPublisherFolder otherPublisherFolder = otherProjectFolder.getPublisherFolder().await();
@@ -4156,7 +4154,7 @@ public interface JavaProjectBuildTests
                         projectJsonFile.setContentsAsString(projectJson.toString()).await();
 
                         final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                        JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                        JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                         JavaProjectBuild.run(process, action);
 
@@ -4212,10 +4210,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                        final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                        final CommandLineAction action = JavaProjectTests.createAction(process);
                         final QubFolder qubFolder = process.getQubFolder().await();
-                        final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                        final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                        final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                        final File javacFile = jdkFolder.getJavacFile().await();
 
                         final JavaPublishedProjectFolder otherProjectVersionFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("other-publisher", "other-project", "other-version").await());
                         final QubPublisherFolder otherPublisherFolder = otherProjectVersionFolder.getPublisherFolder().await();
@@ -4233,7 +4231,7 @@ public interface JavaProjectBuildTests
                         projectJsonFile.setContentsAsString(projectJson.toString()).await();
 
                         final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                        JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                        JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                         JavaProjectBuild.run(process, action);
 
@@ -4290,10 +4288,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final JavaPublishedProjectFolder otherProjectVersionFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("other-publisher", "other-project", "other-version").await());
                     final QubPublisherFolder otherPublisherFolder = otherProjectVersionFolder.getPublisherFolder().await();
@@ -4311,7 +4309,7 @@ public interface JavaProjectBuildTests
                     projectJsonFile.setContentsAsString(projectJson.toString()).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -4370,10 +4368,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final JavaPublishedProjectFolder ab1Folder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("a", "b", "1").await());
                     ab1Folder.getProjectJsonFile().await()
@@ -4415,10 +4413,10 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
                             }));
@@ -4509,10 +4507,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final JavaPublishedProjectFolder ab1Folder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("a", "b", "1").await());
                     ab1Folder.getProjectJsonFile().await()
@@ -4563,10 +4561,10 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
                             }));
@@ -4663,10 +4661,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final JavaPublishedProjectFolder ab1Folder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("a", "b", "1").await());
                     ab1Folder.getProjectJsonFile().await()
@@ -4711,7 +4709,7 @@ public interface JavaProjectBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
                     JavaProjectBuild.run(process, action);
 
@@ -4791,10 +4789,10 @@ public interface JavaProjectBuildTests
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
                     (Test test, FakeDesktopProcess process) ->
                 {
-                    final CommandLineAction action = JavaProjectBuildTests.createAction(process);
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final QubProjectVersionFolder jdkFolder = JavaProjectBuildTests.getJdkFolder(qubFolder);
-                    final File javacFile = JavaProjectBuildTests.getJavacFile(jdkFolder);
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
@@ -4823,10 +4821,10 @@ public interface JavaProjectBuildTests
                     final DateTime beforeBuild = clock.getCurrentDateTime();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
-                    JavaProjectBuildTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
                         FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
-                            .setFunction((ByteWriteStream output, ByteWriteStream error) ->
+                            .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 1").await();
                                 clock.advance(Duration.minutes(1));
@@ -4921,58 +4919,5 @@ public interface JavaProjectBuildTests
                 });
             });
         });
-    }
-
-    static CommandLineAction createAction(DesktopProcess process)
-    {
-        PreCondition.assertNotNull(process, "process");
-
-        final CommandLineActions actions = JavaProject.createCommandLineActions(process);
-        return JavaProjectBuild.addAction(actions);
-    }
-
-    static QubProjectVersionFolder getJdkFolder(QubFolder qubFolder)
-    {
-        PreCondition.assertNotNull(qubFolder, "qubFolder");
-
-        final QubProjectVersionFolder jdkFolder = qubFolder.getProjectVersionFolder("openjdk", "jdk", "17").await();
-        jdkFolder.create().catchError().await();
-
-        return jdkFolder;
-    }
-
-    static File getJavacFile(QubProjectVersionFolder jdkFolder)
-    {
-        PreCondition.assertNotNull(jdkFolder, "jdkFolder");
-
-        return jdkFolder.getFile("bin/javac").await();
-    }
-
-    static void addJavacVersionFakeChildProcessRun(FakeChildProcessRunner childProcessRunner, File javacFile)
-    {
-        PreCondition.assertNotNull(childProcessRunner, "childProcessRunner");
-        PreCondition.assertNotNull(javacFile, "javacFile");
-
-        childProcessRunner.add(
-            FakeChildProcessRun.create(javacFile, "--version")
-                .setFunction((ByteWriteStream output) ->
-                {
-                    CharacterWriteStream.create(output)
-                        .writeLine("javac 17").await();
-                }));
-    }
-
-    static void writeIssues(ByteWriteStream writeStream, JavacIssue... issues)
-    {
-        PreCondition.assertNotNull(writeStream, "writeStream");
-        PreCondition.assertNotNull(issues, "issues");
-
-        final CharacterWriteStream characterWriteStream = CharacterWriteStream.create(writeStream);
-        for (final JavacIssue issue : issues)
-        {
-            characterWriteStream.writeLine(issue.getSourceFilePath() + ":" + issue.getLineNumber() + ": " + issue.getType().toLowerCase() + ": " + issue.getMessage()).await();
-            characterWriteStream.writeLine("Fake code line").await();
-            characterWriteStream.writeLine(Strings.repeat(' ', issue.getColumnNumber() - 1) + "^").await();
-        }
     }
 }

@@ -43,6 +43,36 @@ public interface JavaFileTests
                     test.assertEqual(startTime, javaFile.getLastModified().await());
                 });
             });
+
+
+
+            runner.testGroup("getRelativePathFromFullTypeName(String)", () ->
+            {
+                final Action2<String,Throwable> getRelativePathFromFullTypeNameErrorTest = (String fullTypeName, Throwable expected) ->
+                {
+                    runner.test("with " + Strings.escapeAndQuote(fullTypeName), (Test test) ->
+                    {
+                        test.assertThrows(() -> JavaFile.getRelativePathFromFullTypeName(fullTypeName),
+                            expected);
+                    });
+                };
+
+                getRelativePathFromFullTypeNameErrorTest.run(null, new PreConditionFailure("fullTypeName cannot be null."));
+                getRelativePathFromFullTypeNameErrorTest.run("", new PreConditionFailure("fullTypeName cannot be empty."));
+
+                final Action2<String,Path> getRelativePathFromFullTypeNameTest = (String fullTypeName, Path expected) ->
+                {
+                    runner.test("with " + Strings.escapeAndQuote(fullTypeName), (Test test) ->
+                    {
+                        test.assertEqual(expected, JavaFile.getRelativePathFromFullTypeName(fullTypeName));
+                    });
+                };
+
+                getRelativePathFromFullTypeNameTest.run("a", Path.parse("a.java"));
+                getRelativePathFromFullTypeNameTest.run("a.b", Path.parse("a/b.java"));
+                getRelativePathFromFullTypeNameTest.run("a.b.c", Path.parse("a/b/c.java"));
+                getRelativePathFromFullTypeNameTest.run("a.b$5", Path.parse("a/b.java"));
+            });
         });
     }
 }

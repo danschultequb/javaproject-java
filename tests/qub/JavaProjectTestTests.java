@@ -789,7 +789,7 @@ public interface JavaProjectTestTests
                         TestJSON.create()
                             .setJavaVersion("fake-java-version")
                             .setClassFiles(Iterable.create(
-                                TestJSONClassFile.create("ATests.class")
+                                TestJSONClassFile.create("tests/ATests.class")
                                     .setLastModified(DateTime.create(1970, 1, 1))
                                     .setPassedTestCount(0)
                                     .setSkippedTestCount(0)
@@ -938,7 +938,7 @@ public interface JavaProjectTestTests
                         TestJSON.create()
                             .setJavaVersion("fake-java-version")
                             .setClassFiles(Iterable.create(
-                                TestJSONClassFile.create("ATests.class")
+                                TestJSONClassFile.create("tests/ATests.class")
                                     .setLastModified(DateTime.create(1970, 1, 1))
                                     .setPassedTestCount(0)
                                     .setSkippedTestCount(0)
@@ -1133,7 +1133,7 @@ public interface JavaProjectTestTests
                             "            at qub.LazyResult.await(LazyResult.java:151)",
                             "            at qub.LazyResult.ensureIsCompleted(LazyResult.java:128)",
                             "            at qub.LazyResult.await(LazyResult.java:151)",
-                            "            at qub.JavaProjectTest.runTests(JavaProjectTest.java:519)",
+                            "            at qub.JavaProjectTest.runTests(JavaProjectTest.java:520)",
                             "            at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "            at qub.AsyncTask.run(AsyncTask.java:178)",
                             "            at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
@@ -1178,7 +1178,7 @@ public interface JavaProjectTestTests
                             "        at qub.LazyResult.await(LazyResult.java:151)",
                             "        at qub.LazyResult.ensureIsCompleted(LazyResult.java:128)",
                             "        at qub.LazyResult.await(LazyResult.java:151)",
-                            "        at qub.JavaProjectTest.runTests(JavaProjectTest.java:519)",
+                            "        at qub.JavaProjectTest.runTests(JavaProjectTest.java:520)",
                             "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "        at qub.AsyncTask.run(AsyncTask.java:178)",
                             "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
@@ -1220,7 +1220,7 @@ public interface JavaProjectTestTests
                         TestJSON.create()
                             .setJavaVersion("fake-java-version")
                             .setClassFiles(Iterable.create(
-                                TestJSONClassFile.create("ATests.class")
+                                TestJSONClassFile.create("tests/ATests.class")
                                     .setLastModified(DateTime.create(1970, 1, 1))
                                     .setPassedTestCount(4)
                                     .setSkippedTestCount(2)
@@ -1301,7 +1301,7 @@ public interface JavaProjectTestTests
                             "            at qub.LazyResult.await(LazyResult.java:151)",
                             "            at qub.LazyResult.ensureIsCompleted(LazyResult.java:128)",
                             "            at qub.LazyResult.await(LazyResult.java:151)",
-                            "            at qub.JavaProjectTest.runTests(JavaProjectTest.java:519)",
+                            "            at qub.JavaProjectTest.runTests(JavaProjectTest.java:520)",
                             "            at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "            at qub.AsyncTask.run(AsyncTask.java:178)",
                             "            at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
@@ -1347,7 +1347,7 @@ public interface JavaProjectTestTests
                             "        at qub.LazyResult.await(LazyResult.java:151)",
                             "        at qub.LazyResult.ensureIsCompleted(LazyResult.java:128)",
                             "        at qub.LazyResult.await(LazyResult.java:151)",
-                            "        at qub.JavaProjectTest.runTests(JavaProjectTest.java:519)",
+                            "        at qub.JavaProjectTest.runTests(JavaProjectTest.java:520)",
                             "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "        at qub.AsyncTask.run(AsyncTask.java:178)",
                             "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",

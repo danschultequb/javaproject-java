@@ -57,7 +57,7 @@ public class JavaClassFile extends File
     {
         PreCondition.assertNotNullAndNotEmpty(fullTypeName, "fullTypeName");
 
-        final Path result = Path.parse(fullTypeName.replaceAll("\\.", "//") + ".class");
+        final Path result = Path.parse(fullTypeName.replaceAll("\\.", "/") + ".class");
 
         PostCondition.assertNotNull(result, "result");
         PostCondition.assertFalse(result.isRooted(), "result.isRooted()");

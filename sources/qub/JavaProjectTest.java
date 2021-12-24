@@ -348,6 +348,7 @@ public interface JavaProjectTest
             }
             else
             {
+                final Folder outputsFolder = projectFolder.getOutputsFolder().await();
                 final Folder outputsTestsFolder = projectFolder.getOutputsTestsFolder().await();
                 final Iterable<JavaClassFile> testClassFilesToRun;
 
@@ -375,7 +376,7 @@ public interface JavaProjectTest
                                (TestJSONClassFile testJsonClassFile) -> testJsonClassFile);
                     for (final JavaClassFile testClassFile : testClassFiles)
                     {
-                        final Path testClassFileRelativePath = testClassFile.relativeTo(outputsTestsFolder);
+                        final Path testClassFileRelativePath = testClassFile.relativeTo(outputsFolder);
                         final TestJSONClassFile testJsonClassFile = relativePathToTestJsonClassFileMap.get(testClassFileRelativePath).catchError().await();
                         if (testJsonClassFile == null)
                         {
@@ -496,7 +497,7 @@ public interface JavaProjectTest
                         verbose.writeLine("Updating test.json class file for " + testClass.getFullName() + "...").await();
                         final Path testClassRelativePath = JavaClassFile.getRelativePathFromFullTypeName(testClass.getFullName());
                         final JavaClassFile testClassFile = relativePathToTestClassFilesToRunMap.get(testClassRelativePath).catchError().await();
-                        newTestJsonClassFiles.add(TestJSONClassFile.create(testClassRelativePath)
+                        newTestJsonClassFiles.add(TestJSONClassFile.create(testClassFile.relativeTo(outputsFolder))
                             .setLastModified(testClassFile.getLastModified().await())
                             .setPassedTestCount(testClass.getPassedTestCount())
                             .setSkippedTestCount(testClass.getSkippedTestCount())

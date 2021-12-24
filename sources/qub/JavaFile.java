@@ -48,7 +48,12 @@ public class JavaFile extends File
     {
         PreCondition.assertNotNullAndNotEmpty(fullTypeName, "fullTypeName");
 
-        final Path result = Path.parse(fullTypeName.replaceAll("\\.", "//") + ".java");
+        final int dollarSignIndex = fullTypeName.lastIndexOf('$');
+        if (dollarSignIndex >= 0)
+        {
+            fullTypeName = fullTypeName.substring(0, dollarSignIndex);
+        }
+        final Path result = Path.parse(fullTypeName.replaceAll("\\.", "/") + ".java");
 
         PostCondition.assertNotNull(result, "result");
         PostCondition.assertFalse(result.isRooted(), "result.isRooted()");

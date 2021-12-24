@@ -199,9 +199,11 @@ public interface JavaProjectBuild
                     {
                         final Path javaFileRelativePath = javaFileToCompile.getRelativePath();
                         final Set<String> javaFileWords;
-                        try (final CharacterToByteReadStream fileStream = projectFolder.getFileContentReadStream(javaFileRelativePath).await())
+                        try (final ByteReadStream fileByteReadStream = projectFolder.getFileContentReadStream(javaFileRelativePath).await())
                         {
-                            javaFileWords = Strings.iterateWords(CharacterReadStream.iterate(fileStream)).toSet();
+                            final BufferedByteReadStream bufferedFileByteReadStream = BufferedByteReadStream.create(fileByteReadStream);
+                            final CharacterReadStream fileCharacterReadStream = CharacterReadStream.create(bufferedFileByteReadStream);
+                            javaFileWords = Strings.iterateWords(CharacterReadStream.iterate(fileCharacterReadStream)).toSet();
                         }
 
                         final String javaFileTypeName = javaFileRelativePath.getNameWithoutFileExtension();
@@ -271,6 +273,9 @@ public interface JavaProjectBuild
                 }
 
                 verboseStream.writeLine("Discovering unmodified .java files that have missing or modified .class files...").await();
+                final Map<Path,JavaClassFile> classFilesMap = projectFolder.iterateClassFiles().toMap(
+                    (JavaClassFile classFile) -> classFile.relativeTo(projectFolder),
+                    (JavaClassFile classFile) -> classFile);
                 for (final BuildJSONJavaFile unmodifiedJavaFile : unmodifiedJavaFiles.toList())
                 {
                     boolean shouldCompileJavaFile = false;
@@ -284,9 +289,6 @@ public interface JavaProjectBuild
                     }
                     else
                     {
-                        final Map<Path,JavaClassFile> classFilesMap = projectFolder.iterateClassFiles().toMap(
-                            (JavaClassFile classFile) -> classFile.relativeTo(projectFolder),
-                            (JavaClassFile classFile) -> classFile);
                         for (final BuildJSONClassFile buildJsonJavaFileClassFile : buildJsonJavaFileClassFiles)
                         {
                             final Path classFileRelativePath = buildJsonJavaFileClassFile.getRelativePath();
@@ -489,8 +491,15 @@ public interface JavaProjectBuild
 
                     for (final MapEntry<Path,List<BuildJSONClassFile>> entry : sourceFilePathToClassFileMap)
                     {
-                        newBuildJson.getJavaFile(entry.getKey()).await()
-                            .setClassFiles(entry.getValue());
+                        final Path javaFileRelativePath = entry.getKey();
+                        final List<BuildJSONClassFile> classFiles = entry.getValue();
+                        final BuildJSONJavaFile buildJsonJavaFile = newBuildJson.getJavaFile(javaFileRelativePath)
+                                .catchError((Throwable e) -> verboseStream.writeLine(e.getMessage()).await())
+                                .await();
+                        if (buildJsonJavaFile != null)
+                        {
+                            buildJsonJavaFile.setClassFiles(classFiles);
+                        }
                     }
                 }
 

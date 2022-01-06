@@ -61,6 +61,11 @@ public interface JavaProjectTest
 
     static void run(DesktopProcess process, CommandLineAction action)
     {
+        JavaProjectTest.run(process, action, null, null);
+    }
+
+    static void run(DesktopProcess process, CommandLineAction action, JavaProjectFolder providedProjectFolder, File providedLogFile)
+    {
         PreCondition.assertNotNull(process, "process");
         PreCondition.assertNotNull(action, "action");
 
@@ -76,18 +81,22 @@ public interface JavaProjectTest
         if (!helpParameter.showApplicationHelpLines(process).await())
         {
             profilerParameter.await();
+            profilerParameter.removeValue().await();
 
-            final Folder dataFolder = process.getQubProjectDataFolder().await();
-            final JavaProjectFolder projectFolder = JavaProjectFolder.get(projectFolderParameter.getValue().await());
+            final JavaProjectFolder projectFolder = providedProjectFolder != null
+                ? providedProjectFolder
+                : JavaProjectFolder.get(projectFolderParameter.getValue().await());
 
-            try (final LogStreams logStreamsBeforeTests = CommandLineLogsAction.getLogStreamsFromDataFolder(dataFolder, process.getOutputWriteStream(), verboseParameter.getVerboseCharacterToByteWriteStream().await()))
+            final File logFile = providedLogFile != null
+                ? providedLogFile
+                : CommandLineLogsAction.getLogFileFromProcess(process);
+
+            JavaProjectBuild.run(process, action, projectFolder, logFile);
+
+            if (process.getExitCode() == 0)
             {
-                JavaProjectBuild.run(process, projectFolder, logStreamsBeforeTests);
-
-                if (process.getExitCode() == 0)
+                try (final LogStreams logStreamsBeforeTests = CommandLineLogsAction.getLogStreamsFromLogFile(logFile, process.getOutputWriteStream(), verboseParameter.getVerboseCharacterToByteWriteStream().await()))
                 {
-                    final File logFile = logStreamsBeforeTests.getLogFile();
-
                     final QubFolder qubFolder = process.getQubFolder().await();
 
                     final Coverage coverage = coverageParameter.getValue().await();

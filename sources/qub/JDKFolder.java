@@ -72,4 +72,27 @@ public class JDKFolder extends QubProjectVersionFolder
                 .setExecutablePath(this.getJavaFile().await());
         });
     }
+
+    public Result<File> getJarFile()
+    {
+        return this.getFile("bin/jar");
+    }
+
+    public Result<Jar> getJar(DesktopProcess process)
+    {
+        PreCondition.assertNotNull(process, "process");
+
+        return this.getJar(process.getChildProcessRunner());
+    }
+
+    public Result<Jar> getJar(ChildProcessRunner childProcessRunner)
+    {
+        PreCondition.assertNotNull(childProcessRunner, "childProcessRunner");
+
+        return Result.create(() ->
+        {
+            return Jar.create(childProcessRunner)
+                .setExecutablePath(this.getJarFile().await());
+        });
+    }
 }

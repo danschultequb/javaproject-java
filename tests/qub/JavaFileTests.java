@@ -44,7 +44,86 @@ public interface JavaFileTests
                 });
             });
 
+            runner.testGroup("getFullTypeName(Path)", () ->
+            {
+                final Action2<Path,Throwable> getFullTypeNameErrorTest = (Path relativeFilePath, Throwable expected) ->
+                {
+                    runner.test("with " + Strings.escapeAndQuote(relativeFilePath), (Test test) ->
+                    {
+                        test.assertThrows(() -> JavaFile.getFullTypeName(relativeFilePath),
+                            expected);
+                    });
+                };
 
+                getFullTypeNameErrorTest.run(null, new PreConditionFailure("relativeFilePath cannot be null."));
+                getFullTypeNameErrorTest.run(Path.parse("/test"), new PreConditionFailure("relativeFilePath.isRooted() cannot be true."));
+
+                final Action2<Path,String> getFullTypeNameTest = (Path relativePath, String expected) ->
+                {
+                    runner.test("with " + Strings.escapeAndQuote(relativePath), (Test test) ->
+                    {
+                        test.assertEqual(expected, JavaFile.getFullTypeName(relativePath));
+                    });
+                };
+
+                getFullTypeNameTest.run(Path.parse("a/b/c.java"), "a.b.c");
+            });
+
+            runner.testGroup("getFullTypeName(Folder,File)", () ->
+            {
+                runner.test("with null baseFolder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                    {
+                        final Folder baseFolder = null;
+                        final File file = process.getCurrentFolder().getFile("fake/base/folder/file").await();
+
+                        test.assertThrows(() -> JavaFile.getFullTypeName(baseFolder, file),
+                            new PreConditionFailure("baseFolder cannot be null."));
+                    });
+
+                runner.test("with null file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                    {
+                        final Folder baseFolder = process.getCurrentFolder().getFolder("fake/base/folder/").await();
+                        final File file = null;
+
+                        test.assertThrows(() -> JavaFile.getFullTypeName(baseFolder, file),
+                            new PreConditionFailure("file cannot be null."));
+                    });
+
+                runner.test("with file outside of baseFolder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                    {
+                        final Folder baseFolder = process.getCurrentFolder().getFolder("fake/base/folder/").await();
+                        final File file = baseFolder.getFile("../other-folder/file").await();
+
+                        test.assertThrows(() -> JavaFile.getFullTypeName(baseFolder, file),
+                            new PreConditionFailure("baseFolder.isAncestorOf(file).await() cannot be false."));
+                    });
+
+                runner.test("with file immediately under baseFolder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                    {
+                        final Folder baseFolder = process.getCurrentFolder().getFolder("fake/base/folder/").await();
+                        final File file = baseFolder.getFile("file").await();
+
+                        test.assertEqual("file", JavaFile.getFullTypeName(baseFolder, file));
+                    });
+
+                runner.test("with file immediately under baseFolder child-folder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                    {
+                        final Folder baseFolder = process.getCurrentFolder().getFolder("fake/base/folder/").await();
+                        final File file = baseFolder.getFile("subfolder/file").await();
+
+                        test.assertEqual("subfolder.file", JavaFile.getFullTypeName(baseFolder, file));
+                    });
+            });
 
             runner.testGroup("getRelativePathFromFullTypeName(String)", () ->
             {

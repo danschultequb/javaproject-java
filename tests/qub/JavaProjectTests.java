@@ -166,6 +166,19 @@ public interface JavaProjectTests
                 }));
     }
 
+    static void addJarVersionFakeChildProcessRun(FakeChildProcessRunner childProcessRunner, File jarFile)
+    {
+        PreCondition.assertNotNull(childProcessRunner, "childProcessRunner");
+        PreCondition.assertNotNull(jarFile, "jarFile");
+
+        childProcessRunner.add(
+            FakeChildProcessRun.create(jarFile, "--version")
+                .setAction((FakeDesktopProcess childProcess) ->
+                {
+                    childProcess.getOutputWriteStream().writeLine("jar 17").await();
+                }));
+    }
+
     static void writeIssues(ByteWriteStream writeStream, JavacIssue... issues)
     {
         PreCondition.assertNotNull(writeStream, "writeStream");

@@ -61,12 +61,12 @@ public class JavaProjectFolder extends Folder
         });
     }
 
-    public Result<CharacterWriteStream> getBuildJsonFileWriteStream()
+    public Result<BuildJSON> getBuildJson()
     {
         return Result.create(() ->
         {
             final File buildJsonFile = this.getBuildJsonFile().await();
-            return CharacterWriteStream.create(ByteWriteStream.buffer(buildJsonFile.getContentsByteWriteStream().await()));
+            return BuildJSON.parse(buildJsonFile).await();
         });
     }
 
@@ -76,19 +76,11 @@ public class JavaProjectFolder extends Folder
 
         return Result.create(() ->
         {
-            try (final CharacterWriteStream writeStream = this.getBuildJsonFileWriteStream().await())
+            final File buildJsonFile = this.getBuildJsonFile().await();
+            try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(buildJsonFile.getContentsByteWriteStream().await())))
             {
                 buildJson.toString(writeStream, JSONFormat.pretty).await();
             }
-        });
-    }
-
-    public Result<BuildJSON> getBuildJson()
-    {
-        return Result.create(() ->
-        {
-            final File buildJsonFile = this.getBuildJsonFile().await();
-            return BuildJSON.parse(buildJsonFile).await();
         });
     }
 
@@ -110,12 +102,12 @@ public class JavaProjectFolder extends Folder
         });
     }
 
-    public Result<CharacterWriteStream> getTestJsonFileWriteStream()
+    public Result<TestJSON> getTestJson()
     {
         return Result.create(() ->
         {
             final File testJsonFile = this.getTestJsonFile().await();
-            return CharacterWriteStream.create(ByteWriteStream.buffer(testJsonFile.getContentsByteWriteStream().await()));
+            return TestJSON.parse(testJsonFile).await();
         });
     }
 
@@ -125,19 +117,52 @@ public class JavaProjectFolder extends Folder
 
         return Result.create(() ->
         {
-            try (final CharacterWriteStream writeStream = this.getTestJsonFileWriteStream().await())
+            final File testJsonFile = this.getTestJsonFile().await();
+            try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(testJsonFile.getContentsByteWriteStream().await())))
             {
                 testJson.toString(writeStream, JSONFormat.pretty).await();
             }
         });
     }
 
-    public Result<TestJSON> getTestJson()
+    public Result<File> getPackJsonFile()
     {
         return Result.create(() ->
         {
-            final File testJsonFile = this.getTestJsonFile().await();
-            return TestJSON.parse(testJsonFile).await();
+            final Folder outputsFolder = this.getOutputsFolder().await();
+            return outputsFolder.getFile("pack.json").await();
+        });
+    }
+
+    public Result<Path> getPackJsonRelativePath()
+    {
+        return Result.create(() ->
+        {
+            final File packJsonFile = this.getPackJsonFile().await();
+            return packJsonFile.relativeTo(this);
+        });
+    }
+
+    public Result<PackJSON> getPackJson()
+    {
+        return Result.create(() ->
+        {
+            final File packJsonFile = this.getPackJsonFile().await();
+            return PackJSON.parse(packJsonFile).await();
+        });
+    }
+
+    public Result<Void> writePackJson(PackJSON packJson)
+    {
+        PreCondition.assertNotNull(packJson, "packJson");
+
+        return Result.create(() ->
+        {
+            final File packJsonFile = this.getPackJsonFile().await();
+            try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(packJsonFile.getContentsByteWriteStream().await())))
+            {
+                packJson.toString(writeStream, JSONFormat.pretty).await();
+            }
         });
     }
 
@@ -159,7 +184,7 @@ public class JavaProjectFolder extends Folder
         return JavaProjectFolder.iterateClassFilesFromOutputsFolder(outputsTestsFolder);
     }
 
-    public static Iterator<JavaClassFile> iterateClassFilesFromOutputsFolder(Folder outputsFolder)
+    private static Iterator<JavaClassFile> iterateClassFilesFromOutputsFolder(Folder outputsFolder)
     {
         PreCondition.assertNotNull(outputsFolder, "outputsFolder");
 
@@ -182,7 +207,7 @@ public class JavaProjectFolder extends Folder
             final BuildJSON buildJson = this.getBuildJson().catchError().await();
             if (buildJson != null)
             {
-                final Iterable<JavaFile> javaFiles = this.getJavaFiles().await().toList();
+                final Iterable<JavaFile> javaFiles = this.iterateJavaFiles().toList();
 
                 final Iterable<BuildJSONJavaFile> buildJsonJavaFiles = buildJson.getJavaFiles();
                 for (final BuildJSONJavaFile buildJsonJavaFile : buildJsonJavaFiles)
@@ -381,14 +406,30 @@ public class JavaProjectFolder extends Folder
      * Get all files within this project folder that have the .java file extension.
      * @return All files within this project folder that have the .java file extension.
      */
-    public Result<Iterable<JavaFile>> getJavaFiles()
+    public Iterator<JavaFile> iterateJavaFiles()
     {
-        return Result.create(() ->
-        {
-            return this.iterateFilesRecursively()
-                .where((File file) -> Comparer.equalIgnoreCase(".java", file.getFileExtension()))
-                .map(JavaFile::get)
-                .toList();
-        });
+        return JavaProjectFolder.iterateJavaFilesFromFolder(this);
+    }
+
+    public Iterator<JavaFile> iterateSourceJavaFiles()
+    {
+        final Folder sourcesFolder = this.getSourcesFolder().await();
+        return JavaProjectFolder.iterateJavaFilesFromFolder(sourcesFolder);
+    }
+
+    public Iterator<JavaFile> iterateTestJavaFiles()
+    {
+        final Folder testsFolder = this.getTestSourcesFolder().await();
+        return JavaProjectFolder.iterateJavaFilesFromFolder(testsFolder);
+    }
+
+    private static Iterator<JavaFile> iterateJavaFilesFromFolder(Folder folder)
+    {
+        PreCondition.assertNotNull(folder, "folder");
+
+        return folder.iterateFilesRecursively()
+            .catchError(NotFoundException.class)
+            .where((File file) -> Comparer.equalIgnoreCase(".java", file.getFileExtension()))
+            .map(JavaFile::get);
     }
 }

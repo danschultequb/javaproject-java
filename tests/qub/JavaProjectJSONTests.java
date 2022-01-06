@@ -785,6 +785,79 @@ public interface JavaProjectJSONTests
                     Iterable.create(
                         ProjectSignature.create("x", "y", "z")));
             });
+
+            runner.testGroup("getAllDependencyFolders(QubFolder)", () ->
+            {
+                runner.test("with null", (Test test) ->
+                {
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create();
+                    test.assertThrows(() -> projectJson.getAllDependencyFolders(null),
+                        new PreConditionFailure("qubFolder cannot be null."));
+                });
+
+                runner.test("with no dependencies",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create();
+                    final QubFolder qubFolder = process.getQubFolder().await();
+                    test.assertEqual(Iterable.create(), projectJson.getAllDependencyFolders(qubFolder).await());
+                });
+
+                runner.test("with not found publisher",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create()
+                        .setDependencies(Iterable.create(
+                            ProjectSignature.create("not-found-publisher", "fake-project", "7")));
+                    final QubFolder qubFolder = process.getQubFolder().await();
+                    test.assertThrows(() -> projectJson.getAllDependencyFolders(qubFolder).await(),
+                        new FileNotFoundException("/qub/not-found-publisher/fake-project/versions/7/project.json"));
+                });
+
+                runner.test("with not found project",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create()
+                        .setDependencies(Iterable.create(
+                            ProjectSignature.create("fake-publisher", "not-found-project", "7")));
+                    final QubFolder qubFolder = process.getQubFolder().await();
+                    test.assertThrows(() -> projectJson.getAllDependencyFolders(qubFolder).await(),
+                        new FileNotFoundException("/qub/fake-publisher/not-found-project/versions/7/project.json"));
+                });
+
+                runner.test("with not found version",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create()
+                        .setDependencies(Iterable.create(
+                            ProjectSignature.create("fake-publisher", "fake-project", "not-found-version")));
+                    final QubFolder qubFolder = process.getQubFolder().await();
+                    test.assertThrows(() -> projectJson.getAllDependencyFolders(qubFolder).await(),
+                        new FileNotFoundException("/qub/fake-publisher/fake-project/versions/not-found-version/project.json"));
+                });
+
+                runner.test("with existing dependency",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final QubFolder qubFolder = process.getQubFolder().await();
+                    final JavaPublishedProjectFolder dependencyFolder = JavaPublishedProjectFolder.get(
+                        qubFolder.getProjectVersionFolder("fake-publisher", "fake-project", "8").await());
+                    dependencyFolder.getProjectJsonFile().await()
+                        .setContentsAsString(JavaProjectJSON.create()
+                            .toString()).await();
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create()
+                        .setDependencies(Iterable.create(
+                            ProjectSignature.create(dependencyFolder.getPublisherName().await(), dependencyFolder.getProjectName().await(), dependencyFolder.getVersion().await())));
+                    test.assertEqual(
+                        Iterable.create(dependencyFolder),
+                        projectJson.getAllDependencyFolders(qubFolder).await());
+                });
+            });
         });
     }
 }

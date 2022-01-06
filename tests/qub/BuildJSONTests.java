@@ -702,6 +702,77 @@ public interface BuildJSONTests
                         .setMinor(2)
                         .setPatch(3));
             });
+
+            runner.testGroup("getJavaFile(String)", () ->
+            {
+                final Action3<BuildJSON,String,Throwable> getJavaFileErrorTest = (BuildJSON buildJson, String relativePath, Throwable expected) ->
+                {
+                    runner.test("with " + English.andList(buildJson, Strings.escapeAndQuote(relativePath)), (Test test) ->
+                    {
+                        test.assertThrows(() -> buildJson.getJavaFile(relativePath).await(),
+                            expected);
+                    });
+                };
+
+                getJavaFileErrorTest.run(BuildJSON.create(), null, new PreConditionFailure("relativePath cannot be null."));
+                getJavaFileErrorTest.run(BuildJSON.create(), "", new PreConditionFailure("relativePath cannot be empty."));
+                getJavaFileErrorTest.run(BuildJSON.create(), "/test.java", new PreConditionFailure("relativePath.isRooted() cannot be true."));
+                getJavaFileErrorTest.run(BuildJSON.create(), "test.java", new NotFoundException("No .java file found in the BuildJSON object with the path \"test.java\"."));
+                getJavaFileErrorTest.run(
+                    BuildJSON.create()
+                        .setJavaFile(BuildJSONJavaFile.create("TEST.JAVA")),
+                    "test.java",
+                    new NotFoundException("No .java file found in the BuildJSON object with the path \"test.java\"."));
+
+                final Action3<BuildJSON,String,BuildJSONJavaFile> getJavaFileTest = (BuildJSON buildJson, String relativePath, BuildJSONJavaFile expected) ->
+                {
+                    runner.test("with " + English.andList(buildJson, Strings.escapeAndQuote(relativePath)), (Test test) ->
+                    {
+                        test.assertEqual(expected, buildJson.getJavaFile(relativePath).await());
+                    });
+                };
+
+                getJavaFileTest.run(
+                    BuildJSON.create()
+                        .setJavaFile(BuildJSONJavaFile.create("A.java").setLastModified(DateTime.create(1, 2, 3))),
+                    "A.java",
+                    BuildJSONJavaFile.create("A.java").setLastModified(DateTime.create(1, 2, 3)));
+            });
+
+            runner.testGroup("getJavaFile(Path)", () ->
+            {
+                final Action3<BuildJSON,Path,Throwable> getJavaFileErrorTest = (BuildJSON buildJson, Path relativePath, Throwable expected) ->
+                {
+                    runner.test("with " + English.andList(buildJson, Strings.escapeAndQuote(relativePath)), (Test test) ->
+                    {
+                        test.assertThrows(() -> buildJson.getJavaFile(relativePath).await(),
+                            expected);
+                    });
+                };
+
+                getJavaFileErrorTest.run(BuildJSON.create(), null, new PreConditionFailure("relativePath cannot be null."));
+                getJavaFileErrorTest.run(BuildJSON.create(), Path.parse("/test.java"), new PreConditionFailure("relativePath.isRooted() cannot be true."));
+                getJavaFileErrorTest.run(BuildJSON.create(), Path.parse("test.java"), new NotFoundException("No .java file found in the BuildJSON object with the path \"test.java\"."));
+                getJavaFileErrorTest.run(
+                    BuildJSON.create()
+                        .setJavaFile(BuildJSONJavaFile.create("TEST.JAVA")),
+                    Path.parse("test.java"),
+                    new NotFoundException("No .java file found in the BuildJSON object with the path \"test.java\"."));
+
+                final Action3<BuildJSON,Path,BuildJSONJavaFile> getJavaFileTest = (BuildJSON buildJson, Path relativePath, BuildJSONJavaFile expected) ->
+                {
+                    runner.test("with " + English.andList(buildJson, Strings.escapeAndQuote(relativePath)), (Test test) ->
+                    {
+                        test.assertEqual(expected, buildJson.getJavaFile(relativePath).await());
+                    });
+                };
+
+                getJavaFileTest.run(
+                    BuildJSON.create()
+                        .setJavaFile(BuildJSONJavaFile.create("A.java").setLastModified(DateTime.create(1, 2, 3))),
+                    Path.parse("A.java"),
+                    BuildJSONJavaFile.create("A.java").setLastModified(DateTime.create(1, 2, 3)));
+            });
         });
     }
 }

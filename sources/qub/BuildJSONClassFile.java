@@ -12,9 +12,18 @@ public class BuildJSONClassFile extends JSONPropertyWrapperBase
         return new BuildJSONClassFile(innerProperty);
     }
 
+    public static BuildJSONClassFile create(String relativePath, DateTime lastModified)
+    {
+        PreCondition.assertNotNullAndNotEmpty(relativePath, "relativePath");
+        PreCondition.assertNotNull(lastModified, "lastModified");
+
+        return BuildJSONClassFile.create(Path.parse(relativePath), lastModified);
+    }
+
     public static BuildJSONClassFile create(Path relativePath, DateTime lastModified)
     {
         PreCondition.assertNotNull(relativePath, "relativePath");
+        PreCondition.assertFalse(relativePath.isRooted(), "relativePath.isRooted()");
         PreCondition.assertNotNull(lastModified, "lastModified");
 
         return BuildJSONClassFile.create(JSONProperty.create(relativePath.toString(), lastModified.toString()));

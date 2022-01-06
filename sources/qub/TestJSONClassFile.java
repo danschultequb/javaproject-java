@@ -21,7 +21,7 @@ public class TestJSONClassFile extends JSONPropertyWrapperBase
     {
         PreCondition.assertNotNullAndNotEmpty(testClassRelativePath, "testClassRelativePath");
 
-        return TestJSONClassFile.create(JSONProperty.create(testClassRelativePath, JSONObject.create()));
+        return TestJSONClassFile.create(Path.parse(testClassRelativePath));
     }
 
     public static TestJSONClassFile create(Path testClassRelativePath)
@@ -29,7 +29,7 @@ public class TestJSONClassFile extends JSONPropertyWrapperBase
         PreCondition.assertNotNull(testClassRelativePath, "testClassRelativePath");
         PreCondition.assertFalse(testClassRelativePath.isRooted(), "testClassRelativePath.isRooted()");
 
-        return TestJSONClassFile.create(testClassRelativePath.toString());
+        return TestJSONClassFile.create(JSONProperty.create(testClassRelativePath.toString(), JSONObject.create()));
     }
 
     public Path getRelativePath()

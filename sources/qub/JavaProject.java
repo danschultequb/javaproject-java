@@ -51,4 +51,32 @@ public interface JavaProject
 
         return parameters.addProfiler(process, JavaProject.class);
     }
+
+    static String getSourcesJarFileName(String projectName)
+    {
+        PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
+
+        return projectName + ".sources.jar";
+    }
+
+    static String getTestSourcesJarFileName(String projectName)
+    {
+        PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
+
+        return projectName + ".test.sources.jar";
+    }
+
+    static String getCompiledSourcesJarFileName(String projectName)
+    {
+        PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
+
+        return projectName + ".jar";
+    }
+
+    static String getCompiledTestsJarFileName(String projectName)
+    {
+        PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
+
+        return projectName + ".tests.jar";
+    }
 }

@@ -84,7 +84,7 @@ public class JavaPublishedProjectFolder extends QubProjectVersionFolder
         return Result.create(() ->
         {
             final String projectName = this.getProjectName().await();
-            final String compiledSourcesJarFileName = projectName + ".jar";
+            final String compiledSourcesJarFileName = JavaProject.getCompiledSourcesJarFileName(projectName);
             return this.getFile(compiledSourcesJarFileName).await();
         });
     }
@@ -94,7 +94,7 @@ public class JavaPublishedProjectFolder extends QubProjectVersionFolder
         return Result.create(() ->
         {
             final String projectName = this.getProjectName().await();
-            final String sourcesJarFileName = projectName + ".sources.jar";
+            final String sourcesJarFileName = JavaProject.getSourcesJarFileName(projectName);
             return this.getFile(sourcesJarFileName).await();
         });
     }
@@ -104,7 +104,7 @@ public class JavaPublishedProjectFolder extends QubProjectVersionFolder
         return Result.create(() ->
         {
             final String projectName = this.getProjectName().await();
-            final String compiledSourcesJarFileName = projectName + ".tests.jar";
+            final String compiledSourcesJarFileName = JavaProject.getCompiledTestsJarFileName(projectName);
             return this.getFile(compiledSourcesJarFileName).await();
         });
     }
@@ -114,7 +114,7 @@ public class JavaPublishedProjectFolder extends QubProjectVersionFolder
         return Result.create(() ->
         {
             final String projectName = this.getProjectName().await();
-            final String sourcesJarFileName = projectName + ".tests.sources.jar";
+            final String sourcesJarFileName = JavaProject.getTestSourcesJarFileName(projectName);
             return this.getFile(sourcesJarFileName).await();
         });
     }

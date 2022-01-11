@@ -308,6 +308,19 @@ public class JavaProjectFolder extends Folder
     }
 
     /**
+     * Get the main class/entry point type for this project.
+     * @return The main class/entry point type for this project.
+     */
+    public Result<String> getMainClass()
+    {
+        return Result.create(() ->
+        {
+            final JavaProjectJSON projectJSON = this.getProjectJson().await();
+            return projectJSON.getMainClass();
+        });
+    }
+
+    /**
      * Get the dependencies that are specified in this folder's project.json file.
      * @return The dependencies that are specified in this folder's project.json file.
      */
@@ -431,5 +444,49 @@ public class JavaProjectFolder extends Folder
             .catchError(NotFoundException.class)
             .where((File file) -> Comparer.equalIgnoreCase(".java", file.getFileExtension()))
             .map(JavaFile::get);
+    }
+
+    public Result<File> getSourcesJarFile()
+    {
+        return Result.create(() ->
+        {
+            final String project = this.getProject().await();
+            final String sourcesJarFileName = JavaProject.getSourcesJarFileName(project);
+            final Folder outputsFolder = this.getOutputsFolder().await();
+            return outputsFolder.getFile(sourcesJarFileName).await();
+        });
+    }
+
+    public Result<File> getTestSourcesJarFile()
+    {
+        return Result.create(() ->
+        {
+            final String project = this.getProject().await();
+            final String sourcesJarFileName = JavaProject.getTestSourcesJarFileName(project);
+            final Folder outputsFolder = this.getOutputsFolder().await();
+            return outputsFolder.getFile(sourcesJarFileName).await();
+        });
+    }
+
+    public Result<File> getCompiledSourcesJarFile()
+    {
+        return Result.create(() ->
+        {
+            final String project = this.getProject().await();
+            final String sourcesJarFileName = JavaProject.getCompiledSourcesJarFileName(project);
+            final Folder outputsFolder = this.getOutputsFolder().await();
+            return outputsFolder.getFile(sourcesJarFileName).await();
+        });
+    }
+
+    public Result<File> getCompiledTestSourcesJarFile()
+    {
+        return Result.create(() ->
+        {
+            final String project = this.getProject().await();
+            final String sourcesJarFileName = JavaProject.getCompiledTestsJarFileName(project);
+            final Folder outputsFolder = this.getOutputsFolder().await();
+            return outputsFolder.getFile(sourcesJarFileName).await();
+        });
     }
 }

@@ -410,7 +410,8 @@ public interface JavaProjectPackTests
 
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
-                    final JavaProjectJSON projectJson = JavaProjectJSON.create();
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create()
+                        .setProject("fake-project-to-pack");
                     final File projectJsonFile = projectFolder.getFile("project.json").await();
                     projectJsonFile.setContentsAsString(projectJson.toString()).await();
 
@@ -422,6 +423,8 @@ public interface JavaProjectPackTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     final File testJsonFile = outputsFolder.getFile("test.json").await();
                     final File packJsonFile = outputsFolder.getFile("pack.json").await();
+                    final File sourcesJarFile = outputsFolder.getFile("fake-project-to-pack.sources.jar").await();
+                    final File compiledSourcesJarFile = outputsFolder.getFile("fake-project-to-pack.jar").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder("sources").await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
 
@@ -438,9 +441,20 @@ public interface JavaProjectPackTests
                         {
                             clock.advance(Duration.minutes(1));
                             JavaProjectTest.runTests(testProcess);
-                            clock.advance(Duration.minutes(1));
                         }));
                     JavaProjectTests.addJarVersionFakeChildProcessRun(childProcessRunner, jarFile);
+                    childProcessRunner.add(FakeChildProcessRun.create(jarFile, "--create", "--file=/project/folder/outputs/fake-project-to-pack.sources.jar", "-C", "/project/folder/sources/", ".")
+                        .setAction((FakeDesktopProcess testProcess) ->
+                        {
+                            clock.advance(Duration.minutes(1));
+                            sourcesJarFile.setContentsAsString("sources jar file").await();
+                        }));
+                    childProcessRunner.add(FakeChildProcessRun.create(jarFile, "--create", "--file=/project/folder/outputs/fake-project-to-pack.jar", "-C", "/project/folder/outputs/sources/", ".")
+                        .setAction((FakeDesktopProcess testProcess) ->
+                        {
+                            clock.advance(Duration.minutes(1));
+                            compiledSourcesJarFile.setContentsAsString("compiled sources jar file").await();
+                        }));
 
                     JavaProjectPack.run(process, action);
 
@@ -448,7 +462,8 @@ public interface JavaProjectPackTests
                         Iterable.create(
                             "Compiling 1 source file...",
                             "No test classes found.",
-                            "Creating sources jar file..."),
+                            "Creating outputs/fake-project-to-pack.sources.jar...",
+                            "Creating outputs/fake-project-to-pack.jar..."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -462,6 +477,8 @@ public interface JavaProjectPackTests
                             projectJsonFile,
                             outputsSourcesFolder,
                             buildJsonFile,
+                            compiledSourcesJarFile,
+                            sourcesJarFile,
                             packJsonFile,
                             testJsonFile,
                             aClassFile,
@@ -491,9 +508,17 @@ public interface JavaProjectPackTests
                             .setJarVersion("17")
                             .setSourceFiles(Iterable.create(
                                 PackJSONFile.create("sources/A.java", DateTime.create(1970, 1, 1))))
+                            .setTestSourceFiles(Iterable.create())
+                            .setSourceOutputFiles(Iterable.create(
+                                PackJSONFile.create("outputs/sources/A.class", DateTime.create(1970, 1, 1, 0, 1))))
+                            .setTestOutputFiles(Iterable.create())
                             .toString(JSONFormat.pretty),
                         packJsonFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.create(1970, 1, 1, 0, 3), packJsonFile.getLastModified().await());
+                    test.assertEqual(DateTime.create(1970, 1, 1, 0, 4), packJsonFile.getLastModified().await());
+                    test.assertEqual("sources jar file", sourcesJarFile.getContentsAsString().await());
+                    test.assertEqual(DateTime.create(1970, 1, 1, 0, 3), sourcesJarFile.getLastModified().await());
+                    test.assertEqual("compiled sources jar file", compiledSourcesJarFile.getContentsAsString().await());
+                    test.assertEqual(DateTime.create(1970, 1, 1, 0, 4), compiledSourcesJarFile.getLastModified().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
@@ -532,13 +557,21 @@ public interface JavaProjectPackTests
                             "VERBOSE: Updating test.json file...",
                             "VERBOSE: Parsing pack.json file...",
                             "VERBOSE: Getting jar version...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/jar --version",
                             "VERBOSE: Previous jar version number: null",
                             "VERBOSE: Current jar version number:  17",
-                            "VERBOSE: Checking if the sources jar file needs to be created...",
-                            "Creating sources jar file...",
-                            "VERBOSE: Checking if the compiled sources jar file needs to be created...",
-                            "VERBOSE: Checking if the test sources jar file needs to be created...",
-                            "VERBOSE: Checking if the compiled tests jar file needs to be created...",
+                            "VERBOSE: Checking if the outputs/fake-project-to-pack.sources.jar needs to be created...",
+                            "VERBOSE: Jar version changed.",
+                            "Creating outputs/fake-project-to-pack.sources.jar...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/jar --create --file=/project/folder/outputs/fake-project-to-pack.sources.jar -C /project/folder/sources/ .",
+                            "VERBOSE: Checking if the outputs/fake-project-to-pack.test.sources.jar needs to be created...",
+                            "VERBOSE: No files exist that would go into outputs/fake-project-to-pack.test.sources.jar.",
+                            "VERBOSE: Checking if the outputs/fake-project-to-pack.jar needs to be created...",
+                            "VERBOSE: Jar version changed.",
+                            "Creating outputs/fake-project-to-pack.jar...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/jar --create --file=/project/folder/outputs/fake-project-to-pack.jar -C /project/folder/outputs/sources/ .",
+                            "VERBOSE: Checking if the outputs/fake-project-to-pack.tests.jar needs to be created...",
+                            "VERBOSE: No files exist that would go into outputs/fake-project-to-pack.tests.jar.",
                             "VERBOSE: Updating outputs/pack.json..."),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(

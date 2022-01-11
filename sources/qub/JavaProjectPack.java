@@ -55,7 +55,8 @@ public interface JavaProjectPack
                     final VerboseCharacterToByteWriteStream verbose = logStreams.getVerbose();
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final JDKFolder jdkFolder = JDKFolder.getLatestVersion(qubFolder).await();
-                    final Jar jar = jdkFolder.getJar(process).await();
+                    final VerboseChildProcessRunner childProcessRunner = VerboseChildProcessRunner.create(process, verbose);
+                    final Jar jar = jdkFolder.getJar(childProcessRunner).await();
 
                     verbose.writeLine("Parsing pack.json file...").await();
                     final PackJSON packJson = projectFolder.getPackJson()
@@ -71,43 +72,102 @@ public interface JavaProjectPack
 
                     final boolean jarVersionChanged = !Comparer.equal(packJson.getJarVersion(), jarVersion);
 
-                    verbose.writeLine("Checking if the sources jar file needs to be created...").await();
-                    boolean createSourcesJarFile = jarVersionChanged;
-                    if (!createSourcesJarFile)
+                    final Function4<File,Folder,String,Iterable<PackJSONFile>,Iterable<PackJSONFile>> createJarFileIfNeeded = (File jarFile, Folder baseFolder, String mainClassFullTypeName, Iterable<PackJSONFile> packJsonFiles) ->
                     {
-                        final Map<Path,DateTime> previousSourceFiles = packJson.getSourceFiles()
-                            .toMap(PackJSONFile::getRelativePath, PackJSONFile::getLastModified);
-                        for (final JavaFile sourceFile : projectFolder.iterateSourceJavaFiles())
+                        Iterable<PackJSONFile> newPackJsonFiles;
+                        final Path jarFileRelativePath = jarFile.relativeTo(projectFolder);
+
+                        verbose.writeLine("Checking if the " + jarFileRelativePath.toString() + " needs to be created...").await();
+                        final Iterable<File> baseFolderFiles = baseFolder.iterateFilesRecursively().catchError().toList();
+                        if (!baseFolderFiles.any())
                         {
-                            final Path relativePath = sourceFile.relativeTo(projectFolder);
-                            final DateTime previousLastModified = previousSourceFiles.get(relativePath).catchError().await();
-                            if (previousLastModified == null || !previousLastModified.equals(sourceFile.getLastModified().await()))
+                            verbose.writeLine("No files exist that would go into " + jarFileRelativePath.toString() + ".").await();
+                            jarFile.delete().catchError().await();
+                            newPackJsonFiles = Iterable.create();
+                        }
+                        else
+                        {
+                            boolean createSourcesJarFile = true;
+                            if (jarVersionChanged)
                             {
-                                createSourcesJarFile = true;
-                                break;
+                                verbose.writeLine("Jar version changed.").await();
+                            }
+                            else if (!jarFile.exists().await())
+                            {
+                                verbose.writeLine(jarFileRelativePath.toString() + " doesn't exist.").await();
+                            }
+                            else
+                            {
+                                createSourcesJarFile = false;
+
+                                final Map<Path, DateTime> previousBaseFolderFiles = packJsonFiles
+                                    .toMap(PackJSONFile::getRelativePath, PackJSONFile::getLastModified);
+                                for (final File baseFolderFile : baseFolderFiles)
+                                {
+                                    final Path relativePath = baseFolderFile.relativeTo(projectFolder);
+                                    final DateTime previousLastModified = previousBaseFolderFiles.get(relativePath).catchError().await();
+                                    if (previousLastModified == null || !previousLastModified.equals(baseFolderFile.getLastModified().await()))
+                                    {
+                                        verbose.writeLine("Found file(s) that have changed since the last pack occurred.").await();
+                                        createSourcesJarFile = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!createSourcesJarFile)
+                            {
+                                verbose.writeLine(jarFileRelativePath.toString() + " is up to date.").await();
+                                newPackJsonFiles = packJsonFiles;
+                            }
+                            else
+                            {
+                                output.writeLine("Creating " + jarFileRelativePath.toString() + "...").await();
+                                jar.run((JarParameters jarParameters) ->
+                                {
+                                    jarParameters.addCreate();
+                                    jarParameters.addJarFile(jarFile);
+                                    if (!Strings.isNullOrEmpty(mainClassFullTypeName))
+                                    {
+                                        jarParameters.addMainClass(mainClassFullTypeName);
+                                    }
+                                    jarParameters.addBaseFolderPath(baseFolder);
+                                    jarParameters.addContentPath(".");
+                                }).await();
+                                newPackJsonFiles = baseFolder.iterateFilesRecursively()
+                                    .map((File baseFolderFile) -> PackJSONFile.create(baseFolderFile.relativeTo(projectFolder), baseFolderFile.getLastModified().await()))
+                                    .toList();
                             }
                         }
-                    }
-                    Iterable<PackJSONFile> newPackJsonSourceFiles;
-                    if (!createSourcesJarFile)
-                    {
-                        verbose.writeLine("Source jar file is up to date.").await();
-                        newPackJsonSourceFiles = packJson.getSourceFiles();
-                    }
-                    else
-                    {
-                        output.writeLine("Creating sources jar file...").await();
-                        newPackJsonSourceFiles = projectFolder.iterateSourceJavaFiles()
-                            .map((JavaFile javaFile) -> PackJSONFile.create(javaFile.relativeTo(projectFolder), javaFile.getLastModified().await()))
-                            .toList();
-                    }
-                    newPackJson.setSourceFiles(newPackJsonSourceFiles);
 
-                    verbose.writeLine("Checking if the compiled sources jar file needs to be created...").await();
+                        return newPackJsonFiles;
+                    };
 
-                    verbose.writeLine("Checking if the test sources jar file needs to be created...").await();
 
-                    verbose.writeLine("Checking if the compiled tests jar file needs to be created...").await();
+                    newPackJson.setSourceFiles(createJarFileIfNeeded.run(
+                        projectFolder.getSourcesJarFile().await(),
+                        projectFolder.getSourcesFolder().await(),
+                        null,
+                        packJson.getSourceFiles()));
+
+                    newPackJson.setTestSourceFiles(createJarFileIfNeeded.run(
+                        projectFolder.getTestSourcesJarFile().await(),
+                        projectFolder.getTestSourcesFolder().await(),
+                        null,
+                        packJson.getTestSourceFiles()));
+
+                    final String mainClassFullTypeName = projectFolder.getMainClass().catchError().await();
+                    newPackJson.setSourceOutputFiles(createJarFileIfNeeded.run(
+                        projectFolder.getCompiledSourcesJarFile().await(),
+                        projectFolder.getOutputsSourcesFolder().await(),
+                        mainClassFullTypeName,
+                        packJson.getSourceOutputFiles()));
+
+                    newPackJson.setTestOutputFiles(createJarFileIfNeeded.run(
+                        projectFolder.getCompiledTestSourcesJarFile().await(),
+                        projectFolder.getOutputsTestsFolder().await(),
+                        null,
+                        packJson.getTestOutputFiles()));
 
                     verbose.writeLine("Updating " + projectFolder.getPackJsonRelativePath().await() + "...").await();
                     projectFolder.writePackJson(newPackJson).await();

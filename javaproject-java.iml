@@ -12,66 +12,55 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/github-java/versions/23/github-java.jar!/"/>
+          <root url="jar://C:/qub/qub/github-java/versions/24/github-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/github-java/versions/23/github-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/github-java/versions/24/github-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/http-java/versions/45/http-java.jar!/"/>
+          <root url="jar://C:/qub/qub/http-java/versions/46/http-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/http-java/versions/45/http-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/http-java/versions/46/http-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/dns-java/versions/51/dns-java.jar!/"/>
+          <root url="jar://C:/qub/qub/lib-java/versions/169/lib-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/dns-java/versions/51/dns-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/lib-java/versions/169/lib-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/lib-java/versions/168/lib-java.jar!/"/>
+          <root url="jar://C:/qub/qub/git-java/versions/43/git-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/lib-java/versions/168/lib-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/git-java/versions/43/git-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/git-java/versions/42/git-java.jar!/"/>
+          <root url="jar://C:/qub/qub/projectjson-java/versions/118/projectjson-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/git-java/versions/42/git-java.sources.jar!/"/>
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://C:/qub/qub/projectjson-java/versions/117/projectjson-java.jar!/"/>
-        </CLASSES>
-        <JAVADOC/>
-        <SOURCES>
-          <root url="jar://C:/qub/qub/projectjson-java/versions/117/projectjson-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/projectjson-java/versions/118/projectjson-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>

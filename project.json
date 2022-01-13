@@ -2,7 +2,7 @@
   "$schema": "file:///C:/qub/qub/javaproject-java/data/javaproject.schema.json",
   "project": "javaproject-java",
   "publisher": "qub",
-  "version": "30",
+  "version": "35",
   "java": {
     "mainClass": "qub.JavaProject",
     "shortcutName": "qub-javaproject",
@@ -10,17 +10,17 @@
       {
         "publisher": "qub",
         "project": "projectjson-java",
-        "version": "117"
+        "version": "118"
       },
       {
         "publisher": "qub",
         "project": "git-java",
-        "version": "42"
+        "version": "43"
       },
       {
         "publisher": "qub",
         "project": "github-java",
-        "version": "23"
+        "version": "24"
       }
     ]
   }

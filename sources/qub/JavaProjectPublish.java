@@ -80,88 +80,91 @@ public interface JavaProjectPublish
                     final QubProjectVersionFolder versionFolder = publishedProjectFolder.getProjectVersionFolder(version).await();
                     if (versionFolder.exists().await())
                     {
-                        throw new AlreadyExistsException("This package (" + publisher + "/" + project + ":" + version + ") can't be published because a package with that signature already exists.");
+                        output.writeLine("This package (" + publisher + "/" + project + ":" + version + ") can't be published because a package with that signature already exists.").await();
+                        process.setExitCode(1);
                     }
-
-                    final File sourcesJarFile = projectFolder.getSourcesJarFile().await();
-                    final File testSourcesJarFile = projectFolder.getTestSourcesJarFile().await();
-                    final File compiledSourcesJarFile = projectFolder.getCompiledSourcesJarFile().await();
-                    final File compiledTestsJarFile = projectFolder.getCompiledTestSourcesJarFile().await();
-
-                    output.writeLine("Publishing " + publisher + "/" + project + "@" + version + "...").await();
-                    JavaProjectPublish.publishFile(projectJsonFile, versionFolder, verbose);
-                    JavaProjectPublish.publishFile(sourcesJarFile, versionFolder, verbose);
-                    JavaProjectPublish.publishFile(testSourcesJarFile, versionFolder, verbose);
-                    JavaProjectPublish.publishFile(compiledSourcesJarFile, versionFolder, verbose);
-                    JavaProjectPublish.publishFile(compiledTestsJarFile, versionFolder, verbose);
-
-                    final String mainClass = projectJSON.getMainClass();
-                    if (!Strings.isNullOrEmpty(mainClass))
+                    else
                     {
-                        String shortcutName = projectJSON.getShortcutName();
-                        if (Strings.isNullOrEmpty(shortcutName))
-                        {
-                            shortcutName = projectJSON.getProject();
-                        }
+                        final File sourcesJarFile = projectFolder.getSourcesJarFile().await();
+                        final File testSourcesJarFile = projectFolder.getTestSourcesJarFile().await();
+                        final File compiledSourcesJarFile = projectFolder.getCompiledSourcesJarFile().await();
+                        final File compiledTestsJarFile = projectFolder.getCompiledTestSourcesJarFile().await();
 
-                        final CharacterList classpath = CharacterList.create()
-                            .addAll("%~dp0").addAll(versionFolder.getFile(compiledSourcesJarFile.getName()).await().relativeTo(qubFolder).toString());
-                        Iterable<JavaPublishedProjectFolder> dependencyFolders = projectJSON.getAllDependencyFolders(qubFolder).await();
-                        if (!Iterable.isNullOrEmpty(dependencyFolders))
+                        output.writeLine("Publishing " + publisher + "/" + project + "@" + version + "...").await();
+                        JavaProjectPublish.publishFile(projectJsonFile, versionFolder, verbose);
+                        JavaProjectPublish.publishFile(sourcesJarFile, versionFolder, verbose);
+                        JavaProjectPublish.publishFile(testSourcesJarFile, versionFolder, verbose);
+                        JavaProjectPublish.publishFile(compiledSourcesJarFile, versionFolder, verbose);
+                        JavaProjectPublish.publishFile(compiledTestsJarFile, versionFolder, verbose);
+
+                        final String mainClass = projectJSON.getMainClass();
+                        if (!Strings.isNullOrEmpty(mainClass))
                         {
-                            for (final JavaPublishedProjectFolder dependencyFolder : dependencyFolders)
+                            String shortcutName = projectJSON.getShortcutName();
+                            if (Strings.isNullOrEmpty(shortcutName))
                             {
-                                final File dependencyCompiledSourcesJarFile = dependencyFolder.getCompiledSourcesJarFile().await();
-                                final Path dependencyCompiledSourcesJarFileRelativePath = dependencyCompiledSourcesJarFile.relativeTo(qubFolder);
-                                classpath.addAll(";%~dp0").addAll(dependencyCompiledSourcesJarFileRelativePath.toString());
+                                shortcutName = projectJSON.getProject();
+                            }
+
+                            final CharacterList classpath = CharacterList.create()
+                                .addAll("%~dp0").addAll(versionFolder.getFile(compiledSourcesJarFile.getName()).await().relativeTo(qubFolder).toString());
+                            Iterable<JavaPublishedProjectFolder> dependencyFolders = projectJSON.getAllDependencyFolders(qubFolder).await();
+                            if (!Iterable.isNullOrEmpty(dependencyFolders))
+                            {
+                                for (final JavaPublishedProjectFolder dependencyFolder : dependencyFolders)
+                                {
+                                    final File dependencyCompiledSourcesJarFile = dependencyFolder.getCompiledSourcesJarFile().await();
+                                    final Path dependencyCompiledSourcesJarFileRelativePath = dependencyCompiledSourcesJarFile.relativeTo(qubFolder);
+                                    classpath.addAll(";%~dp0").addAll(dependencyCompiledSourcesJarFileRelativePath.toString());
+                                }
+                            }
+
+                            final File shortcutFile = qubFolder.getFile(shortcutName + ".cmd").await();
+                            try (final CharacterWriteStream shortcutFileStream = shortcutFile.getContentsCharacterWriteStream().await())
+                            {
+                                shortcutFileStream.writeLine("@echo OFF").await();
+                                shortcutFileStream.writeLine("java -classpath " + classpath + " " + mainClass + " %*").await();
                             }
                         }
 
-                        final File shortcutFile = qubFolder.getFile(shortcutName + ".cmd").await();
-                        try (final CharacterWriteStream shortcutFileStream = shortcutFile.getContentsCharacterWriteStream().await())
+                        final List<String> projectsToUpdate = List.create();
+                        for (final QubPublisherFolder publisherFolder : qubFolder.iteratePublisherFolders())
                         {
-                            shortcutFileStream.writeLine("@echo OFF").await();
-                            shortcutFileStream.writeLine("java -classpath " + classpath + " " + mainClass + " %*").await();
-                        }
-                    }
-
-                    final List<String> projectsToUpdate = List.create();
-                    for (final QubPublisherFolder publisherFolder : qubFolder.iteratePublisherFolders())
-                    {
-                        for (final QubProjectFolder projectFolder2 : publisherFolder.iterateProjectFolders())
-                        {
-                            final QubProjectVersionFolder latestVersionFolder = projectFolder2.getLatestProjectVersionFolder().catchError().await();
-                            if (latestVersionFolder != null)
+                            for (final QubProjectFolder projectFolder2 : publisherFolder.iterateProjectFolders())
                             {
-                                final JavaPublishedProjectFolder javaPublishedProjectFolder = JavaPublishedProjectFolder.get(latestVersionFolder);
-                                final JavaProjectJSON publishedProjectJson = javaPublishedProjectFolder.getProjectJson().catchError().await();
-                                if (publishedProjectJson != null)
+                                final QubProjectVersionFolder latestVersionFolder = projectFolder2.getLatestProjectVersionFolder().catchError().await();
+                                if (latestVersionFolder != null)
                                 {
-                                    final Iterable<ProjectSignature> dependencies = publishedProjectJson.getDependencies();
-                                    if (!Iterable.isNullOrEmpty(dependencies))
+                                    final JavaPublishedProjectFolder javaPublishedProjectFolder = JavaPublishedProjectFolder.get(latestVersionFolder);
+                                    final JavaProjectJSON publishedProjectJson = javaPublishedProjectFolder.getProjectJson().catchError().await();
+                                    if (publishedProjectJson != null)
                                     {
-                                        final ProjectSignature dependency = dependencies.first((ProjectSignature d) ->
-                                            Comparer.equal(d.getPublisher(), publisher) &&
-                                            Comparer.equal(d.getProject(), project));
-                                        if (dependency != null)
+                                        final Iterable<ProjectSignature> dependencies = publishedProjectJson.getDependencies();
+                                        if (!Iterable.isNullOrEmpty(dependencies))
                                         {
-                                            final ProjectSignature publishedProjectSignature = ProjectSignature.create(
-                                                publishedProjectJson.getPublisher(),
-                                                publishedProjectJson.getProject(),
-                                                publishedProjectJson.getVersion());
-                                            projectsToUpdate.add(publishedProjectSignature.toString());
+                                            final ProjectSignature dependency = dependencies.first((ProjectSignature d) ->
+                                                Comparer.equal(d.getPublisher(), publisher) &&
+                                                    Comparer.equal(d.getProject(), project));
+                                            if (dependency != null)
+                                            {
+                                                final ProjectSignature publishedProjectSignature = ProjectSignature.create(
+                                                    publishedProjectJson.getPublisher(),
+                                                    publishedProjectJson.getProject(),
+                                                    publishedProjectJson.getVersion());
+                                                projectsToUpdate.add(publishedProjectSignature.toString());
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    if (!Iterable.isNullOrEmpty(projectsToUpdate))
-                    {
-                        output.writeLine("The following projects should be updated to use " + publisher + "/" + project + "@" + version + ":").await();
-                        for (final String projectToUpdate : projectsToUpdate)
+                        if (!Iterable.isNullOrEmpty(projectsToUpdate))
                         {
-                            output.writeLine("  " + projectToUpdate).await();
+                            output.writeLine("The following projects should be updated to use " + publisher + "/" + project + "@" + version + ":").await();
+                            for (final String projectToUpdate : projectsToUpdate)
+                            {
+                                output.writeLine("  " + projectToUpdate).await();
+                            }
                         }
                     }
                 }

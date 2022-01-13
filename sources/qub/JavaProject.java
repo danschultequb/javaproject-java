@@ -29,6 +29,7 @@ public interface JavaProject
             .addAction(JavaProjectTest::addAction)
             .addAction(JavaProjectPack::addAction)
             .addAction(JavaProjectPublish::addAction)
+            .addAction(JavaProjectDependencies::addAction)
             .addAction(CommandLineLogsAction::addAction)
             .addAction(CommandLineConfigurationAction::addAction)
             .run();

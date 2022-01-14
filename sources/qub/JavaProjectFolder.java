@@ -280,6 +280,20 @@ public class JavaProjectFolder extends Folder
         });
     }
 
+    public Result<Void> writeProjectJson(JavaProjectJSON projectJson)
+    {
+        PreCondition.assertNotNull(projectJson, "projectJson");
+
+        return Result.create(() ->
+        {
+            final File projectJsonFile = this.getProjectJsonFile().await();
+            try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(projectJsonFile.getContentsByteWriteStream().await())))
+            {
+                projectJson.toString(writeStream, JSONFormat.pretty).await();
+            }
+        });
+    }
+
     public Result<String> getPublisher()
     {
         return Result.create(() ->

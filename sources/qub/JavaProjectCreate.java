@@ -179,10 +179,20 @@ public interface JavaProjectCreate
                     testsFolder.create().await();
                     indentedVerboseStream.writeLine("Done.").await();
 
-                    indentedVerboseStream.write("Initializing Git repository... ").await();
-                    final Git git = Git.create(process);
-                    git.init(p -> p.addDirectory(projectFolder)).await();
-                    indentedVerboseStream.writeLine("Done.").await();
+                    indentedVerboseStream.writeLine("Initializing Git repository...").await();
+                    final VerboseChildProcessRunner childProcessRunner = VerboseChildProcessRunner.create(process, indentedVerboseStream);
+                    final Git git = Git.create(childProcessRunner);
+                    indentedVerboseStream.indent(() ->
+                    {
+                        git.init(p ->
+                        {
+                            p.addDirectory(projectFolder);
+
+                            p.redirectOutputTo(verboseStream);
+                            p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(verboseStream).setLinePrefix("ERROR: "));
+                        }).await();
+                        indentedVerboseStream.writeLine("Done.").await();
+                    });
 
                     final String gitHubTokenEnvironmentVariableName = "GITHUB_TOKEN";
                     final String gitHubToken = process.getEnvironmentVariable(gitHubTokenEnvironmentVariableName)
@@ -202,13 +212,19 @@ public interface JavaProjectCreate
                             .await();
                         indentedVerboseStream.writeLine("Done.").await();
 
-                        indentedVerboseStream.write("Adding remote reference to GitHub repository... ").await();
-                        git.remoteAdd(p ->
+                        indentedVerboseStream.writeLine("Adding remote reference to GitHub repository...").await();
+                        indentedVerboseStream.indent(() ->
                         {
-                            p.addName("origin");
-                            p.addUrl(repository.getGitUrl());
-                        }).await();
-                        indentedVerboseStream.writeLine("Done.").await();
+                            git.remoteAdd(p ->
+                            {
+                                p.addName("origin");
+                                p.addUrl(repository.getGitUrl());
+
+                                p.redirectOutputTo(verboseStream);
+                                p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(verboseStream).setLinePrefix("ERROR: "));
+                            }).await();
+                            indentedVerboseStream.writeLine("Done.").await();
+                        });
                     }
 
                     outputStream.writeLine("Done.").await();

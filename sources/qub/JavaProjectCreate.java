@@ -218,6 +218,8 @@ public interface JavaProjectCreate
                         {
                             git.remoteAdd(p ->
                             {
+                                p.setWorkingFolder(projectFolder);
+
                                 p.addName("origin");
                                 p.addUrl(repository.getGitUrl());
 

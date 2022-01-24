@@ -10,22 +10,22 @@
       {
         "publisher": "qub",
         "project": "projectjson-java",
-        "version": "118"
+        "version": "119"
       },
       {
         "publisher": "qub",
         "project": "git-java",
-        "version": "43"
+        "version": "44"
       },
       {
         "publisher": "qub",
         "project": "github-java",
-        "version": "24"
+        "version": "25"
       },
       {
         "publisher": "qub",
         "project": "intellij-java",
-        "version": "16"
+        "version": "17"
       }
     ]
   }

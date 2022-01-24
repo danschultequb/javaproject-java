@@ -108,7 +108,7 @@ public interface JavaProjectCreate
                     outputStream.write("Creating Java project " + Strings.escapeAndQuote(projectSignature) + " in " + projectFolder + "... ").await();
                     verboseStream.writeLine().await();
 
-                    final IndentedCharacterWriteStream indentedVerboseStream = IndentedCharacterWriteStream.create(verboseStream)
+                    final IndentedCharacterToByteWriteStream indentedVerboseStream = IndentedCharacterToByteWriteStream.create(verboseStream)
                         .setCurrentIndent("  ");
 
                     indentedVerboseStream.write("Creating " + projectJsonFile + "... ").await();
@@ -180,7 +180,8 @@ public interface JavaProjectCreate
                     indentedVerboseStream.writeLine("Done.").await();
 
                     indentedVerboseStream.writeLine("Initializing Git repository...").await();
-                    final VerboseChildProcessRunner childProcessRunner = VerboseChildProcessRunner.create(process, indentedVerboseStream);
+                    final LockedCharacterToByteWriteStream lockedVerboseStream = LockedCharacterToByteWriteStream.create(indentedVerboseStream);
+                    final VerboseChildProcessRunner childProcessRunner = VerboseChildProcessRunner.create(process, lockedVerboseStream);
                     final Git git = Git.create(childProcessRunner);
                     indentedVerboseStream.indent(() ->
                     {
@@ -188,10 +189,10 @@ public interface JavaProjectCreate
                         {
                             p.addDirectory(projectFolder);
 
-                            p.redirectOutputTo(verboseStream);
-                            p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(verboseStream).setLinePrefix("ERROR: "));
+                            p.redirectOutputTo(lockedVerboseStream);
+                            p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(lockedVerboseStream).setLinePrefix("ERROR: "));
                         }).await();
-                        indentedVerboseStream.writeLine("Done.").await();
+                        lockedVerboseStream.writeLine("Done.").await();
                     });
 
                     final String gitHubTokenEnvironmentVariableName = "GITHUB_TOKEN";
@@ -220,10 +221,10 @@ public interface JavaProjectCreate
                                 p.addName("origin");
                                 p.addUrl(repository.getGitUrl());
 
-                                p.redirectOutputTo(verboseStream);
-                                p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(verboseStream).setLinePrefix("ERROR: "));
+                                p.redirectOutputTo(lockedVerboseStream);
+                                p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(lockedVerboseStream).setLinePrefix("ERROR: "));
                             }).await();
-                            indentedVerboseStream.writeLine("Done.").await();
+                            lockedVerboseStream.writeLine("Done.").await();
                         });
                     }
 

@@ -33,7 +33,7 @@ public interface JavaProjectCreate
             try (final Disposable logStream = logStreams.getLogStream())
             {
                 final CharacterToByteWriteStream outputStream = logStreams.getOutput();
-                final VerboseCharacterToByteWriteStream verboseStream = logStreams.getVerbose();
+                final CharacterToByteWriteStream verboseStream = LockedCharacterToByteWriteStream.create(logStreams.getVerbose());
                 final File projectJsonSchemaFile = dataFolder.getFile("javaproject.schema.json").await();
                 if (!projectJsonSchemaFile.exists().await())
                 {
@@ -108,10 +108,7 @@ public interface JavaProjectCreate
                     outputStream.write("Creating Java project " + Strings.escapeAndQuote(projectSignature) + " in " + projectFolder + "... ").await();
                     verboseStream.writeLine().await();
 
-                    final IndentedCharacterToByteWriteStream indentedVerboseStream = IndentedCharacterToByteWriteStream.create(verboseStream)
-                        .setCurrentIndent("  ");
-
-                    indentedVerboseStream.write("Creating " + projectJsonFile + "... ").await();
+                    verboseStream.write("Creating " + projectJsonFile + "... ").await();
                     projectJsonFile.setContentsAsString(
                         JavaProjectJSON.create()
                             .setSchema(projectJsonSchemaFile)
@@ -121,15 +118,15 @@ public interface JavaProjectCreate
                             .setDependencies(Iterable.create())
                             .toString(JSONFormat.pretty))
                         .await();
-                    indentedVerboseStream.writeLine("Done.").await();
+                    verboseStream.writeLine("Done.").await();
 
                     final File readmeMdFile = projectFolder.getFile("README.md").await();
-                    indentedVerboseStream.write("Creating " + readmeMdFile + "... ").await();
+                    verboseStream.write("Creating " + readmeMdFile + "... ").await();
                     readmeMdFile.setContentsAsString("# " + projectSignature.toStringIgnoreVersion()).await();
-                    indentedVerboseStream.writeLine("Done.").await();
+                    verboseStream.writeLine("Done.").await();
 
                     final File licenseFile = projectFolder.getFile("LICENSE").await();
-                    indentedVerboseStream.write("Creating " + licenseFile + "... ").await();
+                    verboseStream.write("Creating " + licenseFile + "... ").await();
                     licenseFile.setContentsAsString(
                         Strings.join('\n', Iterable.create(
                             "MIT License",
@@ -154,10 +151,10 @@ public interface JavaProjectCreate
                             "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE",
                             "SOFTWARE.")))
                         .await();
-                    indentedVerboseStream.writeLine("Done.").await();
+                    verboseStream.writeLine("Done.").await();
 
                     final File gitIgnoreFile = projectFolder.getFile(".gitignore").await();
-                    indentedVerboseStream.write("Creating " + gitIgnoreFile + "... ").await();
+                    verboseStream.write("Creating " + gitIgnoreFile + "... ").await();
                     gitIgnoreFile.setContentsAsString(
                         Strings.join('\n', Iterable.create(
                             ".idea",
@@ -165,34 +162,34 @@ public interface JavaProjectCreate
                             "outputs",
                             "target")))
                         .await();
-                    indentedVerboseStream.writeLine("Done.").await();
+                    verboseStream.writeLine("Done.").await();
 
                     final Folder sourcesFolder = projectFolder.getFolder("sources").await()
                         .getFolder(sourcePackage).await();
-                    indentedVerboseStream.write("Creating " + sourcesFolder + "... ").await();
+                    verboseStream.write("Creating " + sourcesFolder + "... ").await();
                     sourcesFolder.create().await();
-                    indentedVerboseStream.writeLine("Done.").await();
+                    verboseStream.writeLine("Done.").await();
 
                     final Folder testsFolder = projectFolder.getFolder("tests").await()
                         .getFolder(sourcePackage).await();
-                    indentedVerboseStream.write("Creating " + testsFolder + "... ").await();
+                    verboseStream.write("Creating " + testsFolder + "... ").await();
                     testsFolder.create().await();
-                    indentedVerboseStream.writeLine("Done.").await();
+                    verboseStream.writeLine("Done.").await();
 
-                    indentedVerboseStream.writeLine("Initializing Git repository...").await();
-                    final LockedCharacterToByteWriteStream lockedVerboseStream = LockedCharacterToByteWriteStream.create(indentedVerboseStream);
-                    final VerboseChildProcessRunner childProcessRunner = VerboseChildProcessRunner.create(process, lockedVerboseStream);
+                    verboseStream.writeLine("Initializing Git repository...").await();
+                    final IndentedCharacterToByteWriteStream indentedVerboseStream = IndentedCharacterToByteWriteStream.create(verboseStream);
+                    final VerboseChildProcessRunner childProcessRunner = VerboseChildProcessRunner.create(process, indentedVerboseStream);
                     final Git git = Git.create(childProcessRunner);
                     indentedVerboseStream.indent(() ->
                     {
                         git.init(p ->
                         {
-                            p.addDirectory(projectFolder);
+                            p.setWorkingFolder(projectFolder);
 
-                            p.redirectOutputTo(lockedVerboseStream);
-                            p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(lockedVerboseStream).setLinePrefix("ERROR: "));
+                            p.redirectOutputTo(indentedVerboseStream);
+                            p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(indentedVerboseStream).setLinePrefix("ERROR: "));
                         }).await();
-                        lockedVerboseStream.writeLine("Done.").await();
+                        indentedVerboseStream.writeLine("Done.").await();
                     });
 
                     final String gitHubTokenEnvironmentVariableName = "GITHUB_TOKEN";
@@ -223,10 +220,10 @@ public interface JavaProjectCreate
                                 p.addName("origin");
                                 p.addUrl(repository.getGitUrl());
 
-                                p.redirectOutputTo(lockedVerboseStream);
-                                p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(lockedVerboseStream).setLinePrefix("ERROR: "));
+                                p.redirectOutputTo(indentedVerboseStream);
+                                p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(indentedVerboseStream).setLinePrefix("ERROR: "));
                             }).await();
-                            lockedVerboseStream.writeLine("Done.").await();
+                            indentedVerboseStream.writeLine("Done.").await();
                         });
                     }
 

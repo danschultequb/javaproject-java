@@ -2,11 +2,11 @@ package qub;
 
 public interface JavaProjectDependencies
 {
-    static void addAction(CommandLineActions actions)
+    static CommandLineAction addAction(CommandLineActions actions)
     {
         PreCondition.assertNotNull(actions, "actions");
 
-        actions.addAction("dependencies", JavaProjectDependencies::run)
+        return actions.addAction("dependencies", JavaProjectDependencies::run)
             .setDescription("Perform actions based on a Java project's dependencies.");
     }
 
@@ -27,7 +27,11 @@ public interface JavaProjectDependencies
         PreCondition.assertNotNull(output, "output");
 
         return projectFolder.getDependencies()
-            .catchError((Throwable e) -> output.writeLine(e.getMessage()).await())
+            .catchError((Throwable e) ->
+            {
+                output.writeLine(e.getMessage()).await();
+                return Iterable.create();
+            })
             .await();
     }
 }

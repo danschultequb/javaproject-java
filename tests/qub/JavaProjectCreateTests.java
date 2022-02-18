@@ -119,7 +119,8 @@ public interface JavaProjectCreateTests
                     process.setCurrentFolderPath("/my-project/");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
-                        .addArguments("init", "/my-project/"));
+                        .setWorkingFolder("/my-project/")
+                        .addArguments("init"));
 
                     JavaProjectCreate.run(process, action);
 
@@ -299,16 +300,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/my-project@1\" in /my-project/... ",
-                            "VERBOSE:   Creating /my-project/project.json... Done.",
-                            "VERBOSE:   Creating /my-project/README.md... Done.",
-                            "VERBOSE:   Creating /my-project/LICENSE... Done.",
-                            "VERBOSE:   Creating /my-project/.gitignore... Done.",
-                            "VERBOSE:   Creating /my-project/sources/qub/... Done.",
-                            "VERBOSE:   Creating /my-project/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /my-project/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /my-project/project.json... Done.",
+                            "VERBOSE: Creating /my-project/README.md... Done.",
+                            "VERBOSE: Creating /my-project/LICENSE... Done.",
+                            "VERBOSE: Creating /my-project/.gitignore... Done.",
+                            "VERBOSE: Creating /my-project/sources/qub/... Done.",
+                            "VERBOSE: Creating /my-project/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /my-project/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()).toList());
                 });
@@ -384,7 +385,8 @@ public interface JavaProjectCreateTests
                     process.setCurrentFolderPath("/my-project/");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
-                        .addArguments("init", "/my-project/relative/path/"));
+                        .setWorkingFolder("/my-project/relative/path/")
+                        .addArguments("init"));
 
                     JavaProjectCreate.run(process, action);
 
@@ -564,16 +566,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /my-project/relative/path/... ",
-                            "VERBOSE:   Creating /my-project/relative/path/project.json... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/README.md... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/LICENSE... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/.gitignore... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/sources/qub/... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /my-project/relative/path/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /my-project/relative/path/project.json... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/README.md... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/LICENSE... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/.gitignore... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/sources/qub/... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /my-project/relative/path/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -647,7 +649,8 @@ public interface JavaProjectCreateTests
                         .setDescription("Fake action description");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
-                        .addArguments("init", "/rooted/path/"));
+                        .setWorkingFolder("/rooted/path/")
+                        .addArguments("init"));
 
                     JavaProjectCreate.run(process, action);
 
@@ -827,16 +830,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /rooted/path/... ",
-                            "VERBOSE:   Creating /rooted/path/project.json... Done.",
-                            "VERBOSE:   Creating /rooted/path/README.md... Done.",
-                            "VERBOSE:   Creating /rooted/path/LICENSE... Done.",
-                            "VERBOSE:   Creating /rooted/path/.gitignore... Done.",
-                            "VERBOSE:   Creating /rooted/path/sources/qub/... Done.",
-                            "VERBOSE:   Creating /rooted/path/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /rooted/path/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /rooted/path/project.json... Done.",
+                            "VERBOSE: Creating /rooted/path/README.md... Done.",
+                            "VERBOSE: Creating /rooted/path/LICENSE... Done.",
+                            "VERBOSE: Creating /rooted/path/.gitignore... Done.",
+                            "VERBOSE: Creating /rooted/path/sources/qub/... Done.",
+                            "VERBOSE: Creating /rooted/path/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /rooted/path/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -911,7 +914,8 @@ public interface JavaProjectCreateTests
                     process.setCurrentFolderPath("/my-project/");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
-                        .addArguments("init", "/my-project/"));
+                        .setWorkingFolder("/my-project/")
+                        .addArguments("init"));
 
                     JavaProjectCreate.run(process, action);
 
@@ -919,16 +923,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/my-project@1\" in /my-project/... ",
-                            "VERBOSE:   Creating /my-project/project.json... Done.",
-                            "VERBOSE:   Creating /my-project/README.md... Done.",
-                            "VERBOSE:   Creating /my-project/LICENSE... Done.",
-                            "VERBOSE:   Creating /my-project/.gitignore... Done.",
-                            "VERBOSE:   Creating /my-project/sources/qub/... Done.",
-                            "VERBOSE:   Creating /my-project/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /my-project/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /my-project/project.json... Done.",
+                            "VERBOSE: Creating /my-project/README.md... Done.",
+                            "VERBOSE: Creating /my-project/LICENSE... Done.",
+                            "VERBOSE: Creating /my-project/.gitignore... Done.",
+                            "VERBOSE: Creating /my-project/sources/qub/... Done.",
+                            "VERBOSE: Creating /my-project/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /my-project/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
@@ -1103,16 +1107,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/my-project@1\" in /my-project/... ",
-                            "VERBOSE:   Creating /my-project/project.json... Done.",
-                            "VERBOSE:   Creating /my-project/README.md... Done.",
-                            "VERBOSE:   Creating /my-project/LICENSE... Done.",
-                            "VERBOSE:   Creating /my-project/.gitignore... Done.",
-                            "VERBOSE:   Creating /my-project/sources/qub/... Done.",
-                            "VERBOSE:   Creating /my-project/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /my-project/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /my-project/project.json... Done.",
+                            "VERBOSE: Creating /my-project/README.md... Done.",
+                            "VERBOSE: Creating /my-project/LICENSE... Done.",
+                            "VERBOSE: Creating /my-project/.gitignore... Done.",
+                            "VERBOSE: Creating /my-project/sources/qub/... Done.",
+                            "VERBOSE: Creating /my-project/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /my-project/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -1188,7 +1192,8 @@ public interface JavaProjectCreateTests
                     process.setCurrentFolderPath("/my-project/");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
-                        .addArguments("init", "/my-project/relative/path/"));
+                        .setWorkingFolder("/my-project/relative/path/")
+                        .addArguments("init"));
 
                     JavaProjectCreate.run(process, action);
 
@@ -1196,16 +1201,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /my-project/relative/path/... ",
-                            "VERBOSE:   Creating /my-project/relative/path/project.json... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/README.md... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/LICENSE... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/.gitignore... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/sources/qub/... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /my-project/relative/path/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /my-project/relative/path/project.json... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/README.md... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/LICENSE... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/.gitignore... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/sources/qub/... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /my-project/relative/path/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
@@ -1380,16 +1385,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /my-project/relative/path/... ",
-                            "VERBOSE:   Creating /my-project/relative/path/project.json... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/README.md... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/LICENSE... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/.gitignore... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/sources/qub/... Done.",
-                            "VERBOSE:   Creating /my-project/relative/path/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /my-project/relative/path/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /my-project/relative/path/project.json... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/README.md... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/LICENSE... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/.gitignore... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/sources/qub/... Done.",
+                            "VERBOSE: Creating /my-project/relative/path/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /my-project/relative/path/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });
@@ -1463,8 +1468,8 @@ public interface JavaProjectCreateTests
                         .setDescription("Fake action description");
 
                     process.getChildProcessRunner().add(FakeChildProcessRun.create("git")
-                        .setWorkingFolder("/")
-                        .addArguments("init", "/rooted/path/"));
+                        .setWorkingFolder("/rooted/path/")
+                        .addArguments("init"));
 
                     JavaProjectCreate.run(process, action);
 
@@ -1472,16 +1477,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /rooted/path/... ",
-                            "VERBOSE:   Creating /rooted/path/project.json... Done.",
-                            "VERBOSE:   Creating /rooted/path/README.md... Done.",
-                            "VERBOSE:   Creating /rooted/path/LICENSE... Done.",
-                            "VERBOSE:   Creating /rooted/path/.gitignore... Done.",
-                            "VERBOSE:   Creating /rooted/path/sources/qub/... Done.",
-                            "VERBOSE:   Creating /rooted/path/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /rooted/path/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /rooted/path/project.json... Done.",
+                            "VERBOSE: Creating /rooted/path/README.md... Done.",
+                            "VERBOSE: Creating /rooted/path/LICENSE... Done.",
+                            "VERBOSE: Creating /rooted/path/.gitignore... Done.",
+                            "VERBOSE: Creating /rooted/path/sources/qub/... Done.",
+                            "VERBOSE: Creating /rooted/path/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /rooted/path/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
@@ -1656,16 +1661,16 @@ public interface JavaProjectCreateTests
                         Iterable.create(
                             "VERBOSE: Creating /qub/fake-publisher/fake-project/data/javaproject.schema.json... Done.",
                             "Creating Java project \"qub/path@1\" in /rooted/path/... ",
-                            "VERBOSE:   Creating /rooted/path/project.json... Done.",
-                            "VERBOSE:   Creating /rooted/path/README.md... Done.",
-                            "VERBOSE:   Creating /rooted/path/LICENSE... Done.",
-                            "VERBOSE:   Creating /rooted/path/.gitignore... Done.",
-                            "VERBOSE:   Creating /rooted/path/sources/qub/... Done.",
-                            "VERBOSE:   Creating /rooted/path/tests/qub/... Done.",
-                            "VERBOSE:   Initializing Git repository...",
-                            "VERBOSE:     git init /rooted/path/",
-                            "VERBOSE:     Done.",
-                            "VERBOSE:   No GitHub token found in the environment variable GITHUB_TOKEN.",
+                            "VERBOSE: Creating /rooted/path/project.json... Done.",
+                            "VERBOSE: Creating /rooted/path/README.md... Done.",
+                            "VERBOSE: Creating /rooted/path/LICENSE... Done.",
+                            "VERBOSE: Creating /rooted/path/.gitignore... Done.",
+                            "VERBOSE: Creating /rooted/path/sources/qub/... Done.",
+                            "VERBOSE: Creating /rooted/path/tests/qub/... Done.",
+                            "VERBOSE: Initializing Git repository...",
+                            "VERBOSE:   /rooted/path/: git init",
+                            "VERBOSE:   Done.",
+                            "VERBOSE: No GitHub token found in the environment variable GITHUB_TOKEN.",
                             "Done."),
                         Strings.iterateLines(fakeProjectLogsFile.getContentsAsString().await()));
                 });

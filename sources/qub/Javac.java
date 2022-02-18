@@ -14,13 +14,27 @@ public class Javac extends ChildProcessRunnerWrapper<Javac,JavacParameters>
 
     public Result<VersionNumber> version()
     {
+        return this.version(null);
+    }
+
+    public Result<VersionNumber> version(CharacterToByteWriteStream verboseStream)
+    {
         return Result.create(() ->
         {
             final InMemoryCharacterToByteStream outputStream = InMemoryCharacterToByteStream.create();
             this.run((JavacParameters parameters) ->
             {
                 parameters.addArgument("--version");
-                parameters.redirectOutputTo(outputStream);
+                if (verboseStream == null)
+                {
+                    parameters.redirectOutputTo(outputStream);
+                }
+                else
+                {
+                     final LockedCharacterToByteWriteStream lockedVerboseStream = LockedCharacterToByteWriteStream.create(verboseStream);
+                     parameters.redirectOutputTo(CharacterToByteWriteStreamList.create(outputStream, lockedVerboseStream));
+                     parameters.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(lockedVerboseStream).setLinePrefix("ERROR: "));
+                }
             }).await();
             final String outputText = outputStream.getText().await();
             final String trimmedOutputText = outputText.trim();
@@ -30,6 +44,11 @@ public class Javac extends ChildProcessRunnerWrapper<Javac,JavacParameters>
     }
 
     public Result<JavacResult> compile(Action1<JavacParameters> parametersSetup)
+    {
+        return this.compile(null, parametersSetup);
+    }
+
+    public Result<JavacResult> compile(CharacterToByteWriteStream verboseStream, Action1<JavacParameters> parametersSetup)
     {
         PreCondition.assertNotNull(parametersSetup, "parametersSetup");
 
@@ -41,7 +60,17 @@ public class Javac extends ChildProcessRunnerWrapper<Javac,JavacParameters>
             result.setExitCode(this.run((JavacParameters parameters) ->
             {
                 parametersSetup.run(parameters);
-                parameters.redirectErrorTo(errorStream);
+
+                if (verboseStream == null)
+                {
+                    parameters.redirectErrorTo(errorStream);
+                }
+                else
+                {
+                    LockedCharacterToByteWriteStream lockedVerboseStream = LockedCharacterToByteWriteStream.create(verboseStream);
+                    parameters.redirectOutputTo(lockedVerboseStream);
+                    parameters.redirectErrorTo(CharacterToByteWriteStreamList.create(errorStream, LinePrefixCharacterToByteWriteStream.create(lockedVerboseStream).setLinePrefix("ERROR: ")));
+                }
             }).await());
 
             errorStream.endOfStream();

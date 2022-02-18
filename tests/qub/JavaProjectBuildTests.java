@@ -746,6 +746,21 @@ public interface JavaProjectBuildTests
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
+                    test.assertEqual(
+                        BuildJSON.create()
+                            .setJavacVersion("17")
+                            .setProjectJson(JavaProjectJSON.create())
+                            .setJavaFiles(Iterable.create(
+                                BuildJSONJavaFile.create("sources/A.java")
+                                    .setLastModified(DateTime.create(1970, 1, 1))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create("outputs/sources/A.class", DateTime.create(1970, 1, 1)))),
+                                BuildJSONJavaFile.create("sources/B.java")
+                                    .setLastModified(DateTime.create(1970, 1, 1))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create("outputs/sources/B.class", DateTime.create(1970, 1, 1))))))
+                            .toString(JSONFormat.pretty),
+                        buildJsonFile.getContentsAsString().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
@@ -863,6 +878,21 @@ public interface JavaProjectBuildTests
                             aJavaFile,
                             bJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
+                    test.assertEqual(
+                        BuildJSON.create()
+                            .setJavacVersion("17")
+                            .setProjectJson(JavaProjectJSON.create())
+                            .setJavaFiles(Iterable.create(
+                                BuildJSONJavaFile.create("sources/A.java")
+                                    .setLastModified(DateTime.create(1970, 1, 1))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create("outputs/sources/A.class", DateTime.create(1970, 1, 1)))),
+                                BuildJSONJavaFile.create("tests/B.java")
+                                    .setLastModified(DateTime.create(1970, 1, 1))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create("outputs/tests/B.class", DateTime.create(1970, 1, 1))))))
+                            .toString(JSONFormat.pretty),
+                        buildJsonFile.getContentsAsString().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
@@ -972,6 +1002,18 @@ public interface JavaProjectBuildTests
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java byte code - 2", aClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aClassFile.getLastModified().await());
+                    test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
+                    test.assertEqual(
+                        BuildJSON.create()
+                            .setJavacVersion("17")
+                            .setProjectJson(JavaProjectJSON.create())
+                            .setJavaFiles(Iterable.create(
+                                BuildJSONJavaFile.create("sources/A.java")
+                                    .setLastModified(DateTime.create(1970, 1, 1))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create("outputs/sources/A.class", DateTime.create(1970, 1, 1, 0, 1))))))
+                            .toString(JSONFormat.pretty),
+                        buildJsonFile.getContentsAsString().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
@@ -1041,7 +1083,8 @@ public interface JavaProjectBuildTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
-                    final File aClassFile = outputsFolder.getFile("A.class").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder("sources").await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     aClassFile.setContentsAsString("A.java byte code").await();
                     final BuildJSON buildJson = BuildJSON.create()
                         .setProjectJson(projectJson)
@@ -1074,13 +1117,25 @@ public interface JavaProjectBuildTests
                             outputsFolder,
                             sourcesFolder,
                             projectJsonFile,
-                            aClassFile,
+                            outputsSourcesFolder,
                             buildJsonFile,
+                            aClassFile,
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual("A.java byte code", aClassFile.getContentsAsString().await());
                     test.assertEqual(startTime, aClassFile.getLastModified().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
+                    test.assertEqual(
+                        BuildJSON.create()
+                            .setJavacVersion("17")
+                            .setProjectJson(JavaProjectJSON.create())
+                            .setJavaFiles(Iterable.create(
+                                BuildJSONJavaFile.create("sources/A.java")
+                                    .setLastModified(DateTime.create(1970, 1, 1))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create("outputs/sources/A.class", DateTime.create(1970, 1, 1))))))
+                            .toString(JSONFormat.pretty),
+                        buildJsonFile.getContentsAsString().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
@@ -1196,6 +1251,17 @@ public interface JavaProjectBuildTests
                     test.assertEqual("A.java byte code - 2", aClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aClassFile.getLastModified().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
+                    test.assertEqual(
+                        BuildJSON.create()
+                            .setJavacVersion("17")
+                            .setProjectJson(JavaProjectJSON.create())
+                            .setJavaFiles(Iterable.create(
+                                BuildJSONJavaFile.create("sources/A.java")
+                                    .setLastModified(DateTime.create(1970, 1, 1, 0, 1))
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create("outputs/sources/A.class", DateTime.create(1970, 1, 1, 0, 1))))))
+                            .toString(JSONFormat.pretty),
+                        buildJsonFile.getContentsAsString().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
@@ -1307,6 +1373,22 @@ public interface JavaProjectBuildTests
                             aJavaFile),
                         projectFolder.iterateEntriesRecursively().toList());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
+                    test.assertEqual(
+                        BuildJSON.create()
+                            .setJavacVersion("17")
+                            .setProjectJson(JavaProjectJSON.create())
+                            .setJavaFiles(Iterable.create(
+                                BuildJSONJavaFile.create("sources/A.java")
+                                    .setLastModified(DateTime.create(1970, 1, 1, 0, 1))
+                                    .setIssues(Iterable.create(
+                                        JavacIssue.create()
+                                            .setSourceFilePath("sources/A.java")
+                                            .setLineNumber(1)
+                                            .setType("error")
+                                            .setMessage("This doesn't look right to me.")
+                                            .setColumnNumber(20)))))
+                            .toString(JSONFormat.pretty),
+                        buildJsonFile.getContentsAsString().await());
 
                     final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
@@ -1866,6 +1948,149 @@ public interface JavaProjectBuildTests
                             "2 Errors:",
                             "sources/A.java (Line 12): Are you sure?",
                             "sources/B.java (Line 1): Are you sure?",
+                            "VERBOSE: Updating outputs/build.json..."),
+                        fakeLogFile.getContentsAsString().await());
+                    test.assertEqual(
+                        Iterable.create(
+                            fakePublisherFolder,
+                            jdkFolder.getPublisherFolder().await(),
+                            fakeProjectFolder,
+                            fakeProjectDataFolder,
+                            fakeProjectVersionsFolder,
+                            fakeProjectLogsFolder,
+                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectVersionFolder,
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await(),
+                            jdkFolder.getProjectFolder().await(),
+                            jdkFolder.getProjectVersionsFolder().await(),
+                            jdkFolder),
+                        qubFolder.iterateEntriesRecursively().toList());
+                });
+
+                runner.test("with one unmodified source file with one warning and one modified source file with one error",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
+                    final QubFolder qubFolder = process.getQubFolder().await();
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
+
+                    final ManualClock clock = process.getClock();
+                    final DateTime startTime = clock.getCurrentDateTime();
+
+                    final FileSystem fileSystem = process.getFileSystem();
+                    final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create();
+                    final File projectJsonFile = projectFolder.getFile("project.json").await();
+                    projectJsonFile.setContentsAsString(projectJson.toString()).await();
+                    final Folder sourcesFolder = projectFolder.createFolder("sources").await();
+                    final File aJavaFile = sourcesFolder.getFile("A.java").await();
+                    aJavaFile.setContentsAsString("A.java source code").await();
+                    final File bJavaFile = sourcesFolder.getFile("B.java").await();
+                    final Folder outputsFolder = projectFolder.createFolder("outputs").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder("sources").await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    aClassFile.setContentsAsString("A.java byte code").await();
+                    final File bClassFile = outputsSourcesFolder.getFile("B.class").await();
+                    bClassFile.setContentsAsString("B.java byte code - 1").await();
+                    final File buildJsonFile = outputsFolder.getFile("build.json").await();
+                    final BuildJSON buildJson = BuildJSON.create()
+                        .setProjectJson(projectJson)
+                        .setJavacVersion("17")
+                        .setJavaFiles(Iterable.create(
+                            BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
+                                .setLastModified(startTime)
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime)))
+                                .setIssues(Iterable.create(
+                                    JavacIssue.create()
+                                        .setSourceFilePath(aJavaFile.relativeTo(projectFolder))
+                                        .setLineNumber(1)
+                                        .setColumnNumber(20)
+                                        .setType("WARNING")
+                                        .setMessage("Are you sure?"))),
+                            BuildJSONJavaFile.create(bJavaFile.relativeTo(projectFolder))
+                                .setLastModified(startTime)
+                                .setClassFiles(Iterable.create(
+                                    BuildJSONClassFile.create(bClassFile.relativeTo(projectFolder), startTime)))));
+                    buildJsonFile.setContentsAsString(buildJson.toString(JSONFormat.pretty)).await();
+
+                    final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    childProcessRunner.add(
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/B.java")
+                            .setAction(() ->
+                            {
+                                bClassFile.setContentsAsString("B.java byte code - 2").await();
+                            }));
+
+                    clock.advance(Duration.minutes(1));
+
+                    bJavaFile.setContentsAsString("B.java source code - 2").await();
+
+                    JavaProjectBuild.run(process, action);
+
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Compiling 1 source file...",
+                            "1 Unmodified Warning:",
+                            "sources/A.java (Line 1): Are you sure?"),
+                        process.getOutputWriteStream());
+                    test.assertLinesEqual(
+                        Iterable.create(),
+                        process.getErrorWriteStream());
+                    test.assertEqual(0, process.getExitCode());
+
+                    test.assertEqual(
+                        Iterable.create(
+                            outputsFolder,
+                            sourcesFolder,
+                            projectJsonFile,
+                            outputsSourcesFolder,
+                            buildJsonFile,
+                            aClassFile,
+                            bClassFile,
+                            aJavaFile,
+                            bJavaFile),
+                        projectFolder.iterateEntriesRecursively().toList());
+                    test.assertEqual(startTime, aClassFile.getLastModified().await());
+                    test.assertEqual("A.java byte code", aClassFile.getContentsAsString().await());
+                    test.assertEqual(clock.getCurrentDateTime(), bClassFile.getLastModified().await());
+                    test.assertEqual("B.java byte code - 2", bClassFile.getContentsAsString().await());
+                    test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
+
+                    final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
+                    final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
+                    final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
+                    final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeLogFile = fakeProjectLogsFolder.getFile("1.log").await();
+                    final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: Checking if dependencies have changed since the previous build...",
+                            "VERBOSE:   Previous dependencies have not changed.",
+                            "VERBOSE: Checking if latest installed JDK has changed since the previous build...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac --version",
+                            "VERBOSE:   Installed JDK has not changed.",
+                            "VERBOSE: Looking for .java files that have been deleted...",
+                            "VERBOSE: Looking for .java files to compile...",
+                            "VERBOSE: sources/B.java - Modified",
+                            "VERBOSE: Update .java file dependencies...",
+                            "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
+                            "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
+                            "VERBOSE: sources/A.java - All class files are up to date.",
+                            "VERBOSE: Discovering unmodified .java file issues...",
+                            "Compiling 1 source file...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/B.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
+                            "VERBOSE: Associating .class files with original .java files...",
+                            "1 Unmodified Warning:",
+                            "sources/A.java (Line 1): Are you sure?",
                             "VERBOSE: Updating outputs/build.json..."),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
@@ -4154,8 +4379,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Parsing /project/folder/project.json...",
                             "VERBOSE: Discovering dependencies...",
                             "An error occurred while discovering dependencies:",
-                            "1. No publisher folder named \"other-publisher\" found in the Qub folder (/qub/).",
-                            "VERBOSE: qub.NotFoundException: No publisher folder named \"other-publisher\" found in the Qub folder (/qub/)."),
+                            "1. No publisher folder named \"other-publisher\" found in the Qub folder (/qub/)."),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
                         Iterable.create(
@@ -4229,8 +4453,7 @@ public interface JavaProjectBuildTests
                                 "VERBOSE: Parsing /project/folder/project.json...",
                                 "VERBOSE: Discovering dependencies...",
                                 "An error occurred while discovering dependencies:",
-                                "1. No project folder named \"other-project\" found in the \"other-publisher\" publisher folder (/qub/other-publisher/).",
-                                "VERBOSE: qub.NotFoundException: No project folder named \"other-project\" found in the \"other-publisher\" publisher folder (/qub/other-publisher/)."),
+                                "1. No project folder named \"other-project\" found in the \"other-publisher\" publisher folder (/qub/other-publisher/)."),
                             fakeLogFile.getContentsAsString().await());
                         test.assertEqual(
                             Iterable.create(
@@ -4306,8 +4529,7 @@ public interface JavaProjectBuildTests
                                 "VERBOSE: Parsing /project/folder/project.json...",
                                 "VERBOSE: Discovering dependencies...",
                                 "An error occurred while discovering dependencies:",
-                                "1. No version folder named \"other-version\" found in the \"other-publisher/other-project\" project folder (/qub/other-publisher/other-project/).",
-                                "VERBOSE: qub.NotFoundException: No version folder named \"other-version\" found in the \"other-publisher/other-project\" project folder (/qub/other-publisher/other-project/)."),
+                                "1. No version folder named \"other-version\" found in the \"other-publisher/other-project\" project folder (/qub/other-publisher/other-project/)."),
                             fakeLogFile.getContentsAsString().await());
                         test.assertEqual(
                             Iterable.create(
@@ -4384,8 +4606,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Parsing /project/folder/project.json...",
                             "VERBOSE: Discovering dependencies...",
                             "An error occurred while discovering dependencies:",
-                            "1. The file at \"/qub/other-publisher/other-project/versions/other-version/project.json\" doesn't exist.",
-                            "VERBOSE: qub.FileNotFoundException: The file at \"/qub/other-publisher/other-project/versions/other-version/project.json\" doesn't exist."),
+                            "1. The file at \"/qub/other-publisher/other-project/versions/other-version/project.json\" doesn't exist."),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
                         Iterable.create(
@@ -4794,11 +5015,7 @@ public interface JavaProjectBuildTests
                             "1. Found more than one required version for package a/b:",
                             "   1. a/b@2",
                             "   2. a/b@1",
-                            "       from a/c@1",
-                            "VERBOSE: java.lang.RuntimeException: Found more than one required version for package a/b:",
-                            "VERBOSE: 1. a/b@2",
-                            "VERBOSE: 2. a/b@1",
-                            "VERBOSE:     from a/c@1"),
+                            "       from a/c@1"),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
                         Iterable.create(

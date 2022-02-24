@@ -524,7 +524,6 @@ public interface JavaProjectBuild
                                 }
 
                                 JavaProjectBuild.writeIssues(outputStream, unmodifiedWarnings, "Unmodified Warning").await();
-                                JavaProjectBuild.writeIssues(outputStream, unmodifiedErrors, "Unmodified Error").await();
                                 JavaProjectBuild.writeIssues(outputStream, unmodifiedUnrecognizedIssues, "Unmodified Unrecognized Issue").await();
 
                                 JavaProjectBuild.writeIssues(outputStream, newWarnings, "Warning").await();

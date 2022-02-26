@@ -218,7 +218,7 @@ public interface JavaProjectCreate
                                 p.setWorkingFolder(projectFolder);
 
                                 p.addName("origin");
-                                p.addUrl(repository.getGitUrl());
+                                p.addUrl(repository.getCloneUrl());
 
                                 p.redirectOutputTo(indentedVerboseStream);
                                 p.redirectErrorTo(LinePrefixCharacterToByteWriteStream.create(indentedVerboseStream).setLinePrefix("ERROR: "));

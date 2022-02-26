@@ -977,7 +977,7 @@ public interface JavaProjectBuildTests
                             }));
 
                     final ManualClock clock = process.getClock();
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     JavaProjectBuild.run(process, action);
 
@@ -1099,7 +1099,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     JavaProjectBuild.run(process, action);
 
@@ -1223,7 +1223,7 @@ public interface JavaProjectBuildTests
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                             }));
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code").await();
 
@@ -1347,7 +1347,7 @@ public interface JavaProjectBuildTests
                                 childProcess.setExitCode(1);
                             }));
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code").await();
 
@@ -1482,7 +1482,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     JavaProjectBuild.run(process, action);
 
@@ -1612,7 +1612,7 @@ public interface JavaProjectBuildTests
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
                             }));;
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code").await();
 
@@ -1731,7 +1731,7 @@ public interface JavaProjectBuildTests
                                 childProcess.setExitCode(1);
                             }));
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code").await();
                     bJavaFile.setContentsAsString("B.java source code").await();
@@ -1855,7 +1855,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code").await();
                     bJavaFile.setContentsAsString("B.java source code").await();
@@ -2025,7 +2025,7 @@ public interface JavaProjectBuildTests
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
                             }));
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     bJavaFile.setContentsAsString("B.java source code - 2").await();
 
@@ -2154,7 +2154,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code - 2").await();
                     bJavaFile.setContentsAsString("B.java source code - 2").await();
@@ -2291,7 +2291,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code - 2").await();
 
@@ -2428,7 +2428,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code - 2").await();
 
@@ -2566,7 +2566,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     bJavaFile.setContentsAsString("B.java source code, Depends on A - 1").await();
 
@@ -2702,7 +2702,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -2825,7 +2825,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     aJavaFile.setContentsAsString("A.java source code").await();
 
@@ -2982,7 +2982,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     cJavaFile.setContentsAsString("C.java source code").await();
 
@@ -3151,7 +3151,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -3313,7 +3313,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -3457,7 +3457,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -3576,7 +3576,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -3695,7 +3695,7 @@ public interface JavaProjectBuildTests
                             .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -3819,7 +3819,7 @@ public interface JavaProjectBuildTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -3949,7 +3949,7 @@ public interface JavaProjectBuildTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -4093,7 +4093,7 @@ public interface JavaProjectBuildTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -4241,7 +4241,7 @@ public interface JavaProjectBuildTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -4343,7 +4343,7 @@ public interface JavaProjectBuildTests
 
                     aJavaFile.setContentsAsString("A.java source code").await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -4675,7 +4675,7 @@ public interface JavaProjectBuildTests
 
                     aJavaFile.setContentsAsString("A.java source code").await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -4824,7 +4824,7 @@ public interface JavaProjectBuildTests
 
                     aJavaFile.setContentsAsString("A.java source code").await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -4973,7 +4973,7 @@ public interface JavaProjectBuildTests
 
                     aJavaFile.setContentsAsString("A.java source code").await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
@@ -5080,7 +5080,7 @@ public interface JavaProjectBuildTests
 
                     aJavaFile.setContentsAsString("A.java source code - 1").await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration.minutes(1)).await();
                     final DateTime beforeBuild = clock.getCurrentDateTime();
 
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
@@ -5090,7 +5090,7 @@ public interface JavaProjectBuildTests
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 1").await();
-                                clock.advance(Duration.minutes(1));
+                                clock.advance(Duration.minutes(1)).await();
                                 aJavaFile.setContentsAsString("A.java source code - 2").await();
                             }));
 

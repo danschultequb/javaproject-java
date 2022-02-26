@@ -433,26 +433,26 @@ public interface JavaProjectPackTests
                     childProcessRunner.add(FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
                         .setAction(() ->
                         {
-                            clock.advance(Duration.minutes(1));
+                            clock.advance(Duration.minutes(1)).await();
                             aClassFile.setContentsAsString("A.java bytecode").await();
                         }));
                     childProcessRunner.add(FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/sources/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None", "--profiler=false")
                         .setAction((FakeDesktopProcess testProcess) ->
                         {
-                            clock.advance(Duration.minutes(1));
+                            clock.advance(Duration.minutes(1)).await();
                             JavaProjectTest.runTests(testProcess);
                         }));
                     JavaProjectTests.addJarVersionFakeChildProcessRun(childProcessRunner, jarFile);
                     childProcessRunner.add(FakeChildProcessRun.create(jarFile, "--create", "--file=/project/folder/outputs/fake-project-to-pack.sources.jar", "-C", "/project/folder/sources/", ".")
                         .setAction((FakeDesktopProcess testProcess) ->
                         {
-                            clock.advance(Duration.minutes(1));
+                            clock.advance(Duration.minutes(1)).await();
                             sourcesJarFile.setContentsAsString("sources jar file").await();
                         }));
                     childProcessRunner.add(FakeChildProcessRun.create(jarFile, "--create", "--file=/project/folder/outputs/fake-project-to-pack.jar", "-C", "/project/folder/outputs/sources/", ".")
                         .setAction((FakeDesktopProcess testProcess) ->
                         {
-                            clock.advance(Duration.minutes(1));
+                            clock.advance(Duration.minutes(1)).await();
                             compiledSourcesJarFile.setContentsAsString("compiled sources jar file").await();
                         }));
 

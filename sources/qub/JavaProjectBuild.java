@@ -405,7 +405,7 @@ public interface JavaProjectBuild
                                             classpath.addAll(dependencyCompiledSourcesJarFilePaths);
                                             javacParameters.addClasspath(classpath);
 
-                                            javacParameters.addXLint("all", "-try", "-overrides");
+                                            javacParameters.addXLint("all", "-try", "-overrides", "-varargs", "-serial", "-overloads");
                                             javacParameters.addArguments(javaSourceFileRelativePathsToCompile);
                                         }).await();
 
@@ -449,7 +449,7 @@ public interface JavaProjectBuild
                                                 classpath.addAll(dependencyCompiledTestSourcesJarFilePaths);
                                                 javacParameters.addClasspath(classpath);
 
-                                                javacParameters.addXLint("all", "-try", "-overrides");
+                                                javacParameters.addXLint("all", "-try", "-overrides", "-varargs", "-serial", "-overloads");
                                                 javacParameters.addArguments(javaTestSourceFileRelativePathsToCompile);
                                             }).await();
 

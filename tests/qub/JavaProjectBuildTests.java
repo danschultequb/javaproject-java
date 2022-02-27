@@ -488,7 +488,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -552,7 +552,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -602,7 +602,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -666,7 +666,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -716,7 +716,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java", "sources/B.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -788,7 +788,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -840,13 +840,13 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/tests/", "--class-path", "/project/folder/outputs/tests/;/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "tests/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/tests/", "--class-path", "/project/folder/outputs/tests/;/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "tests/B.java")
                             .setAction(() ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code").await();
@@ -920,9 +920,9 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "Compiling 1 test source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides tests/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -970,7 +970,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -1040,7 +1040,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -1217,7 +1217,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -1288,7 +1288,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -1334,7 +1334,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction((FakeDesktopProcess childProcess) ->
                             {
                                 JavaProjectTests.writeIssues(childProcess.getErrorWriteStream(),
@@ -1415,7 +1415,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "1 Error:",
@@ -1599,7 +1599,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction((FakeDesktopProcess childProcess) ->
                             {
                                 JavaProjectTests.writeIssues(childProcess.getErrorWriteStream(),
@@ -1668,7 +1668,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "1 Warning:",
@@ -1718,7 +1718,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction((FakeDesktopProcess childProcess) ->
                             {
                                 JavaProjectTests.writeIssues(childProcess.getErrorWriteStream(),
@@ -1787,7 +1787,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "1 Error:",
@@ -1865,7 +1865,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java", "sources/B.java")
                             .setAction((FakeDesktopProcess childProcess) ->
                             {
                                 JavaProjectTests.writeIssues(childProcess.getErrorWriteStream(),
@@ -1942,7 +1942,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "2 Errors:",
@@ -2019,7 +2019,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/B.java")
                             .setAction(() ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2086,7 +2086,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/A.java - All class files are up to date.",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "1 Unmodified Warning:",
@@ -2162,7 +2162,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java", "sources/B.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -2224,7 +2224,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2298,7 +2298,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -2359,7 +2359,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/B.java - All class files are up to date.",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2435,7 +2435,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java", "sources/B.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -2497,7 +2497,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2573,7 +2573,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/B.java")
                             .setAction(() ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2634,7 +2634,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/A.java - All class files are up to date.",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2707,7 +2707,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/B.java")
                             .setAction(() ->
                             {
                                 bClassFile.setContentsAsString("B.java byte code - 2").await();
@@ -2763,7 +2763,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2832,7 +2832,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -2893,7 +2893,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/B.java - All class files are up to date.",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -2989,7 +2989,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java", "sources/C.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java", "sources/B.java", "sources/C.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -3062,7 +3062,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/N.java - All class files are up to date.",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 3 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java sources/C.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java sources/B.java sources/C.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -3156,7 +3156,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java", "sources/B.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java", "sources/B.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -3224,7 +3224,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/N.java - All class files are up to date.",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 2 source files...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java sources/B.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java sources/B.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -3318,7 +3318,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/C.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/C.java")
                             .setAction(() ->
                             {
                                 cClassFile.setContentsAsString("C.java byte code - 2").await();
@@ -3389,7 +3389,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: sources/N.java - All class files are up to date.",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/C.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/C.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -3954,7 +3954,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -4009,7 +4009,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -4098,7 +4098,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/other-publisher/other-project/versions/2/other-project.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/other-publisher/other-project/versions/2/other-project.jar", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 2").await();
@@ -4153,7 +4153,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/other-publisher/other-project/versions/2/other-project.jar -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/other-publisher/other-project/versions/2/other-project.jar -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -4680,7 +4680,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -4736,7 +4736,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -4829,7 +4829,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code").await();
@@ -4885,7 +4885,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/;/qub/d/e/versions/5/e.jar;/qub/a/c/versions/1/c.jar;/qub/a/b/versions/1/b.jar -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),
@@ -5086,7 +5086,7 @@ public interface JavaProjectBuildTests
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides", "sources/A.java")
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
                             .setAction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java byte code - 1").await();
@@ -5160,7 +5160,7 @@ public interface JavaProjectBuildTests
                             "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides sources/A.java",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json..."),

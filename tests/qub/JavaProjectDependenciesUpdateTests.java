@@ -504,8 +504,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final CommandLineAction action = JavaProjectDependenciesUpdateTests.createCommandLineAction(process);
 
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    final JavaPublishedProjectFolder projectVersionFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder("a", "b", "20").await());
-
+                    
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final File projectJsonFile = projectFolder.getFile("project.json").await();

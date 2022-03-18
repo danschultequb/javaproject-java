@@ -328,11 +328,7 @@ public interface JavaProjectPackTests
                     final QubFolder qubFolder = process.getQubFolder().await();
                     final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
                     final File javacFile = jdkFolder.getJavacFile().await();
-                    final File javaFile = jdkFolder.getJavaFile().await();
-
-                    final Clock clock = process.getClock();
-                    final DateTime startTime = clock.getCurrentDateTime();
-
+                    
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final JavaProjectJSON projectJson = JavaProjectJSON.create();

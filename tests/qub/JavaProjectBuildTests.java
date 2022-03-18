@@ -1836,9 +1836,7 @@ public interface JavaProjectBuildTests
 
                     final Folder outputsFolder = projectFolder.createFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
-                    final Folder outputsTestsFolder = outputsFolder.getFolder(testsFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
-                    final File aTestsClassFile = outputsTestsFolder.getFile("ATests.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
 
                     final ManualClock clock = process.getClock();

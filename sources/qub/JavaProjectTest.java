@@ -225,8 +225,7 @@ public interface JavaProjectTest
                         try (final LogStreams logStreamsAfterTests = CommandLineLogsAction.getLogStreamsFromLogFile(logFile, process.getOutputWriteStream(), verboseParameter.getVerboseCharacterToByteWriteStream().await()))
                         {
                             final CharacterToByteWriteStream output = logStreamsAfterTests.getOutput();
-                            final VerboseCharacterToByteWriteStream verbose = logStreamsAfterTests.getVerbose();
-
+                            
                             output.writeLine().await();
                             output.writeLine("Analyzing coverage...").await();
 

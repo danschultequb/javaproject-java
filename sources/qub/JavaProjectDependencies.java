@@ -20,18 +20,4 @@ public interface JavaProjectDependencies
             .addAction(JavaProjectDependenciesUpdate::addAction)
             .run();
     }
-
-    static Iterable<ProjectSignature> getDependencies(JavaProjectFolder projectFolder, CharacterWriteStream output)
-    {
-        PreCondition.assertNotNull(projectFolder, "projectFolder");
-        PreCondition.assertNotNull(output, "output");
-
-        return projectFolder.getDependencies()
-            .catchError((Throwable e) ->
-            {
-                output.writeLine(e.getMessage()).await();
-                return Iterable.create();
-            })
-            .await();
-    }
 }

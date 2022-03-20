@@ -67,13 +67,13 @@ public interface JavaProjectDependenciesUpdate
                     {
                         output.writeLine("Getting dependencies for " + projectFolder.toString() + "...").await();
                         final Iterable<ProjectSignature> currentDependencies = projectJson.getDependencies();
+                        final List<ProjectSignature> newDependencies = List.create();
                         if (Iterable.isNullOrEmpty(currentDependencies))
                         {
                             output.writeLine("No dependencies found.").await();
                         }
                         else
                         {
-                            final List<ProjectSignature> newDependencies = List.create();
                             output.writeLine("Found " + currentDependencies.getCount() + " dependencies:").await();
                             output.indent(() ->
                             {
@@ -117,7 +117,7 @@ public interface JavaProjectDependenciesUpdate
                             });
                         }
 
-                        final Iterable<ProjectSignature> projectJsonTransitiveDependencies = currentDependencies.any()
+                        final Iterable<ProjectSignature> projectJsonTransitiveDependencies = newDependencies.any()
                             ? projectFolder.getAllDependencies(qubFolder, false).await()
                             : Iterable.create();
 
@@ -324,6 +324,82 @@ public interface JavaProjectDependenciesUpdate
 
                                 intellijWorkspaceFile.setContentsAsString(intellijWorkspace.toString(XMLFormat.pretty)).await();
                             });
+                        }
+
+                        final VSCodeWorkspaceFolder vscodeWorkspaceFolder = VSCodeWorkspaceFolder.get(projectFolder);
+                        final File vscodeSettingsJsonFile = vscodeWorkspaceFolder.getSettingsJsonFile();
+                        if (vscodeSettingsJsonFile.exists().await())
+                        {
+                            output.writeLine("Updating " + vscodeSettingsJsonFile.relativeTo(vscodeWorkspaceFolder) + "...").await();
+                            
+                            final VSCodeJavaSettingsJson vscodeSettingsJson = VSCodeJavaSettingsJson.parse(vscodeSettingsJsonFile).catchError().await();
+                            if (vscodeSettingsJson != null)
+                            {
+                                boolean vscodeSettingsJsonChanged = false;
+
+                                final List<String> sourcePaths = vscodeSettingsJson.getJavaProjectSourcePaths().toList();
+                                boolean sourcePathsChanged = false;
+                                for (final String sourcePath : Iterable.create("sources", "tests"))
+                                {
+                                    if (!sourcePaths.contains(sourcePath))
+                                    {
+                                        sourcePathsChanged = true;
+                                        sourcePaths.add(sourcePath);
+                                    }
+                                }
+                                if (sourcePathsChanged)
+                                {
+                                    vscodeSettingsJsonChanged = true;
+
+                                    vscodeSettingsJson.setJavaProjectSourcePaths(sourcePaths);
+                                }
+
+                                final Iterable<String> javaProjectReferencedLibraries = vscodeSettingsJson.getJavaProjectReferencedLibraries();
+                                final List<String> newJavaProjectReferencedLibraries = List.create();
+                                for (final ProjectSignature projectDependency : projectJsonTransitiveDependencies)
+                                {
+                                    final JavaPublishedProjectFolder projectDependencyFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder(projectDependency).await());
+
+                                    final List<File> projectDependencyFiles = List.create(
+                                        projectDependencyFolder.getCompiledSourcesJarFile().await(),
+                                        projectDependencyFolder.getCompiledTestsJarFile().await());
+                                    for (final File projectDependencyFile : projectDependencyFiles)
+                                    {
+                                        if (projectDependencyFile.exists().await())
+                                        {
+                                            newJavaProjectReferencedLibraries.add(projectDependencyFile.toString());
+                                        }
+                                    }
+                                }
+                                if (!javaProjectReferencedLibraries.equals(newJavaProjectReferencedLibraries))
+                                {
+                                    vscodeSettingsJsonChanged = true;
+
+                                    vscodeSettingsJson.setJavaProjectReferencedLibraries(newJavaProjectReferencedLibraries);
+                                }
+
+                                final File codeStyleFile = dataFolder.getFile("DansCodeStyle.xml").await();
+                                final String javaFormatSettingsUrl = vscodeSettingsJson.getJavaFormatSettingsUrl();
+                                if (!codeStyleFile.getPath().equals(javaFormatSettingsUrl))
+                                {
+                                    vscodeSettingsJsonChanged = true;
+
+                                    vscodeSettingsJson.setJavaFormatSettingsUrl(codeStyleFile.toString());
+                                } 
+                                
+                                final Boolean javaFormatEnabled = vscodeSettingsJson.getJavaFormatEnabled();
+                                if (Booleans.isTrue(javaFormatEnabled) == false)
+                                {
+                                    vscodeSettingsJsonChanged = true;
+
+                                    vscodeSettingsJson.setJavaFormatEnabled(true);
+                                }
+
+                                if (vscodeSettingsJsonChanged)
+                                {
+                                    vscodeSettingsJsonFile.setContentsAsString(vscodeSettingsJson.toString(JSONFormat.pretty)).await();
+                                }
+                            }
                         }
                     }
                 }

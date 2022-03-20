@@ -2,11 +2,11 @@ package qub;
 
 public interface JavaProjectDependenciesList
 {
-    static void addAction(CommandLineActions actions)
+    static CommandLineAction addAction(CommandLineActions actions)
     {
         PreCondition.assertNotNull(actions, "actions");
 
-        actions.addAction("list", JavaProjectDependenciesList::run)
+        return actions.addAction("list", JavaProjectDependenciesList::run)
             .setDescription("List the Java project's dependencies.");
     }
 
@@ -40,14 +40,15 @@ public interface JavaProjectDependenciesList
                 final boolean recurse = recurseParameter.getValue().await();
 
                 output.writeLine("Getting dependencies for " + projectFolder.toString() + "...").await();
-                final Iterable<ProjectSignature> dependencies = JavaProjectDependencies.getDependencies(projectFolder, output);
+                final Iterable<ProjectSignature> dependencies = JavaProjectDependenciesList.getDependencies(projectFolder, output);
                 if (Iterable.isNullOrEmpty(dependencies))
                 {
                     output.writeLine("No dependencies found.").await();
                 }
                 else
                 {
-                    output.writeLine("Found " + dependencies.getCount() + " dependencies:").await();
+                    final int dependencyCount = dependencies.getCount();
+                    output.writeLine("Found " + dependencyCount + " dependenc" + (dependencyCount == 1 ? "y" : "ies") + ":").await();
                     output.indent(() ->
                     {
                         JavaProjectDependenciesList.writeDependencyTree(qubFolder, dependencies, output, recurse);
@@ -55,6 +56,20 @@ public interface JavaProjectDependenciesList
                 }
             }
         }
+    }
+
+    public static Iterable<ProjectSignature> getDependencies(JavaProjectFolder projectFolder, CharacterWriteStream output)
+    {
+        PreCondition.assertNotNull(projectFolder, "projectFolder");
+        PreCondition.assertNotNull(output, "output");
+
+        return projectFolder.getDependencies()
+            .catchError((Throwable e) ->
+            {
+                output.writeLine(e.getMessage()).await();
+                return Iterable.create();
+            })
+            .await();
     }
 
     static void writeDependencyTree(QubFolder qubFolder, Iterable<ProjectSignature> dependencies, IndentedCharacterWriteStream output, boolean recurse)
@@ -69,7 +84,7 @@ public interface JavaProjectDependenciesList
             if (recurse)
             {
                 final JavaProjectFolder publishedDependencyFolder = JavaProjectFolder.get(qubFolder.getProjectVersionFolder(dependency).await());
-                final Iterable<ProjectSignature> dependencyDependencies = JavaProjectDependencies.getDependencies(publishedDependencyFolder, output);
+                final Iterable<ProjectSignature> dependencyDependencies = JavaProjectDependenciesList.getDependencies(publishedDependencyFolder, output);
                 output.indent(() ->
                 {
                     JavaProjectDependenciesList.writeDependencyTree(qubFolder, dependencyDependencies, output, recurse);

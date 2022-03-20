@@ -15,7 +15,10 @@
         "C:/qub/qub/intellij-java/versions/21/intellij-java.jar",
         "C:/qub/qub/intellij-java/versions/21/intellij-java.tests.jar",
         "C:/qub/qub/xml-java/versions/35/xml-java.jar",
-        "C:/qub/qub/xml-java/versions/36/xml-java.tests.jar"
+        "C:/qub/qub/xml-java/versions/36/xml-java.tests.jar",
+        "C:/qub/qub/vscode-java/versions/3/vscode-java.jar",
+        "C:/qub/qub/vscode-java/versions/3/vscode-java.tests.jar"
     ],
-    "java.format.settings.url": "C:\\qub\\qub\\javaproject-java\\data\\DansCodeStyle.xml"
+    "java.format.settings.url": "C:\\qub\\qub\\javaproject-java\\data\\DansCodeStyle.xml",
+    "java.format.enabled": true
 }

@@ -26,6 +26,11 @@
         "publisher": "qub",
         "project": "intellij-java",
         "version": "21"
+      },
+      {
+        "publisher": "qub",
+        "project": "vscode-java",
+        "version": "3"
       }
     ]
   }

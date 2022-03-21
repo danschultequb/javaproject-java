@@ -2,11 +2,12 @@ package qub;
 
 public interface JavaProjectTest
 {
-    String patternParameterName = "pattern";
-    String coverageParameterName = "coverage";
-    String testJsonParameterName = "testjson";
-    String logFileParameterName = "logfile";
-    String profilerParameterName = "profiler";
+    public static final String patternParameterName = "pattern";
+    public static final String coverageParameterName = "coverage";
+    public static final String testJsonParameterName = "testjson";
+    public static final String logFileParameterName = "logfile";
+    public static final String profilerParameterName = "profiler";
+    public static final String openCoverageReportParameterName = "openCoverageReport";
 
     static CommandLineAction addAction(CommandLineActions actions)
     {
@@ -59,6 +60,14 @@ public interface JavaProjectTest
             .setDescription("Whether to use a test.json file to cache test results in.");
     }
 
+    public static CommandLineParameterBoolean addOpenCoverageReport(CommandLineParameters parameters)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+
+        return parameters.addBoolean(JavaProjectTest.openCoverageReportParameterName, false)
+            .setDescription("Whether to automatically open the HTML coverage report after the tests complete.");
+    }
+
     static void run(DesktopProcess process, CommandLineAction action)
     {
         JavaProjectTest.run(process, action, null, null);
@@ -74,6 +83,7 @@ public interface JavaProjectTest
         final CommandLineParameter<PathPattern> patternParameter = JavaProjectTest.addPattern(parameters);
         final CommandLineParameter<Coverage> coverageParameter = JavaProjectTest.addCoverage(parameters);
         final CommandLineParameterBoolean testJsonParameter = JavaProjectTest.addTestJson(parameters);
+        final CommandLineParameterBoolean openCoverageReportParameter = JavaProjectTest.addOpenCoverageReport(parameters);
         final CommandLineParameterHelp helpParameter = parameters.addHelp();
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
         final CommandLineParameterProfiler profilerParameter = JavaProject.addProfilerParameter(parameters, process);
@@ -215,6 +225,9 @@ public interface JavaProjectTest
 
                         javaParameters.addArgument("--" + JavaProjectTest.profilerParameterName + "=" + Booleans.toString(profilerParameter.getValue().await()));
 
+                        // It's important that these streams go through the process and not the
+                        // LogStreams because the LogStreams will be disposed just before the child
+                        // process is launched.
                         javaParameters.redirectOutputTo(process.getOutputWriteStream());
                         javaParameters.redirectErrorTo(process.getErrorWriteStream());
                         javaParameters.setInputStream(process.getInputReadStream());
@@ -255,9 +268,15 @@ public interface JavaProjectTest
                                 }
 
                                 javaParameters.addArguments("--html", coverageFolder.toString());
+
+                                final File coverageXmlFile = outputsFolder.getFile("coverage.xml").await();
+                                javaParameters.addArguments("--xml", coverageXmlFile.toString());
+
+                                javaParameters.redirectOutputTo(logStreamsAfterTests.getVerbose());
+                                javaParameters.redirectErrorTo(logStreamsAfterTests.getVerbose());
                             }).await());
 
-                            if (process.getExitCode() == 0)
+                            if (process.getExitCode() == 0 && Booleans.isTrue(openCoverageReportParameter.getValue().await()))
                             {
                                 final DefaultApplicationLauncher defaultApplicationLauncher = process.getDefaultApplicationLauncher();
                                 final File indexHtmlFile = coverageFolder.getFile("index.html").await();

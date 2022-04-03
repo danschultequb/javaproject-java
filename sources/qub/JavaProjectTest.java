@@ -472,7 +472,9 @@ public interface JavaProjectTest
                         .ignoreType(DesktopProcess.class)
                         .ignoreType(JavaProjectTest.class)
                         .ignoreType(java.lang.Thread.class)
-                        .ignoreType(AsyncTask.class);
+                        .ignoreType(AsyncTask.class)
+                        .ignoreType(PreCondition.class)
+                        .ignoreType(PostCondition.class);
 
                     final MutableMap<Path,JavaClassFile> relativePathToTestClassFilesToRunMap = testClassFilesToRun.toMap(
                         (JavaClassFile testClassFileToRun) -> testClassFileToRun.relativeTo(outputsTestsFolder),

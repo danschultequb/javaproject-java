@@ -4,23 +4,24 @@
     "sources"
   ],
   "java.project.referencedLibraries": [
-    "C:/qub/qub/projectjson-java/versions/122/projectjson-java.jar",
-    "C:/qub/qub/projectjson-java/versions/122/projectjson-java.tests.jar",
-    "C:/qub/qub/lib-java/versions/178/lib-java.jar",
-    "C:/qub/qub/lib-java/versions/178/lib-java.tests.jar",
-    "C:/qub/qub/git-java/versions/47/git-java.jar",
-    "C:/qub/qub/git-java/versions/47/git-java.tests.jar",
-    "C:/qub/qub/github-java/versions/29/github-java.jar",
-    "C:/qub/qub/github-java/versions/29/github-java.tests.jar",
-    "C:/qub/qub/http-java/versions/51/http-java.jar",
-    "C:/qub/qub/http-java/versions/51/http-java.tests.jar",
-    "C:/qub/qub/intellij-java/versions/21/intellij-java.jar",
-    "C:/qub/qub/intellij-java/versions/21/intellij-java.tests.jar",
-    "C:/qub/qub/xml-java/versions/35/xml-java.jar",
-    "C:/qub/qub/xml-java/versions/35/xml-java.tests.jar",
-    "C:/qub/qub/vscode-java/versions/3/vscode-java.jar",
-    "C:/qub/qub/vscode-java/versions/3/vscode-java.tests.jar"
+    "C:/qub/qub/projectjson-java/versions/125/projectjson-java.jar",
+    "C:/qub/qub/projectjson-java/versions/125/projectjson-java.tests.jar",
+    "C:/qub/qub/lib-java/versions/183/lib-java.jar",
+    "C:/qub/qub/lib-java/versions/183/lib-java.tests.jar",
+    "C:/qub/qub/git-java/versions/50/git-java.jar",
+    "C:/qub/qub/git-java/versions/50/git-java.tests.jar",
+    "C:/qub/qub/github-java/versions/32/github-java.jar",
+    "C:/qub/qub/github-java/versions/32/github-java.tests.jar",
+    "C:/qub/qub/http-java/versions/54/http-java.jar",
+    "C:/qub/qub/http-java/versions/54/http-java.tests.jar",
+    "C:/qub/qub/intellij-java/versions/24/intellij-java.jar",
+    "C:/qub/qub/intellij-java/versions/24/intellij-java.tests.jar",
+    "C:/qub/qub/xml-java/versions/38/xml-java.jar",
+    "C:/qub/qub/xml-java/versions/38/xml-java.tests.jar",
+    "C:/qub/qub/vscode-java/versions/6/vscode-java.jar",
+    "C:/qub/qub/vscode-java/versions/6/vscode-java.tests.jar"
   ],
   "java.format.settings.url": "C:\\qub\\qub\\javaproject-java\\data\\DansCodeStyle.xml",
-  "java.format.enabled": true
+  "java.format.enabled": true,
+  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m"
 }

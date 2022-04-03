@@ -176,6 +176,62 @@ public interface JDKFolderTests
                     test.assertEqual(jdkFolder.getJavaFile().await().getPath(), java.getExecutablePath());
                 });
             });
+
+
+
+
+            runner.test("getJarFile()",
+                (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                (Test test, FakeDesktopProcess process) ->
+            {
+                final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
+                final File jarFile = jdkFolder.getFile("bin/jar").await();
+                test.assertEqual(jarFile, jdkFolder.getJarFile().await());
+            });
+
+            runner.testGroup("getJar(DesktopProcess)", () ->
+            {
+                runner.test("with null",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
+                    test.assertThrows(() -> jdkFolder.getJar((DesktopProcess)null),
+                        new PreConditionFailure("process cannot be null."));
+                });
+
+                runner.test("with non-null",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
+                    final Jar jar = jdkFolder.getJar(process).await();
+                    test.assertNotNull(jar);
+                    test.assertEqual(jdkFolder.getJarFile().await().getPath(), jar.getExecutablePath());
+                });
+            });
+
+            runner.testGroup("getJar(ChildProcessRunner)", () ->
+            {
+                runner.test("with null",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
+                    test.assertThrows(() -> jdkFolder.getJar((ChildProcessRunner)null),
+                        new PreConditionFailure("childProcessRunner cannot be null."));
+                });
+
+                runner.test("with non-null",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final JDKFolder jdkFolder = JDKFolder.get(process.getCurrentFolder());
+                    final Jar jar = jdkFolder.getJar(process.getChildProcessRunner()).await();
+                    test.assertNotNull(jar);
+                    test.assertEqual(jdkFolder.getJarFile().await().getPath(), jar.getExecutablePath());
+                });
+            });
         });
     }
 }

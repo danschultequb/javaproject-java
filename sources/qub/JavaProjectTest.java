@@ -112,7 +112,12 @@ public interface JavaProjectTest
                     final Coverage coverage = coverageParameter.getValue().await();
                     final QubProjectVersionFolder jacocoFolder = coverage == Coverage.None
                         ? null
-                        : qubFolder.getLatestProjectVersionFolder("jacoco", "jacococli").await();
+                        : qubFolder.getLatestProjectVersionFolder("jacoco", "jacococli")
+                            .catchError((Throwable error) ->
+                            {
+                                logStreamsBeforeTests.getOutput().writeLine(error.getMessage()).await();
+                            })
+                            .await();
 
                     final Folder outputsFolder = projectFolder.getOutputsFolder().await();
                     final Folder outputsSourcesFolder = projectFolder.getOutputsSourcesFolder().await();
@@ -264,7 +269,7 @@ public interface JavaProjectTest
                                 if (coverage == Coverage.Tests || coverage == Coverage.All)
                                 {
                                     javaParameters.addArguments("--classfiles", outputsTestsFolder.toString());
-                                    javaParameters.addArguments("--sourcesfiles", projectFolder.getTestSourcesFolder().await().toString());
+                                    javaParameters.addArguments("--sourcefiles", projectFolder.getTestSourcesFolder().await().toString());
                                 }
 
                                 javaParameters.addArguments("--html", coverageFolder.toString());
@@ -380,7 +385,12 @@ public interface JavaProjectTest
                 final Folder outputsTestsFolder = projectFolder.getOutputsTestsFolder().await();
                 final Iterable<JavaClassFile> testClassFilesToRun;
 
-                final TestRunner runner = TestRunner.create(process, pattern);
+                final TestRunnerParameters testRunnerParameters = TestRunnerParameters.create();
+                if (pattern != null)
+                {
+                    testRunnerParameters.setTestPattern(pattern);
+                }
+                final TestRunner runner = TestRunner.create(process, testRunnerParameters);
 
                 final IntegerValue unmodifiedPassedTestCount = IntegerValue.create(0);
                 final IntegerValue unmodifiedTestFailureCount = IntegerValue.create(0);
@@ -449,6 +459,21 @@ public interface JavaProjectTest
                 }
                 else
                 {
+                    final StackTraceFormat format = StackTraceFormat.create()
+                        .ignoreType(LazyResult.class)
+                        .ignoreType(Result.class)
+                        .ignoreType(java.lang.reflect.Method.class)
+                        .ignoreType("jdk.internal.reflect.NativeMethodAccessorImpl")
+                        .ignoreType(Test.class)
+                        .ignoreType(TestRunner.class)
+                        .ignoreType(BasicTestRunner.class)
+                        .ignoreType("jdk.internal.reflect.DelegatingMethodAccessorImpl")
+                        .ignoreType(StaticMethod1.class)
+                        .ignoreType(DesktopProcess.class)
+                        .ignoreType(JavaProjectTest.class)
+                        .ignoreType(java.lang.Thread.class)
+                        .ignoreType(AsyncTask.class);
+
                     final MutableMap<Path,JavaClassFile> relativePathToTestClassFilesToRunMap = testClassFilesToRun.toMap(
                         (JavaClassFile testClassFileToRun) -> testClassFileToRun.relativeTo(outputsTestsFolder),
                         (JavaClassFile testClassFileToRun) -> testClassFileToRun);
@@ -498,7 +523,7 @@ public interface JavaProjectTest
                         testFailures.add(failure);
 
                         indentedOutput.writeLine(" - Failed").await();
-                        JavaProjectTest.writeFailure(indentedOutput, failure);
+                        JavaProjectTest.writeFailure(indentedOutput, failure, format);
                     });
                     runner.afterTestSkipped((Test test) ->
                     {
@@ -522,14 +547,17 @@ public interface JavaProjectTest
                     });
                     runner.afterTestClass((TestClass testClass) ->
                     {
-                        verbose.writeLine("Updating test.json class file for " + testClass.getFullName() + "...").await();
-                        final Path testClassRelativePath = JavaClassFile.getRelativePathFromFullTypeName(testClass.getFullName());
-                        final JavaClassFile testClassFile = relativePathToTestClassFilesToRunMap.get(testClassRelativePath).catchError().await();
-                        newTestJsonClassFiles.add(TestJSONClassFile.create(testClassFile.relativeTo(outputsFolder))
-                            .setLastModified(testClassFile.getLastModified().await())
-                            .setPassedTestCount(testClass.getPassedTestCount())
-                            .setSkippedTestCount(testClass.getSkippedTestCount())
-                            .setFailedTestCount(testClass.getFailedTestCount()));
+                        if (useTestJson)
+                        {
+                            verbose.writeLine("Updating test.json class file for " + testClass.getFullName() + "...").await();
+                            final Path testClassRelativePath = JavaClassFile.getRelativePathFromFullTypeName(testClass.getFullName());
+                            final JavaClassFile testClassFile = relativePathToTestClassFilesToRunMap.get(testClassRelativePath).catchError().await();
+                            newTestJsonClassFiles.add(TestJSONClassFile.create(testClassFile.relativeTo(outputsFolder))
+                                .setLastModified(testClassFile.getLastModified().await())
+                                .setPassedTestCount(testClass.getPassedTestCount())
+                                .setSkippedTestCount(testClass.getSkippedTestCount())
+                                .setFailedTestCount(testClass.getFailedTestCount()));
+                        }
 
                         if (testParentsWrittenToConsole.remove(testClass))
                         {
@@ -580,7 +608,7 @@ public interface JavaProjectTest
                             indentedOutput.writeLine(testFailureNumber + ") " + failure.getTestScope()).await();
                             ++testFailureNumber;
                             indentedOutput.increaseIndent();
-                            JavaProjectTest.writeFailure(indentedOutput, failure);
+                            JavaProjectTest.writeFailure(indentedOutput, failure, format);
                             indentedOutput.decreaseIndent();
                         }
 
@@ -650,20 +678,21 @@ public interface JavaProjectTest
         }
     }
 
-    static void writeFailure(IndentedCharacterWriteStream writeStream, TestError failure)
+    static void writeFailure(IndentedCharacterWriteStream writeStream, TestError failure, StackTraceFormat format)
     {
         PreCondition.assertNotNull(writeStream, "writeStream");
         PreCondition.assertNotNull(failure, "failure");
+        PreCondition.assertNotNull(format, "format");
 
         writeStream.increaseIndent();
         JavaProjectTest.writeMessageLines(writeStream, failure);
-        JavaProjectTest.writeStackTrace(writeStream, failure);
+        JavaProjectTest.writeStackTrace(writeStream, failure, format);
         writeStream.decreaseIndent();
 
         final Throwable cause = failure.getCause();
         if (cause != null)
         {
-            JavaProjectTest.writeFailureCause(writeStream, cause);
+            JavaProjectTest.writeFailureCause(writeStream, cause, format);
         }
     }
 
@@ -696,10 +725,11 @@ public interface JavaProjectTest
         }
     }
 
-    static void writeFailureCause(IndentedCharacterWriteStream writeStream, Throwable cause)
+    static void writeFailureCause(IndentedCharacterWriteStream writeStream, Throwable cause, StackTraceFormat format)
     {
         PreCondition.assertNotNull(writeStream, "writeStream");
         PreCondition.assertNotNull(cause, "cause");
+        PreCondition.assertNotNull(format, "format");
 
         if (cause instanceof ErrorIterable)
         {
@@ -714,14 +744,14 @@ public interface JavaProjectTest
 
                 writeStream.increaseIndent();
                 JavaProjectTest.writeMessage(writeStream, innerCause);
-                JavaProjectTest.writeStackTrace(writeStream, innerCause);
+                JavaProjectTest.writeStackTrace(writeStream, innerCause, format);
                 writeStream.decreaseIndent();
 
                 final Throwable nextCause = innerCause.getCause();
                 if (nextCause != null && nextCause != innerCause)
                 {
                     writeStream.increaseIndent();
-                    JavaProjectTest.writeFailureCause(writeStream, nextCause);
+                    JavaProjectTest.writeFailureCause(writeStream, nextCause, format);
                     writeStream.decreaseIndent();
                 }
             }
@@ -732,14 +762,14 @@ public interface JavaProjectTest
 
             writeStream.increaseIndent();
             JavaProjectTest.writeMessage(writeStream, cause);
-            JavaProjectTest.writeStackTrace(writeStream, cause);
+            JavaProjectTest.writeStackTrace(writeStream, cause, format);
             writeStream.decreaseIndent();
 
             final Throwable nextCause = cause.getCause();
             if (nextCause != null && nextCause != cause)
             {
                 writeStream.increaseIndent();
-                JavaProjectTest.writeFailureCause(writeStream, nextCause);
+                JavaProjectTest.writeFailureCause(writeStream, nextCause, format);
                 writeStream.decreaseIndent();
             }
         }
@@ -749,10 +779,11 @@ public interface JavaProjectTest
      * Write the stack trace of the provided Throwable to the output stream.
      * @param t The Throwable to writeByte the stack trace of.
      */
-    static void writeStackTrace(IndentedCharacterWriteStream writeStream, Throwable t)
+    static void writeStackTrace(IndentedCharacterWriteStream writeStream, Throwable t, StackTraceFormat format)
     {
         PreCondition.assertNotNull(writeStream, "writeStream");
         PreCondition.assertNotNull(t, "t");
+        PreCondition.assertNotNull(format, "format");
 
         final StackTraceElement[] stackTraceElements = t.getStackTrace();
         if (stackTraceElements != null && stackTraceElements.length > 0)
@@ -761,7 +792,10 @@ public interface JavaProjectTest
             writeStream.increaseIndent();
             for (StackTraceElement stackTraceElement : stackTraceElements)
             {
-                writeStream.writeLine("at " + stackTraceElement.toString()).await();
+                if (format.shouldShow(stackTraceElement))
+                {
+                    writeStream.writeLine("at " + stackTraceElement.toString()).await();
+                }
             }
             writeStream.decreaseIndent();
         }

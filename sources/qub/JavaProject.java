@@ -60,11 +60,25 @@ public interface JavaProject
         return projectName + ".sources.jar";
     }
 
+    static String getSourcesZipFileName(String projectName)
+    {
+        PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
+
+        return projectName + "-sources.zip";
+    }
+
     static String getTestSourcesJarFileName(String projectName)
     {
         PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
 
         return projectName + ".test.sources.jar";
+    }
+
+    static String getTestSourcesZipFileName(String projectName)
+    {
+        PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
+
+        return projectName + ".test-sources.zip";
     }
 
     static String getCompiledSourcesJarFileName(String projectName)

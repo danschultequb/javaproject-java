@@ -471,6 +471,17 @@ public class JavaProjectFolder extends Folder
         });
     }
 
+    public Result<File> getSourcesZipFile()
+    {
+        return Result.create(() ->
+        {
+            final String project = this.getProject().await();
+            final String sourcesZipFileName = JavaProject.getSourcesZipFileName(project);
+            final Folder outputsFolder = this.getOutputsFolder().await();
+            return outputsFolder.getFile(sourcesZipFileName).await();
+        });
+    }
+
     public Result<File> getTestSourcesJarFile()
     {
         return Result.create(() ->
@@ -479,6 +490,17 @@ public class JavaProjectFolder extends Folder
             final String sourcesJarFileName = JavaProject.getTestSourcesJarFileName(project);
             final Folder outputsFolder = this.getOutputsFolder().await();
             return outputsFolder.getFile(sourcesJarFileName).await();
+        });
+    }
+
+    public Result<File> getTestSourcesZipFile()
+    {
+        return Result.create(() ->
+        {
+            final String project = this.getProject().await();
+            final String testSourcesZipFileName = JavaProject.getTestSourcesZipFileName(project);
+            final Folder outputsFolder = this.getOutputsFolder().await();
+            return outputsFolder.getFile(testSourcesZipFileName).await();
         });
     }
 

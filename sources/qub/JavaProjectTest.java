@@ -459,22 +459,14 @@ public interface JavaProjectTest
                 }
                 else
                 {
-                    final StackTraceFormat format = StackTraceFormat.create()
-                        .ignoreType(LazyResult.class)
-                        .ignoreType(Result.class)
-                        .ignoreType(java.lang.reflect.Method.class)
-                        .ignoreType("jdk.internal.reflect.NativeMethodAccessorImpl")
-                        .ignoreType(Test.class)
-                        .ignoreType(TestRunner.class)
-                        .ignoreType(BasicTestRunner.class)
-                        .ignoreType("jdk.internal.reflect.DelegatingMethodAccessorImpl")
-                        .ignoreType(StaticMethod1.class)
-                        .ignoreType(DesktopProcess.class)
-                        .ignoreType(JavaProjectTest.class)
-                        .ignoreType(java.lang.Thread.class)
-                        .ignoreType(AsyncTask.class)
-                        .ignoreType(PreCondition.class)
-                        .ignoreType(PostCondition.class);
+                    final JavaProjectConfiguration configuration = JavaProjectConfiguration.parse(process)
+                        .catchError(() -> JavaProjectConfiguration.create())
+                        .await();
+                    final StackTraceFormat format = StackTraceFormat.create();
+                    for (final String ignoredStackTraceType : configuration.getIgnoredStackTraceTypes())
+                    {
+                        format.ignoreType(ignoredStackTraceType);
+                    }
 
                     final MutableMap<Path,JavaClassFile> relativePathToTestClassFilesToRunMap = testClassFilesToRun.toMap(
                         (JavaClassFile testClassFileToRun) -> testClassFileToRun.relativeTo(outputsTestsFolder),

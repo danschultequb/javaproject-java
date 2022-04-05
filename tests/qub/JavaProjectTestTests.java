@@ -1030,6 +1030,23 @@ public interface JavaProjectTestTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     final File testJsonFile = outputsFolder.getFile("test.json").await();
 
+                    JavaProjectConfiguration.setConfigurationFile(process, JavaProjectConfiguration.create()
+                        .setIgnoredStackTraceTypes(Iterable.create(
+                            "java.lang.reflect.Method",
+                            "java.lang.Thread",
+                            "jdk.internal.reflect.NativeMethodAccessorImpl",
+                            "jdk.internal.reflect.DelegatingMethodAccessorImpl",
+                            "qub.AsyncTask",
+                            "qub.BasicTestRunner",
+                            "qub.JavaProjectTest",
+                            "qub.LazyResult",
+                            "qub.Result",
+                            "qub.StaticMethod1",
+                            "qub.Test",
+                            "qub.TestRunner"
+                        )))
+                        .await();
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -1108,10 +1125,10 @@ public interface JavaProjectTestTests
                             "      Failing test - Failed",
                             "          Intentional failure",
                             "          Stack Trace:",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1075)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1073)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1071)",
-                            "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1055)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1092)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1090)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1088)",
+                            "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
                             "            at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "            at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
                             "      Passing test after failing test - Passed",
@@ -1126,10 +1143,10 @@ public interface JavaProjectTestTests
                             "  1) ATests A B Failing test",
                             "      Intentional failure",
                             "      Stack Trace:",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1075)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1073)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1071)",
-                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1055)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1092)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1090)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1088)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
                             "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
                             "",
@@ -1222,10 +1239,10 @@ public interface JavaProjectTestTests
                             "      Failing test - Failed",
                             "          Intentional failure",
                             "          Stack Trace:",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1075)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1073)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1071)",
-                            "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1055)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1092)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1090)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1088)",
+                            "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
                             "            at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "            at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
                             "      Passing test after failing test - Passed",
@@ -1241,10 +1258,10 @@ public interface JavaProjectTestTests
                             "  1) ATests A B Failing test",
                             "      Intentional failure",
                             "      Stack Trace:",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1075)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1073)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1071)",
-                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1055)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1092)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1090)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1088)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
                             "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
                             "",
@@ -1262,6 +1279,7 @@ public interface JavaProjectTestTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
+                            fakeProjectDataFolder.getFile("configuration.json").await(),
                             fakeProjectLogsFolder.getFile("1.log").await(),
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await(),

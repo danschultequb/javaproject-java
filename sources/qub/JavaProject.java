@@ -31,7 +31,7 @@ public interface JavaProject
             .addAction(JavaProjectPublish::addAction)
             .addAction(JavaProjectDependencies::addAction)
             .addAction(CommandLineLogsAction::addAction)
-            .addAction(CommandLineConfigurationAction::addAction)
+            .addAction(JavaProjectConfiguration::addAction)
             .run();
     }
 
@@ -57,28 +57,14 @@ public interface JavaProject
     {
         PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
 
-        return projectName + ".sources.jar";
-    }
-
-    static String getSourcesZipFileName(String projectName)
-    {
-        PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
-
-        return projectName + "-sources.zip";
+        return projectName + "-sources.jar";
     }
 
     static String getTestSourcesJarFileName(String projectName)
     {
         PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
 
-        return projectName + ".test.sources.jar";
-    }
-
-    static String getTestSourcesZipFileName(String projectName)
-    {
-        PreCondition.assertNotNullAndNotEmpty(projectName, "projectName");
-
-        return projectName + ".test-sources.zip";
+        return projectName + ".test-sources.jar";
     }
 
     static String getCompiledSourcesJarFileName(String projectName)

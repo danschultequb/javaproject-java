@@ -419,7 +419,7 @@ public interface JavaProjectPackTests
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     final File testJsonFile = outputsFolder.getFile("test.json").await();
                     final File packJsonFile = outputsFolder.getFile("pack.json").await();
-                    final File sourcesJarFile = outputsFolder.getFile("fake-project-to-pack.sources.jar").await();
+                    final File sourcesJarFile = outputsFolder.getFile("fake-project-to-pack-sources.jar").await();
                     final File compiledSourcesJarFile = outputsFolder.getFile("fake-project-to-pack.jar").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder("sources").await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -439,7 +439,7 @@ public interface JavaProjectPackTests
                             JavaProjectTest.runTests(testProcess);
                         }));
                     JavaProjectTests.addJarVersionFakeChildProcessRun(childProcessRunner, jarFile);
-                    childProcessRunner.add(FakeChildProcessRun.create(jarFile, "--create", "--file=/project/folder/outputs/fake-project-to-pack.sources.jar", "-C", "/project/folder/sources/", ".")
+                    childProcessRunner.add(FakeChildProcessRun.create(jarFile, "--create", "--file=/project/folder/outputs/fake-project-to-pack-sources.jar", "-C", "/project/folder/sources/", ".")
                         .setAction((FakeDesktopProcess testProcess) ->
                         {
                             clock.advance(Duration.minutes(1)).await();
@@ -458,7 +458,7 @@ public interface JavaProjectPackTests
                         Iterable.create(
                             "Compiling 1 source file...",
                             "No test classes found.",
-                            "Creating outputs/fake-project-to-pack.sources.jar...",
+                            "Creating outputs/fake-project-to-pack-sources.jar...",
                             "Creating outputs/fake-project-to-pack.jar..."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
@@ -473,8 +473,8 @@ public interface JavaProjectPackTests
                             projectJsonFile,
                             outputsSourcesFolder,
                             buildJsonFile,
-                            compiledSourcesJarFile,
                             sourcesJarFile,
+                            compiledSourcesJarFile,
                             packJsonFile,
                             testJsonFile,
                             aClassFile,
@@ -556,12 +556,12 @@ public interface JavaProjectPackTests
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/jar --version",
                             "VERBOSE: Previous jar version number: null",
                             "VERBOSE: Current jar version number:  17",
-                            "VERBOSE: Checking if the outputs/fake-project-to-pack.sources.jar needs to be created...",
+                            "VERBOSE: Checking if the outputs/fake-project-to-pack-sources.jar needs to be created...",
                             "VERBOSE: Jar version changed.",
-                            "Creating outputs/fake-project-to-pack.sources.jar...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/jar --create --file=/project/folder/outputs/fake-project-to-pack.sources.jar -C /project/folder/sources/ .",
-                            "VERBOSE: Checking if the outputs/fake-project-to-pack.test.sources.jar needs to be created...",
-                            "VERBOSE: No files exist that would go into outputs/fake-project-to-pack.test.sources.jar.",
+                            "Creating outputs/fake-project-to-pack-sources.jar...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/jar --create --file=/project/folder/outputs/fake-project-to-pack-sources.jar -C /project/folder/sources/ .",
+                            "VERBOSE: Checking if the outputs/fake-project-to-pack.test-sources.jar needs to be created...",
+                            "VERBOSE: No files exist that would go into outputs/fake-project-to-pack.test-sources.jar.",
                             "VERBOSE: Checking if the outputs/fake-project-to-pack.jar needs to be created...",
                             "VERBOSE: Jar version changed.",
                             "Creating outputs/fake-project-to-pack.jar...",

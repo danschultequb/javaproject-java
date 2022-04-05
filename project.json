@@ -2,7 +2,7 @@
   "$schema": "file:///C:/qub/qub/javaproject-java/data/javaproject.schema.json",
   "project": "javaproject-java",
   "publisher": "qub",
-  "version": "51",
+  "version": "54",
   "java": {
     "mainClass": "qub.JavaProject",
     "shortcutName": "qub-javaproject",

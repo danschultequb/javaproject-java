@@ -723,8 +723,6 @@ public interface JavaProjectDependenciesUpdateTests
                             .setArray("java.project.sourcePaths", JSONArray.create(
                                 JSONString.get("sources"),
                                 JSONString.get("tests")))
-                            .setString("java.format.settings.url", "/qub/fake-publisher/fake-project/data/DansCodeStyle.xml")
-                            .setBoolean("java.format.enabled", true)
                             .toString(JSONFormat.pretty),
                         settingsJsonFile.getContentsAsString().await());
 
@@ -797,8 +795,6 @@ public interface JavaProjectDependenciesUpdateTests
                             .setArray("java.project.sourcePaths", JSONArray.create(
                                 JSONString.get("sources"),
                                 JSONString.get("tests")))
-                            .setString("java.format.settings.url", "/qub/fake-publisher/fake-project/data/DansCodeStyle.xml")
-                            .setBoolean("java.format.enabled", true)
                             .toString(JSONFormat.pretty),
                         settingsJsonFile.getContentsAsString().await());
 
@@ -874,8 +870,6 @@ public interface JavaProjectDependenciesUpdateTests
                             .setArray("java.project.sourcePaths", JSONArray.create(
                                 JSONString.get("sources"),
                                 JSONString.get("tests")))
-                            .setString("java.format.settings.url", "/qub/fake-publisher/fake-project/data/DansCodeStyle.xml")
-                            .setBoolean("java.format.enabled", true)
                             .toString(JSONFormat.pretty),
                         settingsJsonFile.getContentsAsString().await());
 
@@ -954,8 +948,6 @@ public interface JavaProjectDependenciesUpdateTests
                                 JSONString.get("tests")))
                             .setArray("java.project.referencedLibraries", JSONArray.create(
                                 JSONString.get("/qub/a/b/versions/3/b.jar")))
-                            .setString("java.format.settings.url", "/qub/fake-publisher/fake-project/data/DansCodeStyle.xml")
-                            .setBoolean("java.format.enabled", true)
                             .toString(JSONFormat.pretty),
                         settingsJsonFile.getContentsAsString().await());
 
@@ -1042,8 +1034,6 @@ public interface JavaProjectDependenciesUpdateTests
                             .setArray("java.project.referencedLibraries", JSONArray.create(
                                 JSONString.get("/qub/a/b/versions/3/b.jar"),
                                 JSONString.get("/qub/a/b/versions/3/b.tests.jar")))
-                            .setString("java.format.settings.url", "/qub/fake-publisher/fake-project/data/DansCodeStyle.xml")
-                            .setBoolean("java.format.enabled", true)
                             .toString(JSONFormat.pretty),
                         settingsJsonFile.getContentsAsString().await());
 
@@ -1134,8 +1124,6 @@ public interface JavaProjectDependenciesUpdateTests
                             .setArray("java.project.sourcePaths", JSONArray.create(
                                 JSONString.get("sources"),
                                 JSONString.get("tests")))
-                            .setString("java.format.settings.url", "/qub/fake-publisher/fake-project/data/DansCodeStyle.xml")
-                            .setBoolean("java.format.enabled", true)
                             .toString(JSONFormat.pretty),
                         settingsJsonFile.getContentsAsString().await());
 
@@ -1229,8 +1217,8 @@ public interface JavaProjectDependenciesUpdateTests
                             .setArray("java.project.sourcePaths", JSONArray.create(
                                 JSONString.get("sources"),
                                 JSONString.get("tests")))
-                            .setString("java.format.settings.url", "/qub/fake-publisher/fake-project/data/DansCodeStyle.xml")
-                            .setBoolean("java.format.enabled", true)
+                            .setNull("java.format.settings.url")
+                            .setObject("java.format.enabled", JSONObject.create())
                             .toString(JSONFormat.pretty),
                         settingsJsonFile.getContentsAsString().await());
 
@@ -1250,6 +1238,155 @@ public interface JavaProjectDependenciesUpdateTests
                             newDependencyVersionFolder,
                             previousDependencyVersionSourceJarFile,
                             newDependencyVersionSourceJarFile,
+                            fakeProjectFolder,
+                            fakeProjectDataFolder,
+                            fakeProjectVersionsFolder,
+                            fakeProjectLogsFolder,
+                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectVersionFolder,
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
+                        qubFolder.iterateEntriesRecursively().toList());
+                });
+
+                runner.test("with no dependencies, no test files, and VS Code launch.json file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final CommandLineAction action = JavaProjectDependenciesUpdateTests.createCommandLineAction(process);
+
+                    final QubFolder qubFolder = process.getQubFolder().await();
+
+                    final FileSystem fileSystem = process.getFileSystem();
+                    final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
+                    final File projectJsonFile = projectFolder.getFile("project.json").await();
+                    projectJsonFile.setContentsAsString(
+                        JavaProjectJSON.create()
+                            .toString(JSONFormat.pretty))
+                        .await();
+                    final Folder vscodeFolder = projectFolder.getFolder(".vscode").await();
+                    final File launchJsonFile = vscodeFolder.getFile("launch.json").await();
+                    launchJsonFile.setContentsAsString(
+                        JSONObject.create()
+                            .toString(JSONFormat.pretty))
+                        .await();
+
+                    JavaProjectDependenciesUpdate.run(process, action);
+
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found.",
+                            "Updating .vscode/launch.json..."),
+                        process.getOutputWriteStream());
+                    test.assertLinesEqual(
+                        Iterable.create(),
+                        process.getErrorWriteStream());
+                    test.assertEqual(0, process.getExitCode());
+
+                    test.assertEqual(
+                        Iterable.create(
+                            vscodeFolder,
+                            projectJsonFile,
+                            launchJsonFile),
+                        projectFolder.iterateEntriesRecursively().toList());
+
+                    test.assertEqual(
+                        JSONObject.create()
+                            .setString("version", "0.2.0")
+                            .setArray("configurations", JSONArray.create())
+                            .toString(JSONFormat.pretty),
+                        launchJsonFile.getContentsAsString().await());
+
+                    final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
+                    final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
+                    final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
+                    final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
+                    test.assertEqual(
+                        Iterable.create(
+                            fakePublisherFolder,
+                            fakeProjectFolder,
+                            fakeProjectDataFolder,
+                            fakeProjectVersionsFolder,
+                            fakeProjectLogsFolder,
+                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectVersionFolder,
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
+                        qubFolder.iterateEntriesRecursively().toList());
+                });
+
+                runner.test("with no dependencies, a test file, and VS Code launch.json file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final CommandLineAction action = JavaProjectDependenciesUpdateTests.createCommandLineAction(process);
+
+                    final QubFolder qubFolder = process.getQubFolder().await();
+
+                    final FileSystem fileSystem = process.getFileSystem();
+                    final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
+                    final File projectJsonFile = projectFolder.getFile("project.json").await();
+                    projectJsonFile.setContentsAsString(
+                        JavaProjectJSON.create()
+                            .toString(JSONFormat.pretty))
+                        .await();
+                    final Folder vscodeFolder = projectFolder.getFolder(".vscode").await();
+                    final File launchJsonFile = vscodeFolder.getFile("launch.json").await();
+                    launchJsonFile.setContentsAsString(
+                        JSONObject.create()
+                            .toString(JSONFormat.pretty))
+                        .await();
+                    final Folder testsFolder = projectFolder.getFolder("tests").await();
+                    final File aTestsJavaFile = testsFolder.createFile("ATests.java").await();
+                    
+                    JavaProjectDependenciesUpdate.run(process, action);
+
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found.",
+                            "Updating .vscode/launch.json..."),
+                        process.getOutputWriteStream());
+                    test.assertLinesEqual(
+                        Iterable.create(),
+                        process.getErrorWriteStream());
+                    test.assertEqual(0, process.getExitCode());
+
+                    test.assertEqual(
+                        Iterable.create(
+                            vscodeFolder,
+                            testsFolder,
+                            projectJsonFile,
+                            launchJsonFile,
+                            aTestsJavaFile),
+                        projectFolder.iterateEntriesRecursively().toList());
+
+                    test.assertEqual(
+                        JSONObject.create()
+                            .setString("version", "0.2.0")
+                            .setArray("configurations", JSONArray.create(
+                                JSONObject.create()
+                                    .setString("type", "java")
+                                    .setString("request", "launch")
+                                    .setString("name", "ATests.java")
+                                    .setArray("classPaths", JSONArray.create(
+                                        JSONString.get("outputs/sources"),
+                                        JSONString.get("outputs/tests")))
+                                    .setString("mainClass", "qub.JavaProjectTest")
+                                    .setString("args", "--testjson=false --pattern=ATests")))
+                            .toString(JSONFormat.pretty),
+                        launchJsonFile.getContentsAsString().await());
+
+                    final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
+                    final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
+                    final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
+                    final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
+                    test.assertEqual(
+                        Iterable.create(
+                            fakePublisherFolder,
                             fakeProjectFolder,
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,

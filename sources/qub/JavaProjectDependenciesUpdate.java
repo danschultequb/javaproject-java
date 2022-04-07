@@ -225,6 +225,38 @@ public interface JavaProjectDependenciesUpdate
                             });
                         }
 
+                        final Path outputsSourcesRelativePath = projectFolder.getOutputsSourcesFolder().await()
+                            .relativeTo(projectFolder);
+                        final Path outputsTestsRelativePath = projectFolder.getOutputsTestsFolder().await()
+                            .relativeTo(projectFolder);
+                        
+                        final List<ProjectSignature> runConfigurationDependencies = List.create();
+                        final QubProjectVersionFolder qubJavaProjectLatestVersionFolder = qubFolder.getLatestProjectVersionFolder("qub", "javaproject-java")
+                            .catchError()
+                            .await();
+                        if (qubJavaProjectLatestVersionFolder != null)
+                        {
+                            final JavaPublishedProjectFolder qubJavaProjectPublishedFolder = JavaPublishedProjectFolder.get(qubJavaProjectLatestVersionFolder);
+                            runConfigurationDependencies.add(qubJavaProjectPublishedFolder.getProjectSignature().await());
+                            runConfigurationDependencies.addAll(
+                                JavaProjectFolder.getAllDependencies(qubFolder, qubJavaProjectPublishedFolder.getDependencies().await(), false).await());
+                        }
+                        for (final ProjectSignature projectJsonTransitiveDependency : projectJsonTransitiveDependencies)
+                        {
+                            runConfigurationDependencies.removeFirst(projectJsonTransitiveDependency::equalsIgnoreVersion);
+                            runConfigurationDependencies.add(projectJsonTransitiveDependency);
+                        }
+
+                        final Folder testsFolder = projectFolder.getTestSourcesFolder().await();
+                        final Iterable<String> fullTestClassNames = testsFolder.iterateFilesRecursively()
+                            .where((File file) -> Comparer.equal(".java", file.getFileExtension()))
+                            .map((File testJavaFile) -> JavaFile.getFullTypeName(testsFolder, testJavaFile))
+                            .catchError(() -> Iterable.create())
+                            .toList();
+
+                        final String testJsonProgramParameter = "--testjson=false";
+                        final String projectName = projectFolder.getProject().await();
+
                         final File intellijWorkspaceFile = projectFolder.getFile(".idea/workspace.xml").await();
                         if (intellijWorkspaceFile.exists().await())
                         {
@@ -235,29 +267,9 @@ public interface JavaProjectDependenciesUpdate
                                     .catchError(() -> output.writeLine("Invalid Intellij Workspace file: " + intellijWorkspaceFile).await())
                                     .await();
 
-                                final Folder testsFolder = projectFolder.getTestSourcesFolder().await();
-                                final Iterable<String> fullTestClassNames = testsFolder.iterateFilesRecursively()
-                                    .where((File file) -> Comparer.equal(".java", file.getFileExtension()))
-                                    .map((File testJavaFile) -> JavaFile.getFullTypeName(testsFolder, testJavaFile))
-                                    .toList();
-
                                 final List<String> fullTestClassNamesToAdd = List.create(fullTestClassNames);
 
-                                final JavaPublishedProjectFolder qubJavaProjectFolder = JavaPublishedProjectFolder.get(qubFolder.getLatestProjectVersionFolder("qub", "javaproject-java").await());
-                                final List<ProjectSignature> runConfigurationDependencies = List.create(qubJavaProjectFolder.getProjectSignature().await())
-                                    .addAll(JavaProjectFolder.getAllDependencies(qubFolder, qubJavaProjectFolder.getDependencies().await(), false).await());
-
-                                for (final ProjectSignature projectJsonTransitiveDependency : projectJsonTransitiveDependencies)
-                                {
-                                    runConfigurationDependencies.removeFirst(projectJsonTransitiveDependency::equalsIgnoreVersion);
-                                    runConfigurationDependencies.add(projectJsonTransitiveDependency);
-                                }
-
                                 final CharacterList vmParameters = CharacterList.create();
-                                final Path outputsSourcesRelativePath = projectFolder.getOutputsSourcesFolder().await()
-                                    .relativeTo(projectFolder);
-                                final Path outputsTestsRelativePath = projectFolder.getOutputsTestsFolder().await()
-                                    .relativeTo(projectFolder);
                                 vmParameters.addAll("-classpath ");
                                 vmParameters.addAll("$PROJECT_DIR$/" + outputsSourcesRelativePath.toString());
                                 vmParameters.addAll(";");
@@ -281,9 +293,7 @@ public interface JavaProjectDependenciesUpdate
                                     }
                                 }
                                 final String vmParametersString = vmParameters.toString(true);
-                                final String testJsonProgramParameter = "--testjson=false";
-                                final String projectName = projectFolder.getProject().await();
-
+                                
                                 final List<IntellijWorkspaceRunConfiguration> runConfigurationsToRemove = List.create();
                                 for (final IntellijWorkspaceRunConfiguration runConfiguration : intellijWorkspace.getRunConfigurations())
                                 {
@@ -378,27 +388,68 @@ public interface JavaProjectDependenciesUpdate
                                     vscodeSettingsJson.setJavaProjectReferencedLibraries(newJavaProjectReferencedLibraries);
                                 }
 
-                                final File codeStyleFile = dataFolder.getFile("DansCodeStyle.xml").await();
-                                final String javaFormatSettingsUrl = vscodeSettingsJson.getJavaFormatSettingsUrl();
-                                if (!codeStyleFile.getPath().equals(javaFormatSettingsUrl))
-                                {
-                                    vscodeSettingsJsonChanged = true;
-
-                                    vscodeSettingsJson.setJavaFormatSettingsUrl(codeStyleFile.toString());
-                                } 
-                                
-                                final Boolean javaFormatEnabled = vscodeSettingsJson.getJavaFormatEnabled();
-                                if (Booleans.isTrue(javaFormatEnabled) == false)
-                                {
-                                    vscodeSettingsJsonChanged = true;
-
-                                    vscodeSettingsJson.setJavaFormatEnabled(true);
-                                }
-
                                 if (vscodeSettingsJsonChanged)
                                 {
                                     vscodeSettingsJsonFile.setContentsAsString(vscodeSettingsJson.toString(JSONFormat.pretty)).await();
                                 }
+                            }
+                        }
+
+                        final File vscodeLaunchJsonFile = vscodeWorkspaceFolder.getLaunchJsonFile();
+                        if (vscodeLaunchJsonFile.exists().await())
+                        {
+                            output.writeLine("Updating " + vscodeLaunchJsonFile.relativeTo(vscodeWorkspaceFolder) + "...").await();
+
+                            final VSCodeLaunchJson launchJson = VSCodeLaunchJson.parse(vscodeLaunchJsonFile).catchError().await();
+                            if (launchJson != null)
+                            {
+                                if (launchJson.getVersion() == null)
+                                {
+                                    launchJson.setVersion("0.2.0");
+                                }
+
+                                final List<VSCodeJavaLaunchConfigurationJson> configurations = List.create();
+                                for (final JavaFile testJavaFile : projectFolder.iterateTestJavaFiles())
+                                {
+                                    final VSCodeJavaLaunchConfigurationJson configuration = VSCodeJavaLaunchConfigurationJson.create();
+
+                                    configuration.setType("java");
+
+                                    configuration.setRequest("launch");
+
+                                    final Path testFileRelativePath = testJavaFile.relativeTo(testsFolder);
+                                    configuration.setName(testFileRelativePath.toString());
+
+                                    final List<String> classPaths = List.create(
+                                        outputsSourcesRelativePath.toString(),
+                                        outputsTestsRelativePath.toString());
+                                    for (final ProjectSignature runConfigurationDependency : runConfigurationDependencies)
+                                    {
+                                        final JavaPublishedProjectFolder dependencyFolder = JavaPublishedProjectFolder.get(qubFolder.getProjectVersionFolder(runConfigurationDependency).await());
+
+                                        final File compiledSourcesJarFile = dependencyFolder.getCompiledSourcesJarFile().await();
+                                        if (compiledSourcesJarFile.exists().await())
+                                        {
+                                            classPaths.add(compiledSourcesJarFile.toString());
+                                        }
+
+                                        final File compiledTestsJarFile = dependencyFolder.getCompiledTestsJarFile().await();
+                                        if (compiledTestsJarFile.exists().await())
+                                        {
+                                            classPaths.add(compiledTestsJarFile.toString());
+                                        }
+                                    }
+                                    configuration.setClassPaths(classPaths);
+
+                                    configuration.setMainClass(Types.getFullTypeName(JavaProjectTest.class));
+
+                                    configuration.setArgs(Strings.join(' ', Iterable.create(testJsonProgramParameter, "--pattern=" + JavaClassFile.getFullTypeName(testFileRelativePath))));
+                                    
+                                    configurations.add(configuration);
+                                }
+                                launchJson.setConfigurations(configurations);
+
+                                vscodeWorkspaceFolder.setLaunchJson(launchJson).await();
                             }
                         }
                     }

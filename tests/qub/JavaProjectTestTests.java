@@ -1105,6 +1105,19 @@ public interface JavaProjectTestTests
                                         {
                                         });
                                     });
+
+                                    runner.testGroup("Group with unexpected error", () ->
+                                    {
+                                        throw new NullPointerException("Unexpected test group error!");
+                                    });
+
+                                    runner.testGroup("Skipped test group with no message", runner.skip(), () ->
+                                    {
+                                    });
+                                    
+                                    runner.testGroup("Skipped test group with message", runner.skip("Why the test group should be skipped"), () ->
+                                    {
+                                    });
                                 });
                             }
                         }.getClass());
@@ -1127,13 +1140,30 @@ public interface JavaProjectTestTests
                             "          Stack Trace:",
                             "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1092)",
                             "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1090)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1088)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1088)",
                             "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
                             "            at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "            at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
                             "      Passing test after failing test - Passed",
                             "      Skipped test with no message - Skipped",
                             "      Skipped test with message - Skipped: Why the test should be skipped",
+                            "    Group with unexpected error - Failed",
+                            "      An unexpected error occurred during \"ATests A Group with unexpected error\".",
+                            "      Stack Trace:",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1109)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
+                            "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
+                            "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
+                            "    Caused by: java.lang.NullPointerException",
+                            "      Message: Unexpected test group error!",
+                            "      Stack Trace:",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1111)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1109)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
+                            "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
+                            "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
+                            "    Skipped test group with no message - Skipped",
+                            "    Skipped test group with message - Skipped: Why the test group should be skipped",
                             "",
                             "Skipped Tests:",
                             "  1) ATests A B Skipped test with no message",
@@ -1145,20 +1175,36 @@ public interface JavaProjectTestTests
                             "      Stack Trace:",
                             "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1092)",
                             "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1090)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1088)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1088)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
+                            "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
+                            "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
+                            "",
+                            "  2) ATests A Group with unexpected error",
+                            "      An unexpected error occurred during \"ATests A Group with unexpected error\".",
+                            "      Stack Trace:",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1109)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
+                            "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
+                            "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
+                            "    Caused by: java.lang.NullPointerException",
+                            "      Message: Unexpected test group error!",
+                            "      Stack Trace:",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1111)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1109)",
                             "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
                             "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
                             "",
                             "Tests Run:     7",
                             "Tests Passed:  4",
-                            "Tests Failed:  1",
+                            "Tests Failed:  2",
                             "Tests Skipped: 2"),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
                         process.getErrorWriteStream());
-                    test.assertEqual(1, process.getExitCode());
+                    test.assertEqual(2, process.getExitCode());
 
                     test.assertEqual(
                         Iterable.create(
@@ -1190,7 +1236,7 @@ public interface JavaProjectTestTests
                                     .setLastModified(DateTime.create(1970, 1, 1))
                                     .setPassedTestCount(4)
                                     .setSkippedTestCount(2)
-                                    .setFailedTestCount(1)))
+                                    .setFailedTestCount(2)))
                             .toString(JSONFormat.pretty),
                         testJsonFile.getContentsAsString().await());
 
@@ -1241,13 +1287,30 @@ public interface JavaProjectTestTests
                             "          Stack Trace:",
                             "            at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1092)",
                             "            at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1090)",
-                            "            at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1088)",
+                            "            at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1088)",
                             "            at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
                             "            at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "            at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
                             "      Passing test after failing test - Passed",
                             "      Skipped test with no message - Skipped",
                             "      Skipped test with message - Skipped: Why the test should be skipped",
+                            "    Group with unexpected error - Failed",
+                            "      An unexpected error occurred during \"ATests A Group with unexpected error\".",
+                            "      Stack Trace:",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1109)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
+                            "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
+                            "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
+                            "    Caused by: java.lang.NullPointerException",
+                            "      Message: Unexpected test group error!",
+                            "      Stack Trace:",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1111)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1109)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
+                            "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
+                            "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
+                            "    Skipped test group with no message - Skipped",
+                            "    Skipped test group with message - Skipped: Why the test group should be skipped",
                             "VERBOSE: Updating test.json class file for ATests...",
                             "",
                             "Skipped Tests:",
@@ -1260,14 +1323,30 @@ public interface JavaProjectTestTests
                             "      Stack Trace:",
                             "        at qub.JavaProjectTestTests$2.lambda$test$4(JavaProjectTestTests.java:1092)",
                             "        at qub.JavaProjectTestTests$2.lambda$test$8(JavaProjectTestTests.java:1090)",
-                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1088)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1088)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
+                            "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
+                            "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
+                            "",
+                            "  2) ATests A Group with unexpected error",
+                            "      An unexpected error occurred during \"ATests A Group with unexpected error\".",
+                            "      Stack Trace:",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1109)",
+                            "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
+                            "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
+                            "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
+                            "    Caused by: java.lang.NullPointerException",
+                            "      Message: Unexpected test group error!",
+                            "      Stack Trace:",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$9(JavaProjectTestTests.java:1111)",
+                            "        at qub.JavaProjectTestTests$2.lambda$test$12(JavaProjectTestTests.java:1109)",
                             "        at qub.JavaProjectTestTests$2.test(JavaProjectTestTests.java:1072)",
                             "        at qub.FakeChildProcessRunner.lambda$start$4(FakeChildProcessRunner.java:142)",
                             "        at qub.ParallelAsyncRunner.lambda$schedule$0(ParallelAsyncRunner.java:58)",
                             "",
                             "Tests Run:     7",
                             "Tests Passed:  4",
-                            "Tests Failed:  1",
+                            "Tests Failed:  2",
                             "Tests Skipped: 2",
                             "VERBOSE: Updating test.json file..."),
                         fakeLogFile.getContentsAsString().await());

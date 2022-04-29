@@ -475,7 +475,8 @@ public interface JavaProjectTest
                     final BooleanValue wroteRunningTests = BooleanValue.create(false);
                     final IndentedCharacterWriteStream indentedOutput = IndentedCharacterWriteStream.create(output);
                     final List<TestParent> testParentsWrittenToConsole = List.create();
-                    runner.beforeTest((Test test) ->
+                    
+                    final Action0 ensureRunningTestsWritten = () ->
                     {
                         if (!wroteRunningTests.get())
                         {
@@ -483,9 +484,12 @@ public interface JavaProjectTest
                             indentedOutput.writeLine("Running tests...").await();
                             wroteRunningTests.set(true);
                         }
+                    };
 
+                    final Action1<TestParent> ensureTestParentsWritten = (TestParent testParent) ->
+                    {
                         final Stack<TestParent> testParentsToWrite = Stack.create();
-                        TestParent currentTestParent = test.getParent();
+                        TestParent currentTestParent = testParent;
                         while (currentTestParent != null && !testParentsWrittenToConsole.contains(currentTestParent))
                         {
                             testParentsToWrite.push(currentTestParent);
@@ -502,6 +506,12 @@ public interface JavaProjectTest
                             testParentsWrittenToConsole.addAll(testParentToWrite);
                             indentedOutput.increaseIndent();
                         }
+                    };
+
+                    runner.beforeTest((Test test) ->
+                    {
+                        ensureRunningTestsWritten.run();
+                        ensureTestParentsWritten.run(test.getParent());
 
                         indentedOutput.write(test.getName()).await();
                         indentedOutput.increaseIndent();
@@ -531,6 +541,24 @@ public interface JavaProjectTest
                         finishedTestCount.increment();
 
                         indentedOutput.decreaseIndent();
+                    });
+                    runner.afterTestGroupFailure((TestGroup testGroup, TestError failure) ->
+                    {
+                        ensureRunningTestsWritten.run();
+                        ensureTestParentsWritten.run(testGroup.getParent());
+
+                        testFailures.add(failure);
+
+                        indentedOutput.writeLine(testGroup.getName() + " - Failed").await();
+                        JavaProjectTest.writeFailure(indentedOutput, failure, format);
+                    });
+                    runner.afterTestGroupSkipped((TestGroup testGroup) ->
+                    {
+                        ensureRunningTestsWritten.run();
+                        ensureTestParentsWritten.run(testGroup.getParent());
+
+                        final String skipMessage = testGroup.getSkipMessage();
+                        indentedOutput.writeLine(testGroup.getName() + " - Skipped" + (Strings.isNullOrEmpty(skipMessage) ? "" : ": " + skipMessage)).await();
                     });
                     runner.afterTestGroup((TestGroup testGroup) ->
                     {

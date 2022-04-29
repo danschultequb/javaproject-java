@@ -1621,10 +1621,10 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=Sources", "--profiler=false")
+                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=Sources", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/sources/", "--sourcefiles", "/project/folder/sources/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
+                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/lib/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/sources/", "--sourcefiles", "/project/folder/sources/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
                             .setAction(() ->
                             {
                                 indexHtmlFile.create().await();
@@ -1748,7 +1748,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=Sources --profiler=false",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=Sources --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -1765,7 +1765,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Updating test.json file...",
                             "",
                             "Analyzing coverage...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/sources/ --sourcefiles /project/folder/sources/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/lib/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/sources/ --sourcefiles /project/folder/sources/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
                         Iterable.create(
@@ -2040,10 +2040,10 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=Sources", "--profiler=false")
+                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=Sources", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/sources/", "--sourcefiles", "/project/folder/sources/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
+                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/lib/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/sources/", "--sourcefiles", "/project/folder/sources/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
                             .setAction(() ->
                             {
                                 indexHtmlFile.create().await();
@@ -2167,7 +2167,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=Sources --profiler=false",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=Sources --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -2184,7 +2184,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Updating test.json file...",
                             "",
                             "Analyzing coverage...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/sources/ --sourcefiles /project/folder/sources/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/lib/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/sources/ --sourcefiles /project/folder/sources/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
                         Iterable.create(
@@ -2261,10 +2261,10 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=Tests", "--profiler=false")
+                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=Tests", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/tests/", "--sourcefiles", "/project/folder/tests/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
+                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/lib/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/tests/", "--sourcefiles", "/project/folder/tests/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
                             .setAction(() ->
                             {
                                 indexHtmlFile.create().await();
@@ -2388,7 +2388,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=Tests --profiler=false",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=Tests --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -2405,7 +2405,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Updating test.json file...",
                             "",
                             "Analyzing coverage...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/tests/ --sourcefiles /project/folder/tests/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/lib/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/tests/ --sourcefiles /project/folder/tests/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
                         Iterable.create(
@@ -2482,10 +2482,10 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=All", "--profiler=false")
+                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=All", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/sources/", "--sourcefiles", "/project/folder/sources/", "--classfiles", "/project/folder/outputs/tests/", "--sourcefiles", "/project/folder/tests/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
+                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/lib/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/sources/", "--sourcefiles", "/project/folder/sources/", "--classfiles", "/project/folder/outputs/tests/", "--sourcefiles", "/project/folder/tests/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
                             .setAction(() ->
                             {
                                 indexHtmlFile.create().await();
@@ -2609,7 +2609,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=All --profiler=false",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=All --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -2626,7 +2626,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Updating test.json file...",
                             "",
                             "Analyzing coverage...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/sources/ --sourcefiles /project/folder/sources/ --classfiles /project/folder/outputs/tests/ --sourcefiles /project/folder/tests/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/lib/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/sources/ --sourcefiles /project/folder/sources/ --classfiles /project/folder/outputs/tests/ --sourcefiles /project/folder/tests/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
                         Iterable.create(
@@ -2703,10 +2703,10 @@ public interface JavaProjectTestTests
                                 aTestsClassFile.setContentsAsString("ATests.java byte code").await();
                             }));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=Sources", "--profiler=false")
+                        FakeChildProcessRun.create(javaFile, "-javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec", "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=Sources", "--profiler=false")
                             .setAction(JavaProjectTest::runTests));
                     childProcessRunner.add(
-                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/sources/", "--sourcefiles", "/project/folder/sources/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
+                        FakeChildProcessRun.create(javaFile, "-jar", "/qub/jacoco/jacococli/versions/8/lib/jacococli.jar", "report", "/project/folder/outputs/coverage.exec", "--classfiles", "/project/folder/outputs/sources/", "--sourcefiles", "/project/folder/sources/", "--html", "/project/folder/outputs/coverage/", "--xml", "/project/folder/outputs/coverage.xml")
                             .setAction(() ->
                             {
                                 indexHtmlFile.create().await();
@@ -2835,7 +2835,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Adding compilation issues to new build.json...",
                             "VERBOSE: Associating .class files with original .java files...",
                             "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=Sources --profiler=false",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -javaagent:/qub/jacoco/jacococli/versions/8/lib/jacocoagent.jar=destfile=/project/folder/outputs/coverage.exec -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=Sources --profiler=false",
                             "VERBOSE: Current Java version: fake-java-version",
                             "VERBOSE: No test.json file found.",
                             "VERBOSE: Found 1 test class file to test.",
@@ -2852,7 +2852,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Updating test.json file...",
                             "",
                             "Analyzing coverage...",
-                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/sources/ --sourcefiles /project/folder/sources/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -jar /qub/jacoco/jacococli/versions/8/lib/jacococli.jar report /project/folder/outputs/coverage.exec --classfiles /project/folder/outputs/sources/ --sourcefiles /project/folder/sources/ --html /project/folder/outputs/coverage/ --xml /project/folder/outputs/coverage.xml"),
                         fakeLogFile.getContentsAsString().await());
                     test.assertEqual(
                         Iterable.create(

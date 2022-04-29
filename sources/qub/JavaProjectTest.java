@@ -133,7 +133,7 @@ public interface JavaProjectTest
                     {
                         if (jacocoFolder != null)
                         {
-                            final File jacocoAgentJarFile = jacocoFolder.getFile("jacocoagent.jar").await();
+                            final File jacocoAgentJarFile = jacocoFolder.getFile("lib/jacocoagent.jar").await();
                             final File coverageExecFile = outputsFolder.getFile("coverage.exec").await();
                             javaParameters.addJavaAgent(jacocoAgentJarFile + "=destfile=" + coverageExecFile);
                         }
@@ -253,7 +253,7 @@ public interface JavaProjectTest
                             final Java javaForCoverage = jdkFolder.getJava(childProcessRunnerForCoverage).await();
                             process.setExitCode(javaForCoverage.run((JavaParameters javaParameters) ->
                             {
-                                final File jacococliJarFile = jacocoFolder.getFile("jacococli.jar").await();
+                                final File jacococliJarFile = jacocoFolder.getFile("lib/jacococli.jar").await();
                                 javaParameters.addArguments("-jar", jacococliJarFile.toString());
 
                                 javaParameters.addArgument("report");

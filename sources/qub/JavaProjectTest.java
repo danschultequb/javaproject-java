@@ -488,11 +488,11 @@ public interface JavaProjectTest
 
                     final Action1<TestParent> ensureTestParentsWritten = (TestParent testParent) ->
                     {
-                        final Stack2<TestParent> testParentsToWrite = Stack2.create();
+                        final Stack<TestParent> testParentsToWrite = Stack.create();
                         TestParent currentTestParent = testParent;
                         while (currentTestParent != null && !testParentsWrittenToConsole.contains(currentTestParent))
                         {
-                            testParentsToWrite.push2(currentTestParent);
+                            testParentsToWrite.push(currentTestParent);
                             currentTestParent = currentTestParent.getParent();
                         }
 

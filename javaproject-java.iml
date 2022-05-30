@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/outputs"/>
+    <output-test url="file://$MODULE_DIR$/outputs"/>
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/sources" isTestSource="false"/>
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true"/>
+    </content>
+    <orderEntry type="inheritedJdk"/>
+    <orderEntry type="sourceFolder" forTests="false"/>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/projectjson-java/versions/128/projectjson-java.jar!/"/>
+          <root url="jar://C:/qub/qub/projectjson-java/versions/128/projectjson-java.tests.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/projectjson-java/versions/128/projectjson-java-sources.jar!/"/>
+          <root url="jar://C:/qub/qub/projectjson-java/versions/128/projectjson-java.test-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/lib-java/versions/189/lib-java.jar!/"/>
+          <root url="jar://C:/qub/qub/lib-java/versions/189/lib-java.tests.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/lib-java/versions/189/lib-java-sources.jar!/"/>
+          <root url="jar://C:/qub/qub/lib-java/versions/189/lib-java.test-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/git-java/versions/53/git-java.jar!/"/>
+          <root url="jar://C:/qub/qub/git-java/versions/53/git-java.tests.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/git-java/versions/53/git-java-sources.jar!/"/>
+          <root url="jar://C:/qub/qub/git-java/versions/53/git-java.test-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/github-java/versions/35/github-java.jar!/"/>
+          <root url="jar://C:/qub/qub/github-java/versions/35/github-java.tests.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/github-java/versions/35/github-java-sources.jar!/"/>
+          <root url="jar://C:/qub/qub/github-java/versions/35/github-java.test-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/http-java/versions/57/http-java.jar!/"/>
+          <root url="jar://C:/qub/qub/http-java/versions/57/http-java.tests.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/http-java/versions/57/http-java-sources.jar!/"/>
+          <root url="jar://C:/qub/qub/http-java/versions/57/http-java.test-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/intellij-java/versions/27/intellij-java.jar!/"/>
+          <root url="jar://C:/qub/qub/intellij-java/versions/27/intellij-java.tests.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/intellij-java/versions/27/intellij-java-sources.jar!/"/>
+          <root url="jar://C:/qub/qub/intellij-java/versions/27/intellij-java.test-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/xml-java/versions/41/xml-java.jar!/"/>
+          <root url="jar://C:/qub/qub/xml-java/versions/41/xml-java.tests.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/xml-java/versions/41/xml-java-sources.jar!/"/>
+          <root url="jar://C:/qub/qub/xml-java/versions/41/xml-java.test-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/vscode-java/versions/11/vscode-java.jar!/"/>
+          <root url="jar://C:/qub/qub/vscode-java/versions/11/vscode-java.tests.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/vscode-java/versions/11/vscode-java-sources.jar!/"/>
+          <root url="jar://C:/qub/qub/vscode-java/versions/11/vscode-java.test-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>

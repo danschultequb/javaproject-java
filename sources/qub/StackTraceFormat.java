@@ -28,7 +28,7 @@ public class StackTraceFormat
 
     /**
      * Ignore any {@link StackTraceElement}s that belong to the provided type.
-     * @param type The type that will be added to the ignore list.
+     * @param fullyQualifiedTypeName The type that will be added to the ignore list.
      * @return This object for method chaining.
      */
     public StackTraceFormat ignoreType(String fullyQualifiedTypeName)

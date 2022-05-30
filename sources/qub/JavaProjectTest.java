@@ -243,7 +243,7 @@ public interface JavaProjectTest
                         try (final LogStreams logStreamsAfterTests = CommandLineLogsAction.getLogStreamsFromLogFile(logFile, process.getOutputWriteStream(), verboseParameter.getVerboseCharacterToByteWriteStream().await()))
                         {
                             final CharacterToByteWriteStream output = logStreamsAfterTests.getOutput();
-                            
+
                             output.writeLine().await();
                             output.writeLine("Analyzing coverage...").await();
 
@@ -475,7 +475,7 @@ public interface JavaProjectTest
                     final BooleanValue wroteRunningTests = BooleanValue.create(false);
                     final IndentedCharacterWriteStream indentedOutput = IndentedCharacterWriteStream.create(output);
                     final List<TestParent> testParentsWrittenToConsole = List.create();
-                    
+
                     final Action0 ensureRunningTestsWritten = () ->
                     {
                         if (!wroteRunningTests.get())
@@ -488,11 +488,11 @@ public interface JavaProjectTest
 
                     final Action1<TestParent> ensureTestParentsWritten = (TestParent testParent) ->
                     {
-                        final Stack<TestParent> testParentsToWrite = Stack.create();
+                        final Stack2<TestParent> testParentsToWrite = Stack2.create();
                         TestParent currentTestParent = testParent;
                         while (currentTestParent != null && !testParentsWrittenToConsole.contains(currentTestParent))
                         {
-                            testParentsToWrite.push(currentTestParent);
+                            testParentsToWrite.push2(currentTestParent);
                             currentTestParent = currentTestParent.getParent();
                         }
 
@@ -707,7 +707,7 @@ public interface JavaProjectTest
         PreCondition.assertNotNull(format, "format");
 
         writeStream.increaseIndent();
-        JavaProjectTest.writeMessageLines(writeStream, failure);
+        writeStream.writeLine(failure.getErrorMessage()).await();
         JavaProjectTest.writeStackTrace(writeStream, failure, format);
         writeStream.decreaseIndent();
 
@@ -718,20 +718,6 @@ public interface JavaProjectTest
         }
     }
 
-    static void writeMessageLines(IndentedCharacterWriteStream writeStream, TestError failure)
-    {
-        PreCondition.assertNotNull(writeStream, "writeStream");
-        PreCondition.assertNotNull(failure, "failure");
-
-        for (final String messageLine : failure.getMessageLines())
-        {
-            if (messageLine != null)
-            {
-                writeStream.writeLine(messageLine).await();
-            }
-        }
-    }
-
     static void writeMessage(IndentedCharacterWriteStream writeStream, Throwable throwable)
     {
         PreCondition.assertNotNull(writeStream, "writeStream");
@@ -739,7 +725,7 @@ public interface JavaProjectTest
 
         if (throwable instanceof TestError)
         {
-            JavaProjectTest.writeMessageLines(writeStream, (TestError)throwable);
+            writeStream.writeLine(((TestError)throwable).getErrorMessage()).await();
         }
         else if (!Strings.isNullOrEmpty(throwable.getMessage()))
         {

@@ -833,7 +833,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Found 1 test class file to test.",
                             "VERBOSE: Running all tests...",
                             "VERBOSE: Updating test.json class file for ATests...",
-                            "VERBOSE: No static method with the signature java.lang.Object.test(qub.TestRunner) -> ? could be found.",
+                            "VERBOSE: Could not find a static method with the signature java.lang.Object.test(qub.TestRunner) -> ?.",
                             "No tests found.",
                             "VERBOSE: Updating test.json file..."),
                         fakeLogFile.getContentsAsString().await());

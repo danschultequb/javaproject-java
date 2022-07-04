@@ -72,7 +72,6 @@ public class Javac extends ChildProcessRunnerWrapper<Javac,JavacParameters>
                     parameters.redirectErrorTo(CharacterToByteWriteStreamList.create(errorStream, LinePrefixCharacterToByteWriteStream.create(lockedVerboseStream).setLinePrefix("ERROR: ")));
                 }
             }).await());
-
             errorStream.endOfStream();
 
             final Iterator<String> errorLines = Strings.iterateLines(CharacterReadStream.iterate(errorStream)).start();

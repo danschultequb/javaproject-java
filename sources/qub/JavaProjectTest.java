@@ -65,6 +65,7 @@ public interface JavaProjectTest
         PreCondition.assertNotNull(parameters, "parameters");
 
         return parameters.addBoolean(JavaProjectTest.openCoverageReportParameterName, false)
+            .setAliases("ocr")
             .setDescription("Whether to automatically open the HTML coverage report after the tests complete.");
     }
 

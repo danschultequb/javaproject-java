@@ -65,14 +65,14 @@ public interface JavaProjectTestTests
                         Iterable.create(
                             "Usage: qub-javaproject test [[--projectFolder=]<projectFolder-value>] [--pattern=<test-name-pattern>] [--coverage[=<None|Sources|Tests|All>]] [--testjson] [--openCoverageReport] [--help] [--verbose] [--profiler]",
                             "  Run the tests of a Java source code project.",
-                            "  --projectFolder:      The folder that contains a Java project to test. Defaults to the current folder.",
-                            "  --pattern:            The pattern to match against tests to determine if they will be run.",
-                            "  --coverage(c):        Whether code coverage information will be collected while running tests.",
-                            "  --testjson:           Whether to use a test.json file to cache test results in.",
-                            "  --openCoverageReport: Whether to automatically open the HTML coverage report after the tests complete.",
-                            "  --help(?):            Show the help message for this application.",
-                            "  --verbose(v):         Whether or not to show verbose logs.",
-                            "  --profiler:           Whether or not this application should pause before it is run to allow a profiler to be attached."),
+                            "  --projectFolder:           The folder that contains a Java project to test. Defaults to the current folder.",
+                            "  --pattern:                 The pattern to match against tests to determine if they will be run.",
+                            "  --coverage(c):             Whether code coverage information will be collected while running tests.",
+                            "  --testjson:                Whether to use a test.json file to cache test results in.",
+                            "  --openCoverageReport(ocr): Whether to automatically open the HTML coverage report after the tests complete.",
+                            "  --help(?):                 Show the help message for this application.",
+                            "  --verbose(v):              Whether or not to show verbose logs.",
+                            "  --profiler:                Whether or not this application should pause before it is run to allow a profiler to be attached."),
                         process.getOutputWriteStream());
                     test.assertLinesEqual(
                         Iterable.create(),
@@ -1114,7 +1114,7 @@ public interface JavaProjectTestTests
                                     runner.testGroup("Skipped test group with no message", runner.skip(), () ->
                                     {
                                     });
-                                    
+
                                     runner.testGroup("Skipped test group with message", runner.skip("Why the test group should be skipped"), () ->
                                     {
                                     });
@@ -1390,11 +1390,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -1402,7 +1402,7 @@ public interface JavaProjectTestTests
                     final File aTestsClassFile = outputsTestsFolder.getFile("ATests.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     final File testJsonFile = outputsFolder.getFile("test.json").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner
@@ -1528,6 +1528,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -1590,11 +1591,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -1605,7 +1606,7 @@ public interface JavaProjectTestTests
                     final Folder coverageFolder = outputsFolder.getFolder("coverage").await();
                     final File indexHtmlFile = coverageFolder.getFile("index.html").await();
                     final File coverageXmlFile = outputsFolder.getFile("coverage.xml").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -1743,6 +1744,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -1810,11 +1812,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -1822,7 +1824,7 @@ public interface JavaProjectTestTests
                     final File aTestsClassFile = outputsTestsFolder.getFile("ATests.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     final File testJsonFile = outputsFolder.getFile("test.json").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -1948,6 +1950,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -2009,11 +2012,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -2024,7 +2027,7 @@ public interface JavaProjectTestTests
                     final Folder coverageFolder = outputsFolder.getFolder("coverage").await();
                     final File indexHtmlFile = coverageFolder.getFile("index.html").await();
                     final File coverageXmlFile = outputsFolder.getFile("coverage.xml").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -2162,6 +2165,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -2230,11 +2234,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -2245,7 +2249,7 @@ public interface JavaProjectTestTests
                     final Folder coverageFolder = outputsFolder.getFolder("coverage").await();
                     final File indexHtmlFile = coverageFolder.getFile("index.html").await();
                     final File coverageXmlFile = outputsFolder.getFile("coverage.xml").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -2383,6 +2387,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -2451,11 +2456,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -2466,7 +2471,7 @@ public interface JavaProjectTestTests
                     final Folder coverageFolder = outputsFolder.getFolder("coverage").await();
                     final File indexHtmlFile = coverageFolder.getFile("index.html").await();
                     final File coverageXmlFile = outputsFolder.getFile("coverage.xml").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -2604,6 +2609,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -2672,11 +2678,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -2687,7 +2693,7 @@ public interface JavaProjectTestTests
                     final Folder coverageFolder = outputsFolder.getFolder("coverage").await();
                     final File indexHtmlFile = coverageFolder.getFile("index.html").await();
                     final File coverageXmlFile = outputsFolder.getFile("coverage.xml").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -2830,6 +2836,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -2897,11 +2904,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -2909,7 +2916,7 @@ public interface JavaProjectTestTests
                     final File aTestsClassFile = outputsTestsFolder.getFile("ATests.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     final File testJsonFile = outputsFolder.getFile("test.json").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -3035,6 +3042,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -3095,11 +3103,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -3107,7 +3115,7 @@ public interface JavaProjectTestTests
                     final File aTestsClassFile = outputsTestsFolder.getFile("ATests.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
                     final File testJsonFile = outputsFolder.getFile("test.json").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -3233,6 +3241,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -3293,18 +3302,18 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
                     final Folder outputsTestsFolder = outputsFolder.getFolder(testsFolder.getName()).await();
                     final File aTestsClassFile = outputsTestsFolder.getFile("ATests.class").await();
                     final File buildJsonFile = outputsFolder.getFile("build.json").await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(
@@ -3418,6 +3427,7 @@ public interface JavaProjectTestTests
                             "VERBOSE: Discovering unmodified .java file issues...",
                             "Compiling 1 source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
                             "Compiling 1 test source file...",
                             "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
                             "VERBOSE: Adding compilation issues to new build.json...",
@@ -3475,11 +3485,11 @@ public interface JavaProjectTestTests
                     final Folder sourcesFolder = projectFolder.createFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source code").await();
-                    
+
                     final Folder testsFolder = projectFolder.createFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source code, depends on A").await();
-                    
+
                     final Folder outputsFolder = projectFolder.getFolder("outputs").await();
                     final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
                     final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
@@ -3519,7 +3529,7 @@ public interface JavaProjectTestTests
                                     .setFailedTestCount(0)))
                             .toString(JSONFormat.pretty))
                         .await();
-                    
+
                     final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
                     JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
                     childProcessRunner.add(

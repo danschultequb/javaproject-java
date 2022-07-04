@@ -410,6 +410,33 @@ public interface JavaProjectBuild
                                         }).await();
 
                                         process.setExitCode(javacResult.getExitCode());
+
+                                        verboseStream.writeLine("Adding compilation issues to new build.json...").await();
+                                        final MutableMap<Path, List<JavacIssue>> sourceFilePathToIssueMap = Map.create();
+                                        for (final JavacIssue issue : javacResult.getIssues())
+                                        {
+                                            if (Comparer.equalIgnoreCase("warning", issue.getType()))
+                                            {
+                                                newWarnings.add(issue);
+                                            }
+                                            else if (Comparer.equalIgnoreCase("error", issue.getType()))
+                                            {
+                                                newErrors.add(issue);
+                                            }
+                                            else
+                                            {
+                                                newUnrecognizedIssues.add(issue);
+                                            }
+
+                                            sourceFilePathToIssueMap.getOrSet(issue.getSourceFilePath(), List::create).await()
+                                                .add(issue);
+                                        }
+
+                                        for (final MapEntry<Path, List<JavacIssue>> entry : sourceFilePathToIssueMap)
+                                        {
+                                            newBuildJson.getJavaFile(entry.getKey()).await()
+                                                .setIssues(entry.getValue());
+                                        }
                                     }
 
                                     if (process.getExitCode() == 0)
@@ -454,36 +481,33 @@ public interface JavaProjectBuild
                                             }).await();
 
                                             process.setExitCode(javacResult.getExitCode());
-                                        }
-                                    }
 
-                                    if (javacResult != null)
-                                    {
-                                        verboseStream.writeLine("Adding compilation issues to new build.json...").await();
-                                        final MutableMap<Path, List<JavacIssue>> sourceFilePathToIssueMap = Map.create();
-                                        for (final JavacIssue issue : javacResult.getIssues())
-                                        {
-                                            if (Comparer.equalIgnoreCase("warning", issue.getType()))
+                                            verboseStream.writeLine("Adding compilation issues to new build.json...").await();
+                                            final MutableMap<Path, List<JavacIssue>> sourceFilePathToIssueMap = Map.create();
+                                            for (final JavacIssue issue : javacResult.getIssues())
                                             {
-                                                newWarnings.add(issue);
-                                            }
-                                            else if (Comparer.equalIgnoreCase("error", issue.getType()))
-                                            {
-                                                newErrors.add(issue);
-                                            }
-                                            else
-                                            {
-                                                newUnrecognizedIssues.add(issue);
+                                                if (Comparer.equalIgnoreCase("warning", issue.getType()))
+                                                {
+                                                    newWarnings.add(issue);
+                                                }
+                                                else if (Comparer.equalIgnoreCase("error", issue.getType()))
+                                                {
+                                                    newErrors.add(issue);
+                                                }
+                                                else
+                                                {
+                                                    newUnrecognizedIssues.add(issue);
+                                                }
+
+                                                sourceFilePathToIssueMap.getOrSet(issue.getSourceFilePath(), List::create).await()
+                                                    .add(issue);
                                             }
 
-                                            sourceFilePathToIssueMap.getOrSet(issue.getSourceFilePath(), List::create).await()
-                                                .add(issue);
-                                        }
-
-                                        for (final MapEntry<Path, List<JavacIssue>> entry : sourceFilePathToIssueMap)
-                                        {
-                                            newBuildJson.getJavaFile(entry.getKey()).await()
-                                                .setIssues(entry.getValue());
+                                            for (final MapEntry<Path, List<JavacIssue>> entry : sourceFilePathToIssueMap)
+                                            {
+                                                newBuildJson.getJavaFile(entry.getKey()).await()
+                                                    .setIssues(entry.getValue());
+                                            }
                                         }
                                     }
 

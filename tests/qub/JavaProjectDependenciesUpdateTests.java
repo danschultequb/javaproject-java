@@ -332,6 +332,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -341,10 +342,15 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with no dependencies and Intellij module file with no dependencies",
@@ -403,6 +409,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -412,10 +419,16 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found.",
+                            "Updating IntelliJ module files..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with no dependencies and Intellij module file with a Qub dependency",
@@ -482,6 +495,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -491,10 +505,18 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found.",
+                            "Updating IntelliJ module files...",
+                            "VERBOSE: Found module with classesUrl: \"jar:///qub/a/b/versions/20/b.jar\"",
+                            "  a/b@20 - Removed"),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with no dependencies and Intellij module file with a non-Qub dependency",
@@ -504,7 +526,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final CommandLineAction action = JavaProjectDependenciesUpdateTests.createCommandLineAction(process);
 
                     final QubFolder qubFolder = process.getQubFolder().await();
-                    
+
                     final FileSystem fileSystem = process.getFileSystem();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final File projectJsonFile = projectFolder.getFile("project.json").await();
@@ -565,6 +587,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -574,10 +597,17 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found.",
+                            "Updating IntelliJ module files...",
+                            "VERBOSE: Found module with classesUrl: null"),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with one Qub dependency and Intellij module file with no dependencies",
@@ -656,6 +686,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -670,10 +701,18 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "Found 1 dependencies:",
+                            "  a/b@20 - No updates",
+                            "Updating IntelliJ module files...",
+                            "  a/b@20 - Added"),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with no dependencies and VS Code settings.json file",
@@ -730,6 +769,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -739,10 +779,16 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found.",
+                            "Updating .vscode/settings.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with one dependency that doesn't exist and VS Code settings.json file",
@@ -802,6 +848,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -811,10 +858,17 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "Found 1 dependencies:",
+                            "  a/b@3 - Not Found",
+                            "Updating .vscode/settings.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with one dependency that doesn't exist and VS Code settings.json file with same non-existing dependency",
@@ -877,6 +931,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -886,10 +941,17 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "Found 1 dependencies:",
+                            "  a/b@3 - Not Found",
+                            "Updating .vscode/settings.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with one dependency with no tests jar and VS Code settings.json file with no dependencies",
@@ -955,6 +1017,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -969,10 +1032,17 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "Found 1 dependencies:",
+                            "  a/b@3 - No updates",
+                            "Updating .vscode/settings.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with one dependency with tests jar and VS Code settings.json file with no dependencies",
@@ -1041,6 +1111,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -1056,10 +1127,17 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "Found 1 dependencies:",
+                            "  a/b@3 - No updates",
+                            "Updating .vscode/settings.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with newer dependency available",
@@ -1131,6 +1209,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -1147,10 +1226,17 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "Found 1 dependencies:",
+                            "  a/b@3 - Updated to a/b@4",
+                            "Updating .vscode/settings.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with newer dependency available and messed up settings.json file",
@@ -1226,6 +1312,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -1242,10 +1329,17 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "Found 1 dependencies:",
+                            "  a/b@3 - Updated to a/b@4",
+                            "Updating .vscode/settings.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with no dependencies, no test files, and VS Code launch.json file",
@@ -1301,6 +1395,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -1310,10 +1405,16 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found.",
+                            "Updating .vscode/launch.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
 
                 runner.test("with no dependencies, a test file, and VS Code launch.json file",
@@ -1339,7 +1440,7 @@ public interface JavaProjectDependenciesUpdateTests
                         .await();
                     final Folder testsFolder = projectFolder.getFolder("tests").await();
                     final File aTestsJavaFile = testsFolder.createFile("ATests.java").await();
-                    
+
                     JavaProjectDependenciesUpdate.run(process, action);
 
                     test.assertLinesEqual(
@@ -1382,6 +1483,7 @@ public interface JavaProjectDependenciesUpdateTests
                     final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
                     final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
                     final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeProjectLogFile = fakeProjectLogsFolder.getFile("1.log").await();
                     final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
                     final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
                     test.assertEqual(
@@ -1391,10 +1493,16 @@ public interface JavaProjectDependenciesUpdateTests
                             fakeProjectDataFolder,
                             fakeProjectVersionsFolder,
                             fakeProjectLogsFolder,
-                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectLogFile,
                             fakeProjectVersionFolder,
                             fakeProjectVersionFolder.getCompiledSourcesJarFile().await()),
                         qubFolder.iterateEntriesRecursively().toList());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Getting dependencies for /project/folder/...",
+                            "No dependencies found.",
+                            "Updating .vscode/launch.json..."),
+                        fakeProjectLogFile.getContentsAsString().await());
                 });
             });
         });

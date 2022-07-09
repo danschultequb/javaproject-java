@@ -36,6 +36,14 @@ public class JavaClassFile extends File
         return this.lastModifiedResult;
     }
 
+    /**
+     * Get whether this {@link JavaClassFile} is for an anonymous Java type/class.
+     */
+    public boolean isAnonymous()
+    {
+        return this.getName().contains("$");
+    }
+
     public static String getFullTypeName(Path relativeFilePath)
     {
         PreCondition.assertNotNull(relativeFilePath, "relativeFilePath");

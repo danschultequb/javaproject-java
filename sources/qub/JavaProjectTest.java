@@ -371,7 +371,7 @@ public interface JavaProjectTest
 
             final Iterable<JavaClassFile> testClassFiles = projectFolder.iterateTestClassFiles()
                 // Ignore anonymous type class files
-                .where((JavaClassFile testClassFile) -> !testClassFile.getName().contains("$"))
+                .where((JavaClassFile testClassFile) -> !testClassFile.isAnonymous())
                 .toList();
             final int testClassFilesCount = testClassFiles.getCount();
             verbose.writeLine("Found " + testClassFilesCount + " test class file" + (testClassFilesCount == 1 ? "" : "s") + " to test.").await();

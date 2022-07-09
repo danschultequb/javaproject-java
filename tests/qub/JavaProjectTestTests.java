@@ -1368,6 +1368,213 @@ public interface JavaProjectTestTests
                         qubFolder.iterateEntriesRecursively().toList());
                 });
 
+                runner.test("with one source file that has tests and one test file that has tests",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/")),
+                    (Test test, FakeDesktopProcess process) ->
+                {
+                    final CommandLineAction action = JavaProjectTests.createAction(process);
+                    final QubFolder qubFolder = process.getQubFolder().await();
+                    final JDKFolder jdkFolder = JavaProjectTests.getJdkFolder(qubFolder);
+                    final File javacFile = jdkFolder.getJavacFile().await();
+                    final File javaFile = jdkFolder.getJavaFile().await();
+
+                    final Clock clock = process.getClock();
+                    final DateTime startTime = clock.getCurrentDateTime();
+
+                    final FileSystem fileSystem = process.getFileSystem();
+                    final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
+                    final JavaProjectJSON projectJson = JavaProjectJSON.create();
+                    final File projectJsonFile = projectFolder.getFile("project.json").await();
+                    projectJsonFile.setContentsAsString(projectJson.toString()).await();
+                    final Folder sourcesFolder = projectFolder.createFolder("sources").await();
+                    final File aJavaFile = sourcesFolder.getFile("A.java").await();
+                    aJavaFile.setContentsAsString("A.java source code").await();
+                    final Folder testsFolder = projectFolder.createFolder("tests").await();
+                    final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
+                    aTestsJavaFile.setContentsAsString("ATests.java source code").await();
+                    final Folder outputsFolder = projectFolder.getFolder("outputs").await();
+                    final Folder outputsSourcesFolder = outputsFolder.getFolder(sourcesFolder.getName()).await();
+                    final File aClassFile = outputsSourcesFolder.getFile("A.class").await();
+                    final Folder outputsTestsFolder = outputsFolder.getFolder(testsFolder.getName()).await();
+                    final File aTestsClassFile = outputsTestsFolder.getFile("ATests.class").await();
+                    final File buildJsonFile = outputsFolder.getFile("build.json").await();
+                    final File testJsonFile = outputsFolder.getFile("test.json").await();
+
+                    final FakeChildProcessRunner childProcessRunner = process.getChildProcessRunner();
+                    JavaProjectTests.addJavacVersionFakeChildProcessRun(childProcessRunner, javacFile);
+                    childProcessRunner.add(
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/sources/", "--class-path", "/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "sources/A.java")
+                            .setAction(() ->
+                            {
+                                aClassFile.setContentsAsString("A.java byte code").await();
+                            }));
+                    childProcessRunner.add(
+                        FakeChildProcessRun.create(javacFile, "-d", "/project/folder/outputs/tests/", "--class-path", "/project/folder/outputs/tests/;/project/folder/outputs/sources/", "-Xlint:all,-try,-overrides,-varargs,-serial,-overloads", "tests/ATests.java")
+                            .setAction(() ->
+                            {
+                                aTestsClassFile.setContentsAsString("ATests.java byte code").await();
+                            }));
+                    childProcessRunner.add(
+                        FakeChildProcessRun.create(javaFile, "-classpath", "/project/folder/outputs/sources/;/project/folder/outputs/tests/", "qub.JavaProjectTest", "--verbose=false", "--testjson=true", "--logfile=/qub/fake-publisher/fake-project/data/logs/1.log", "--projectFolder=/project/folder/", "--coverage=None", "--profiler=false")
+                            .setAction(JavaProjectTest::runTests));
+
+                    process.getTypeLoader()
+                        .addType("A", new Object()
+                        {
+                            public static void test(TestRunner runner)
+                            {
+                                runner.testGroup("A", () ->
+                                {
+                                    runner.test("B", (Test test) ->
+                                    {
+                                        test.assertTrue(1 < 2);
+                                    });
+                                });
+                            }
+                        }.getClass())
+                        .addType("ATests", new Object()
+                        {
+                            @SuppressWarnings("unused")
+                            public static void test(TestRunner runner)
+                            {
+                                runner.testGroup("ATests", () ->
+                                {
+                                    runner.test("C", (Test test) ->
+                                    {
+                                        test.assertTrue(true);
+                                    });
+                                });
+                            }
+                        }.getClass());
+
+                    JavaProjectTest.run(process, action);
+
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "Compiling 1 source file...",
+                            "Compiling 1 test source file...",
+                            "",
+                            "Running tests...",
+                            "ATests",
+                            "  ATests",
+                            "    C - Passed",
+                            "",
+                            "Tests Run:    1",
+                            "Tests Passed: 1"),
+                        process.getOutputWriteStream());
+                    test.assertLinesEqual(
+                        Iterable.create(),
+                        process.getErrorWriteStream());
+                    test.assertEqual(0, process.getExitCode());
+
+                    test.assertEqual(
+                        Iterable.create(
+                            outputsFolder,
+                            sourcesFolder,
+                            testsFolder,
+                            projectJsonFile,
+                            outputsSourcesFolder,
+                            outputsTestsFolder,
+                            buildJsonFile,
+                            testJsonFile,
+                            aClassFile,
+                            aTestsClassFile,
+                            aJavaFile,
+                            aTestsJavaFile),
+                        projectFolder.iterateEntriesRecursively().toList());
+                    test.assertEqual(
+                        BuildJSON.create()
+                            .setJavacVersion("17")
+                            .setProjectJson(JavaProjectJSON.create())
+                            .setJavaFiles(Iterable.create(
+                                BuildJSONJavaFile.create(aJavaFile.relativeTo(projectFolder))
+                                    .setLastModified(startTime)
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aClassFile.relativeTo(projectFolder), startTime))),
+                                BuildJSONJavaFile.create(aTestsJavaFile.relativeTo(projectFolder))
+                                    .setLastModified(startTime)
+                                    .setClassFiles(Iterable.create(
+                                        BuildJSONClassFile.create(aTestsClassFile.relativeTo(projectFolder), startTime)))))
+                            .toString(JSONFormat.pretty),
+                        buildJsonFile.getContentsAsString().await());
+                    test.assertEqual(
+                        TestJSON.create()
+                            .setJavaVersion("fake-java-version")
+                            .setClassFiles(Iterable.create(
+                                TestJSONClassFile.create("tests/ATests.class")
+                                    .setLastModified(DateTime.create(1970, 1, 1))
+                                    .setPassedTestCount(1)
+                                    .setSkippedTestCount(0)
+                                    .setFailedTestCount(0)))
+                            .toString(JSONFormat.pretty),
+                        testJsonFile.getContentsAsString().await());
+
+                    final QubPublisherFolder fakePublisherFolder = qubFolder.getPublisherFolder("fake-publisher").await();
+                    final QubProjectFolder fakeProjectFolder = fakePublisherFolder.getProjectFolder("fake-project").await();
+                    final Folder fakeProjectDataFolder = fakeProjectFolder.getProjectDataFolder().await();
+                    final Folder fakeProjectLogsFolder = fakeProjectDataFolder.getFolder("logs").await();
+                    final File fakeLogFile = fakeProjectLogsFolder.getFile("1.log").await();
+                    final Folder fakeProjectVersionsFolder = fakeProjectFolder.getProjectVersionsFolder().await();
+                    final JavaPublishedProjectFolder fakeProjectVersionFolder = JavaPublishedProjectFolder.get(fakeProjectFolder.getProjectVersionFolder("8").await());
+                    test.assertLinesEqual(
+                        Iterable.create(
+                            "VERBOSE: Parsing /project/folder/project.json...",
+                            "VERBOSE: Discovering dependencies...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: Checking if dependencies have changed since the previous build...",
+                            "VERBOSE:   Previous dependencies have not changed.",
+                            "VERBOSE: Checking if latest installed JDK has changed since the previous build...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac --version",
+                            "VERBOSE:   Installed JDK has changed.",
+                            "VERBOSE: Looking for .java files that have been deleted...",
+                            "VERBOSE: Looking for .java files to compile...",
+                            "VERBOSE: sources/A.java - New file",
+                            "VERBOSE: tests/ATests.java - New file",
+                            "VERBOSE: Update .java file dependencies...",
+                            "VERBOSE: Discovering unmodified .java files that have dependencies that are being compiled or were deleted...",
+                            "VERBOSE: Discovering unmodified .java files that have missing or modified .class files...",
+                            "VERBOSE: Discovering unmodified .java file issues...",
+                            "Compiling 1 source file...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/sources/ --class-path /project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads sources/A.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
+                            "Compiling 1 test source file...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/javac -d /project/folder/outputs/tests/ --class-path /project/folder/outputs/tests/;/project/folder/outputs/sources/ -Xlint:all,-try,-overrides,-varargs,-serial,-overloads tests/ATests.java",
+                            "VERBOSE: Adding compilation issues to new build.json...",
+                            "VERBOSE: Associating .class files with original .java files...",
+                            "VERBOSE: Updating outputs/build.json...",
+                            "VERBOSE: /qub/openjdk/jdk/versions/17/bin/java -classpath /project/folder/outputs/sources/;/project/folder/outputs/tests/ qub.JavaProjectTest --verbose=false --testjson=true --logfile=/qub/fake-publisher/fake-project/data/logs/1.log --projectFolder=/project/folder/ --coverage=None --profiler=false",
+                            "VERBOSE: Current Java version: fake-java-version",
+                            "VERBOSE: No test.json file found.",
+                            "VERBOSE: Found 1 test class file to test.",
+                            "VERBOSE: Running all tests...",
+                            "",
+                            "Running tests...",
+                            "ATests",
+                            "  ATests",
+                            "    C - Passed",
+                            "VERBOSE: Updating test.json class file for ATests...",
+                            "",
+                            "Tests Run:    1",
+                            "Tests Passed: 1",
+                            "VERBOSE: Updating test.json file..."),
+                        fakeLogFile.getContentsAsString().await());
+                    test.assertEqual(
+                        Iterable.create(
+                            fakePublisherFolder,
+                            jdkFolder.getPublisherFolder().await(),
+                            fakeProjectFolder,
+                            fakeProjectDataFolder,
+                            fakeProjectVersionsFolder,
+                            fakeProjectLogsFolder,
+                            fakeProjectLogsFolder.getFile("1.log").await(),
+                            fakeProjectVersionFolder,
+                            fakeProjectVersionFolder.getCompiledSourcesJarFile().await(),
+                            jdkFolder.getProjectFolder().await(),
+                            jdkFolder.getProjectVersionsFolder().await(),
+                            jdkFolder),
+                        qubFolder.iterateEntriesRecursively().toList());
+                });
+
                 runner.test("with one source file, one test file that has tests, and --coverage with no jacoco/jacococli published project",
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess("/project/folder/", "--coverage")),
                     (Test test, FakeDesktopProcess process) ->

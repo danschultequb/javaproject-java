@@ -143,6 +143,7 @@ public interface JavaProjectDependenciesUpdate
                                         for (final IntellijModuleLibrary moduleLibrary : currentModuleLibraries)
                                         {
                                             final String classesUrl = moduleLibrary.getClassesUrls().first();
+                                            verbose.writeLine("Found module with classesUrl: " + Strings.escapeAndQuote(classesUrl)).await();
                                             if (Strings.isNullOrEmpty(classesUrl) || !classesUrl.startsWith("jar://"))
                                             {
                                                 intellijModule.addModuleLibrary(moduleLibrary);
@@ -229,7 +230,7 @@ public interface JavaProjectDependenciesUpdate
                             .relativeTo(projectFolder);
                         final Path outputsTestsRelativePath = projectFolder.getOutputsTestsFolder().await()
                             .relativeTo(projectFolder);
-                        
+
                         final List<ProjectSignature> runConfigurationDependencies = List.create();
                         final QubProjectVersionFolder qubJavaProjectLatestVersionFolder = qubFolder.getLatestProjectVersionFolder("qub", "javaproject-java")
                             .catchError()
@@ -293,7 +294,7 @@ public interface JavaProjectDependenciesUpdate
                                     }
                                 }
                                 final String vmParametersString = vmParameters.toString(true);
-                                
+
                                 final List<IntellijWorkspaceRunConfiguration> runConfigurationsToRemove = List.create();
                                 for (final IntellijWorkspaceRunConfiguration runConfiguration : intellijWorkspace.getRunConfigurations())
                                 {
@@ -341,7 +342,7 @@ public interface JavaProjectDependenciesUpdate
                         if (vscodeSettingsJsonFile.exists().await())
                         {
                             output.writeLine("Updating " + vscodeSettingsJsonFile.relativeTo(vscodeWorkspaceFolder) + "...").await();
-                            
+
                             final VSCodeJavaSettingsJson vscodeSettingsJson = VSCodeJavaSettingsJson.parse(vscodeSettingsJsonFile).catchError().await();
                             if (vscodeSettingsJson != null)
                             {
@@ -444,7 +445,7 @@ public interface JavaProjectDependenciesUpdate
                                     configuration.setMainClass(Types.getFullTypeName(JavaProjectTest.class));
 
                                     configuration.setArgs(Strings.join(' ', Iterable.create(testJsonProgramParameter, "--pattern=" + JavaClassFile.getFullTypeName(testFileRelativePath))));
-                                    
+
                                     configurations.add(configuration);
                                 }
                                 launchJson.setConfigurations(configurations);

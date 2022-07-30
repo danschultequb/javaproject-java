@@ -6,7 +6,7 @@ public class StackTraceFormat
 
     private StackTraceFormat()
     {
-        this.fullyQualifiedTypeNamesToIgnore = Set2.create();
+        this.fullyQualifiedTypeNamesToIgnore = MutableSet.create();
     }
 
     public static StackTraceFormat create()

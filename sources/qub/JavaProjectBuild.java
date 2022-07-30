@@ -207,7 +207,7 @@ public interface JavaProjectBuild
                                     for (final BuildJSONJavaFile javaFileToCompile : javaFilesWithNewContent)
                                     {
                                         final Path javaFileRelativePath = javaFileToCompile.getRelativePath();
-                                        final Set2<String> javaFileWords;
+                                        final Set<String> javaFileWords;
                                         try (final ByteReadStream fileByteReadStream = projectFolder.getFileContentReadStream(javaFileRelativePath).await())
                                         {
                                             final BufferedByteReadStream bufferedFileByteReadStream = BufferedByteReadStream.create(fileByteReadStream);

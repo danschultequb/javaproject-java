@@ -176,7 +176,7 @@ public class BuildJSON extends JSONObjectWrapperBase
             final Iterable<BuildJSONJavaFile> javaFiles = this.getJavaFiles();
             if (!Iterable.isNullOrEmpty(javaFiles))
             {
-                result = javaFiles.first((BuildJSONJavaFile javaFile) -> javaFile.getRelativePath().equals(relativePath));
+                result = javaFiles.first((BuildJSONJavaFile javaFile) -> javaFile.getRelativePath().equals(relativePath)).catchError().await();
             }
             if (result == null)
             {

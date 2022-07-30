@@ -140,7 +140,7 @@ public class JavacParameters extends ChildProcessParametersDecorator<JavacParame
         if (xlintKeys.any())
         {
             argument.add(':');
-            argument.addAll(xlintKeys.first());
+            argument.addAll(xlintKeys.first().await());
             for (final String xlintKey : xlintKeys.skipFirst())
             {
                 argument.add(',');

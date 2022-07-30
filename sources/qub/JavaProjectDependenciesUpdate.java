@@ -142,7 +142,7 @@ public interface JavaProjectDependenciesUpdate
 
                                         for (final IntellijModuleLibrary moduleLibrary : currentModuleLibraries)
                                         {
-                                            final String classesUrl = moduleLibrary.getClassesUrls().first();
+                                            final String classesUrl = moduleLibrary.getClassesUrls().first().catchError().await();
                                             verbose.writeLine("Found module with classesUrl: " + Strings.escapeAndQuote(classesUrl)).await();
                                             if (Strings.isNullOrEmpty(classesUrl) || !classesUrl.startsWith("jar://"))
                                             {

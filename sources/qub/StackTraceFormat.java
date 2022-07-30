@@ -2,11 +2,11 @@ package qub;
 
 public class StackTraceFormat
 {
-    private final Set<String> fullyQualifiedTypeNamesToIgnore;
+    private final MutableSet<String> fullyQualifiedTypeNamesToIgnore;
 
     private StackTraceFormat()
     {
-        this.fullyQualifiedTypeNamesToIgnore = Set.create();
+        this.fullyQualifiedTypeNamesToIgnore = Set2.create();
     }
 
     public static StackTraceFormat create()

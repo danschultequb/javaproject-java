@@ -142,9 +142,9 @@ public interface JavaProjectPublish
                                         final Iterable<ProjectSignature> dependencies = publishedProjectJson.getDependencies();
                                         if (!Iterable.isNullOrEmpty(dependencies))
                                         {
-                                            final ProjectSignature dependency = dependencies.first((ProjectSignature d) ->
-                                                Comparer.equal(d.getPublisher(), publisher) &&
-                                                    Comparer.equal(d.getProject(), project));
+                                            final ProjectSignature dependency = dependencies.first((ProjectSignature d) -> d.equalsIgnoreVersion(publisher, project))
+                                                .catchError()
+                                                .await();
                                             if (dependency != null)
                                             {
                                                 final ProjectSignature publishedProjectSignature = ProjectSignature.create(
